@@ -154,14 +154,18 @@
 		<script>
 			const gallery = document.getElementById("thumbnails");
 
-			function buildGroup(dataArray, folder, categoryClass) {
+function buildGroup(dataArray, folder, categoryClass) {
 				if (!dataArray || dataArray.length === 0) return "";
 				let html = "";
 				dataArray.forEach(img => {
-					// 🚀 THE MAGIC: If it has a YouTube ID, it builds a Video Player Trigger. If not, it builds a standard Photo.
+					// 🚀 THE MAGIC: If it has a YouTube ID, it builds the decoy and the Video Player
 					if (img.youtubeId && img.youtubeId !== "") {
 						html += `
 						<article class="portfolio-item ${categoryClass}" style="display: none;">
+							<a class="thumbnail" href="images/${folder}/fulls/${img.file}" style="display: none;">
+								<img src="images/${folder}/thumbs/${img.file}" alt="" />
+							</a>
+							
 							<a class="video-trigger" onclick="openVideo('${img.youtubeId}')">
 								<img src="images/${folder}/thumbs/${img.file}" alt="" loading="lazy" />
 								<div class="play-button">▶</div>
@@ -169,6 +173,7 @@
 							<h2></h2><p></p>
 						</article>`;
 					} else {
+						// Standard Photo
 						html += `
 						<article class="portfolio-item ${categoryClass}" style="display: none;">
 							<a class="thumbnail" href="images/${folder}/fulls/${img.file}">
@@ -192,7 +197,7 @@
 				buildGroup((typeof videoTheatreImages !== 'undefined' ? videoTheatreImages : null), 'video-theatre', 'tab-video-theatre') +
 				buildGroup((typeof webDesignImages !== 'undefined' ? webDesignImages : null), 'web-design', 'tab-web-design') +
 				buildGroup((typeof brandingImages !== 'undefined' ? brandingImages : null), 'branding', 'tab-branding');
-				
+
 			document.querySelectorAll('.tab-real-estate').forEach(item => item.style.display = 'block');
 
 			// ENGINE: Category Switching
