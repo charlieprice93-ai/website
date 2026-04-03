@@ -38,14 +38,13 @@
 
 		</div>
 
-		
+		<script src="data.js"></script>
 		<script>
 			const gallery = document.getElementById("thumbnails");
 			let galleryHTML = "";
 
 			if (typeof videoImages !== 'undefined' && gallery) {
-				
-		realEstateImages.forEach(img => {
+				videoImages.forEach(img => {
 					galleryHTML += `
 					<article>
 						<a class="thumbnail" href="images/video/fulls/${img.file}">
@@ -59,11 +58,10 @@
 				gallery.innerHTML = galleryHTML;
 			}
 		</script>
+
 		<script src="assets/js/jquery.min.js"></script>
 		<script src="assets/js/browser.min.js"></script>
 		<script src="assets/js/breakpoints.min.js"></script>
 		<script src="assets/js/main.js"></script>
-		
-			<script src="data.js"></script>
 	</body>
 </html>

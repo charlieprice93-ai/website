@@ -36,16 +36,15 @@
 				</ul>
 			</footer>
 
-		</div>
+	</div>
 
-		
+		<script src="data.js"></script>
 		<script>
 			const gallery = document.getElementById("thumbnails");
 			let galleryHTML = "";
 
 			if (typeof travelImages !== 'undefined' && gallery) {
-				
-realEstateImages.forEach(img => {
+				travelImages.forEach(img => {
 					galleryHTML += `
 					<article>
 						<a class="thumbnail" href="images/travel/fulls/${img.file}">
@@ -59,11 +58,10 @@ realEstateImages.forEach(img => {
 				gallery.innerHTML = galleryHTML;
 			}
 		</script>
+
 		<script src="assets/js/jquery.min.js"></script>
 		<script src="assets/js/browser.min.js"></script>
 		<script src="assets/js/breakpoints.min.js"></script>
 		<script src="assets/js/main.js"></script>
-		
-				<script src="data.js"></script>
 	</body>
 </html>
