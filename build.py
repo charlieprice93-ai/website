@@ -47,7 +47,6 @@ for folder in FOLDERS:
             
         title, ext = os.path.splitext(filename)
         
-        # --- THE FIX: Stop the "web_web_" mutation ---
         clean_title = title[4:] if title.startswith("web_") else title
         
         youtube_id = ""
@@ -55,7 +54,8 @@ for folder in FOLDERS:
         if yt_match:
             youtube_id = yt_match.group(1)
             
-        safe_title = re.sub(r'[^A-Za-z0-9]', '_', clean_title)
+        # THE FIX: Allow brackets [] and dashes - to survive the web-safe renaming!
+        safe_title = re.sub(r'[^A-Za-z0-9\[\]\-_]', '_', clean_title)
         new_filename = f"web_{safe_title}.jpg"
         
         orig_path = os.path.join(fulls_dir, filename)

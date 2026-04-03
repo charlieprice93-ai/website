@@ -67,28 +67,29 @@ const theatreImages = [
 ];
 
 const videoTravelImages = [
-  { file: "web_Wightlink_Summer__o3sHpt3QEKU_.jpg", title: "Wightlink_Summer__o3sHpt3QEKU_", youtubeId: "" },
-  { file: "web_Isle_of_Wight_NHS_Recruitment__AnrCy8_xAEs_.jpg", title: "Isle_of_Wight_NHS_Recruitment__AnrCy8_xAEs_", youtubeId: "" },
-  { file: "web_Wightlink_Ship_Launch__1u0SryIxWFo_.jpg", title: "Wightlink_Ship_Launch__1u0SryIxWFo_", youtubeId: "" },
+  { file: "web_Wightlink_Ship_Launch_[1u0SryIxWFo].jpg", title: "Wightlink Ship Launch [1u0SryIxWFo]", youtubeId: "1u0SryIxWFo" },
+  { file: "web_Isle_of_Wight_NHS_Recruitment_[AnrCy8-xAEs].jpg", title: "Isle of Wight NHS Recruitment [AnrCy8-xAEs]", youtubeId: "AnrCy8-xAEs" },
+  { file: "web_Wightlink_Summer_[o3sHpt3QEKU].jpg", title: "Wightlink Summer [o3sHpt3QEKU]", youtubeId: "o3sHpt3QEKU" },
 ];
 
 const videoMusicImages = [
-  { file: "web_Ulysess_Wells__Sexy_Beautiful_People__gOYoloG8FE0_.jpg", title: "Ulysess_Wells__Sexy_Beautiful_People__gOYoloG8FE0_", youtubeId: "" },
-  { file: "web_Ulysess_Wells__Miles_Away__0l91G80ADbs_.jpg", title: "Ulysess_Wells__Miles_Away__0l91G80ADbs_", youtubeId: "" },
-  { file: "web_Ulysess_Wells__Mend_a_Man__AZ20qykULMU_.jpg", title: "Ulysess_Wells__Mend_a_Man__AZ20qykULMU_", youtubeId: "" },
-  { file: "web_Ulysess_Wells__You_Wanted_It_Over__BXnJ5hQBvxM_.jpg", title: "Ulysess_Wells__You_Wanted_It_Over__BXnJ5hQBvxM_", youtubeId: "" },
-  { file: "web_Ulysess_Wells__Blame__hWBesC77UUc_.jpg", title: "Ulysess_Wells__Blame__hWBesC77UUc_", youtubeId: "" },
-  { file: "web_Ulysess_Wells__Leander_Live__XY8tgTsi0CY_.jpg", title: "Ulysess_Wells__Leander_Live__XY8tgTsi0CY_", youtubeId: "" },
+  { file: "web_Ulysess_Wells__Leander_Live_[XY8tgTsi0CY].jpg", title: "Ulysess Wells  Leander Live [XY8tgTsi0CY]", youtubeId: "XY8tgTsi0CY" },
+  { file: "web_Ulysess_Wells__Miles_Away_[0l91G80ADbs].jpg", title: "Ulysess Wells  Miles Away [0l91G80ADbs]", youtubeId: "0l91G80ADbs" },
+  { file: "web_Ulysess_Wells__Blame_[hWBesC77UUc].jpg", title: "Ulysess Wells  Blame [hWBesC77UUc]", youtubeId: "hWBesC77UUc" },
+  { file: "web_Ulysess_Wells__Mend_a_Man_[AZ20qykULMU].jpg", title: "Ulysess Wells  Mend a Man [AZ20qykULMU]", youtubeId: "AZ20qykULMU" },
+  { file: "web_Ulysess_Wells__Sexy_Beautiful_People_[gOYoloG8FE0].jpg", title: "Ulysess Wells  Sexy Beautiful People [gOYoloG8FE0]", youtubeId: "gOYoloG8FE0" },
+  { file: "web_Ulysess_Wells__You_Wanted_It_Over_[BXnJ5hQBvxM].jpg", title: "Ulysess Wells  You Wanted It Over [BXnJ5hQBvxM]", youtubeId: "BXnJ5hQBvxM" },
 ];
 
 const videoShortsImages = [
-  { file: "web_Cliffedge__gLqr11IlPl8_.jpg", title: "Cliffedge__gLqr11IlPl8_", youtubeId: "" },
+  { file: "web_Cliffedge_[gLqr11IlPl8].jpg", title: "Cliffedge [gLqr11IlPl8]", youtubeId: "gLqr11IlPl8" },
+  { file: "web_Open_Water_[8vUtS2Y6cO4].jpg", title: "Open Water [8vUtS2Y6cO4]", youtubeId: "8vUtS2Y6cO4" },
 ];
 
 const videoTheatreImages = [
-  { file: "web_Joel_Morris_Recital__0iW1bZAvH48_.jpg", title: "Joel_Morris_Recital__0iW1bZAvH48_", youtubeId: "" },
-  { file: "web_Promotion_for_the_Freshwater_5_tour__5W_z8EhCpf8_.jpg", title: "Promotion_for_the_Freshwater_5_tour__5W_z8EhCpf8_", youtubeId: "" },
-  { file: "web_Promotion_for_Damien_Nettles_RD__zEPv_VO_0B4_.jpg", title: "Promotion_for_Damien_Nettles_RD__zEPv_VO_0B4_", youtubeId: "" },
+  { file: "web_Promotion_for_the_Freshwater_5_tour_[5W_z8EhCpf8].jpg", title: "Promotion for the Freshwater 5 tour [5W_z8EhCpf8]", youtubeId: "5W_z8EhCpf8" },
+  { file: "web_Joel_Morris_Recital_[0iW1bZAvH48].jpg", title: "Joel Morris Recital [0iW1bZAvH48]", youtubeId: "0iW1bZAvH48" },
+  { file: "web_Promotion_for_Damien_Nettles_RD_[zEPv-VO-0B4].jpg", title: "Promotion for Damien Nettles RD [zEPv-VO-0B4]", youtubeId: "zEPv-VO-0B4" },
 ];
 
 const webDesignImages = [
