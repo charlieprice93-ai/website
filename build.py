@@ -28,6 +28,18 @@ for folder in FOLDERS:
     if not os.path.exists(fulls_dir):
         os.makedirs(fulls_dir, exist_ok=True)
         
+    # --- NEW: CLEANUP ORPHANED THUMBNAILS ---
+    for thumb_file in os.listdir(thumbs_dir):
+        if thumb_file.startswith('.') or not os.path.isfile(os.path.join(thumbs_dir, thumb_file)):
+            continue
+        
+        # If a thumbnail exists but the full image is missing, delete the thumbnail
+        full_equivalent = os.path.join(fulls_dir, thumb_file)
+        if not os.path.exists(full_equivalent):
+            print(f"🗑️ Removing orphaned thumbnail: {thumb_file}")
+            os.remove(os.path.join(thumbs_dir, thumb_file))
+    # ----------------------------------------
+        
     images_data = []
     
     # 1. OPTIMIZE AND GATHER DATA

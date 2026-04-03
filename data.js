@@ -1,7 +1,7 @@
 // AUTO-GENERATED FILE. DO NOT EDIT MANUALLY.
 
 const realEstateImages = [
-  { file: "DSC03192.jpg", title: "DSC03192", desc: "" },
+  { file: "DSC04383 1EXPORT.jpg", title: "DSC04383 1EXPORT", desc: "" },
   { file: "DSC06646.jpg", title: "DSC06646", desc: "" },
   { file: "03.jpg", title: "03", desc: "" },
   { file: "01.jpg", title: "01", desc: "" },
@@ -12,20 +12,19 @@ const realEstateImages = [
   { file: "DSC00567.jpg", title: "DSC00567", desc: "" },
   { file: "DSC08576 EXPORT 25mb.jpg", title: "DSC08576 EXPORT 25mb", desc: "" },
   { file: "DSC03156.jpg", title: "DSC03156", desc: "" },
-  { file: "DSC04383 1EXPORT.jpg", title: "DSC04383 1EXPORT", desc: "" },
-  { file: "02.jpg", title: "02", desc: "" },
   { file: "DSC06396.jpg", title: "DSC06396", desc: "" },
-  { file: "DSC06446.jpg", title: "DSC06446", desc: "" },
+  { file: "02.jpg", title: "02", desc: "" },
+  { file: "DSC06534.jpg", title: "DSC06534", desc: "" },
+  { file: "DSC04276.jpg", title: "DSC04276", desc: "" },
   { file: "DSC06553.jpg", title: "DSC06553", desc: "" },
   { file: "DSC02987.jpg", title: "DSC02987", desc: "" },
   { file: "DSC06547.jpg", title: "DSC06547", desc: "" },
-  { file: "DSC06648.jpg", title: "DSC06648", desc: "" },
-  { file: "DSC06534.jpg", title: "DSC06534", desc: "" },
-  { file: "DSC04276.jpg", title: "DSC04276", desc: "" },
+  { file: "DSC06446.jpg", title: "DSC06446", desc: "" },
   { file: "DSC06525.jpg", title: "DSC06525", desc: "" },
-  { file: "DSC06527.jpg", title: "DSC06527", desc: "" },
-  { file: "DSC00607.jpg", title: "DSC00607", desc: "" },
+  { file: "DSC06648.jpg", title: "DSC06648", desc: "" },
   { file: "DSC06515.jpg", title: "DSC06515", desc: "" },
+  { file: "DSC00607.jpg", title: "DSC00607", desc: "" },
+  { file: "DSC06527.jpg", title: "DSC06527", desc: "" },
   { file: "DSC08552 EXPORT 25mb.jpg", title: "DSC08552 EXPORT 25mb", desc: "" },
 ];
 
