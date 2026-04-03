@@ -8,9 +8,14 @@
 		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
 <style>
 			/* 1. Flawless Square CSS Grid */
+			/* Smooth Cross-Fade Animation */
+			#thumbnails {
+				transition: opacity 0.3s ease-in-out !important;
+				opacity: 1;
+			}
 			#thumbnails {
 				display: grid !important;
-				grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
+				grid-template-columns: repeat(2, 1fr) !important; /* This forces exactly 2 columns! */
 				gap: 0 !important;
 			}
 			#thumbnails article {
@@ -67,10 +72,10 @@
 				<p>Based on the Isle of Wight, UK</p>
 				<nav style="margin: 2em 0;">
 					<ul style="list-style: none; padding: 0; margin: 0; line-height: 2;">
-						<li><a href="index.html" style="font-weight: bold; border-bottom: none;">Real Estate</a></li>
-						<li><a href="travel.html" style="border-bottom: none;">Travel & Lifestyle</a></li>
-						<li><a href="video.html" style="border-bottom: none;">Videography</a></li>
-						<li><a href="theatre.html" style="border-bottom: none;">Film & Theatre</a></li>
+						<li><a href="#" onclick="switchTab('tab-real-estate', this)" style="font-weight: bold; border-bottom: none;">Real Estate</a></li>
+						<li><a href="#" onclick="switchTab('tab-travel', this)" style="border-bottom: none;">Travel & Lifestyle</a></li>
+						<li><a href="#" onclick="switchTab('tab-video', this)" style="border-bottom: none;">Videography</a></li>
+						<li><a href="#" onclick="switchTab('tab-theatre', this)" style="border-bottom: none;">Film & Theatre</a></li>
 					</ul>
 				</nav>
 				<ul class="icons">
@@ -88,26 +93,64 @@
 			</footer>
 
 		</div>
-
-		<script src="data.js"></script>
+<script src="data.js"></script>
 
 		<script>
 			const gallery = document.getElementById("thumbnails");
-			let galleryHTML = "";
 
-			if (typeof realEstateImages !== 'undefined' && gallery) {
-				realEstateImages.forEach(img => {
-					galleryHTML += `
+			// This helper builds the invisible "buckets" for each category
+			function buildGroup(dataArray, folder, id) {
+				if (typeof dataArray === 'undefined') return "";
+				
+				// We start with display: none so they are hidden in the background
+				let html = `<div id="${id}" class="portfolio-group" style="display: none;">`;
+				dataArray.forEach(img => {
+					html += `
 					<article>
-						<a class="thumbnail" href="images/real-estate/fulls/${img.file}">
-							<img src="images/real-estate/thumbs/${img.file}" alt="${img.title}" loading="lazy" />
+						<a class="thumbnail" href="images/${folder}/fulls/${img.file}">
+							<img src="images/${folder}/thumbs/${img.file}" alt="" loading="lazy" />
 						</a>
-						<h2></h2>
-						<p></p>
-					</article>
-					`;
+						<h2></h2><p></p>
+					</article>`;
 				});
-				gallery.innerHTML = galleryHTML;
+				html += `</div>`;
+				return html;
+			}
+
+			// Instantly load ALL categories into the DOM on page load
+			gallery.innerHTML = 
+				buildGroup(realEstateImages, 'real-estate', 'tab-real-estate') +
+				buildGroup(travelImages, 'travel', 'tab-travel') +
+				buildGroup(videoImages, 'video', 'tab-video') +
+				buildGroup(theatreImages, 'theatre', 'tab-theatre');
+
+			// Turn on the Real Estate tab by default
+			document.getElementById('tab-real-estate').style.display = 'contents';
+
+			// The Seamless Transition Engine
+			function switchTab(tabId, linkEl) {
+				if(event) event.preventDefault(); // Stops the page from jumping to the top
+
+				// 1. Swap the bold text on the menu
+				document.querySelectorAll('nav a').forEach(a => a.style.fontWeight = 'normal');
+				linkEl.style.fontWeight = 'bold';
+
+				// 2. Fade the grid to black
+				gallery.style.opacity = 0;
+
+				// 3. Wait exactly 300ms (for the fade to finish), swap the photos, and fade back in
+				setTimeout(() => {
+					// Hide all buckets
+					document.querySelectorAll('.portfolio-group').forEach(group => {
+						group.style.display = 'none';
+					});
+					
+					// Turn on the chosen bucket
+					document.getElementById(tabId).style.display = 'contents';
+					
+					// Fade back in
+					gallery.style.opacity = 1;
+				}, 300);
 			}
 		</script>
 
