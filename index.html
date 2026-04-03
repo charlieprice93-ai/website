@@ -66,18 +66,19 @@
 				font-size: 1.25em;
 				font-weight: normal;
 				margin: 1em 0;
-				color: #a0a0a1; /* Subtle grey for inactive tabs */
 			}
 			.main-categories a {
-				color: inherit;
+				color: #a0a0a1; /* Subtle grey for inactive tabs */
 				border-bottom: none;
+				text-decoration: none;
 				transition: color 0.2s ease;
 			}
 			.main-categories a:hover {
-				color: #ffffff;
+				color: #333; /* Darkens slightly on hover */
 			}
 			.main-categories span {
 				margin: 0 0.5em;
+				color: #a0a0a1;
 				opacity: 0.5;
 			}
 		</style>
@@ -90,7 +91,7 @@
 				<p style="margin-bottom: 0.5em;">Based on the Isle of Wight, UK</p>
 				
 				<div class="main-categories">
-					<a href="#" id="link-nav-photo" onclick="switchMain(event, 'nav-photo', 'tab-real-estate')" style="font-weight: bold; color: #ffffff;">Photography</a> <span>/</span>
+					<a href="#" id="link-nav-photo" onclick="switchMain(event, 'nav-photo', 'tab-real-estate')" style="font-weight: bold; text-decoration: underline; color: #333;">Photography</a> <span>/</span>
 					<a href="#" id="link-nav-video" onclick="switchMain(event, 'nav-video', 'tab-commercial-video')">Videography</a> <span>/</span>
 					<a href="#" id="link-nav-design" onclick="switchMain(event, 'nav-design', 'tab-web-design')">Design</a>
 				</div>
@@ -139,7 +140,7 @@
 			const gallery = document.getElementById("thumbnails");
 
 			function buildGroup(dataArray, folder, categoryClass) {
-				if (typeof dataArray === 'undefined' || !dataArray) return "";
+				if (!dataArray || dataArray.length === 0) return "";
 				let html = "";
 				dataArray.forEach(img => {
 					html += `
@@ -153,18 +154,18 @@
 				return html;
 			}
 
-			// Instantly load ALL categories (Using window.variable keeps it from crashing if the array doesn't exist yet)
+			// Instantly load ALL categories safely (checks if the arrays exist first)
 			gallery.innerHTML = 
 				// Photography
-				buildGroup(window.realEstateImages, 'real-estate', 'tab-real-estate') +
-				buildGroup(window.travelImages, 'travel', 'tab-travel') +
-				buildGroup(window.theatreImages, 'theatre', 'tab-theatre') +
+				buildGroup((typeof realEstateImages !== 'undefined' ? realEstateImages : null), 'real-estate', 'tab-real-estate') +
+				buildGroup((typeof travelImages !== 'undefined' ? travelImages : null), 'travel', 'tab-travel') +
+				buildGroup((typeof theatreImages !== 'undefined' ? theatreImages : null), 'theatre', 'tab-theatre') +
 				// Videography (Placeholders)
-				buildGroup(window.commercialVideoImages, 'commercial-video', 'tab-commercial-video') +
-				buildGroup(window.eventsVideoImages, 'events-video', 'tab-events-video') +
+				buildGroup((typeof commercialVideoImages !== 'undefined' ? commercialVideoImages : null), 'commercial-video', 'tab-commercial-video') +
+				buildGroup((typeof eventsVideoImages !== 'undefined' ? eventsVideoImages : null), 'events-video', 'tab-events-video') +
 				// Design (Placeholders)
-				buildGroup(window.webDesignImages, 'web-design', 'tab-web-design') +
-				buildGroup(window.brandingImages, 'branding', 'tab-branding');
+				buildGroup((typeof webDesignImages !== 'undefined' ? webDesignImages : null), 'web-design', 'tab-web-design') +
+				buildGroup((typeof brandingImages !== 'undefined' ? brandingImages : null), 'branding', 'tab-branding');
 
 			// Turn on the Real Estate tab by default on first load
 			document.querySelectorAll('.tab-real-estate').forEach(item => item.style.display = 'block');
@@ -176,11 +177,13 @@
 				// Reset main links styling
 				document.querySelectorAll('.main-categories a').forEach(a => {
 					a.style.fontWeight = 'normal';
-					a.style.color = 'inherit';
+					a.style.textDecoration = 'none';
+					a.style.color = '#a0a0a1'; // Return to grey
 				});
 				const activeLink = document.getElementById('link-' + navId);
 				activeLink.style.fontWeight = 'bold';
-				activeLink.style.color = '#ffffff';
+				activeLink.style.textDecoration = 'underline';
+				activeLink.style.color = '#333'; // Dark text for the active tab
 
 				// Hide all sub-menus, then show the correct one
 				document.querySelectorAll('.sub-nav').forEach(nav => nav.style.display = 'none');
