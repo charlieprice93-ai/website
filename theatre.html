@@ -6,6 +6,46 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="assets/css/main.css" />
 		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+<style>
+			/* 1. Perfect Square Thumbnails */
+			#thumbnails article .thumbnail img {
+				width: 100% !important;
+				height: 100% !important;
+				aspect-ratio: 1 / 1 !important;
+				object-fit: cover !important; 
+			}
+
+			/* 2. The Blurred Cinematic Viewer (Portrait Fix) */
+			#viewer .slide {
+				/* The parent acts as the massive, stretched background */
+				background-size: cover !important;
+				background-position: center !important;
+				position: relative;
+			}
+
+			/* Layer 1: The Frosted Glass overlay */
+			#viewer .slide::before {
+				content: "";
+				position: absolute;
+				top: 0; left: 0; width: 100%; height: 100%;
+				backdrop-filter: blur(40px);
+				-webkit-backdrop-filter: blur(40px); /* Required for Safari support */
+				background: rgba(0, 0, 0, 0.65); /* Darkens the blur so the main photo pops */
+				z-index: 1;
+			}
+
+			/* Layer 2: The Sharp, Un-cropped Image */
+			#viewer .slide::after {
+				content: "";
+				position: absolute;
+				top: 0; left: 0; width: 100%; height: 100%;
+				background-image: inherit; /* The magic trick: steals the image from the parent */
+				background-size: contain !important;
+				background-repeat: no-repeat !important;
+				background-position: center !important;
+				z-index: 2;
+			}
+		</style>
 	</head>
 	<body class="is-preload-0 is-preload-1 is-preload-2">
 		<div id="main">
