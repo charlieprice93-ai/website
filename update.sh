@@ -41,7 +41,7 @@ generate_array() {
                 
                 echo "📸 Generating 800px thumbnail for: $new_filename"
                 # Generate the tiny thumbnail from the newly optimized JPEG
-                sips -Z 800 -s formatOptions 70 "$new_filepath" --out "$thumb_path" > /dev/null 2>&1
+                sips -Z 600 -s formatOptions 70 "$new_filepath" --out "$thumb_path" > /dev/null 2>&1
             fi
             
             # Write the new .jpg info into the JavaScript array

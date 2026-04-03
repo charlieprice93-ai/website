@@ -43,17 +43,22 @@
 		<script src="assets/js/breakpoints.min.js"></script>
 		<script src="assets/js/main.js"></script>
 		
-		<script src="data.js"></script>
+			<script src="data.js"></script>
 		<script>
 			const gallery = document.getElementById("thumbnails");
 			let galleryHTML = "";
 
 			if (typeof videoImages !== 'undefined' && gallery) {
-				videoImages.forEach(img => {
+				
+				// 1. SHUFFLE THE IMAGES RANDOMLY
+				const shuffledImages = videoImages.sort(() => 0.5 - Math.random());
+
+				// 2. BUILD THE HTML WITH LAZY LOADING
+				shuffledImages.forEach(img => {
 					galleryHTML += `
 					<article>
 						<a class="thumbnail" href="images/video/fulls/${img.file}">
-							<img src="images/video/thumbs/${img.file}" alt="${img.title}" />
+							<img src="images/video/thumbs/${img.file}" alt="${img.title}" loading="lazy" />
 						</a>
 						<h2>${img.title}</h2>
 						<p></p>
