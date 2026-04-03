@@ -3,7 +3,12 @@ import subprocess
 from PIL import Image
 import re
 
-FOLDERS = ["real-estate", "travel", "video", "theatre"]
+# YOUR NEW MASTER FOLDER LIST
+FOLDERS = [
+    "real-estate", "travel", "theatre", 
+    "video-travel", "video-music", "video-shorts", "video-theatre",
+    "web-design", "branding"
+]
 
 js_content = "// AUTO-GENERATED FILE. DO NOT EDIT MANUALLY.\n\n"
 
@@ -25,19 +30,13 @@ for folder in FOLDERS:
     if not os.path.exists(fulls_dir):
         os.makedirs(fulls_dir, exist_ok=True)
         
-    # Cleanup old/orphaned thumbnails
     for thumb_file in os.listdir(thumbs_dir):
         if thumb_file.startswith('.') or not os.path.isfile(os.path.join(thumbs_dir, thumb_file)):
             continue
-        
-        # We are forcing the new naming convention. If an old file doesn't start with 'web_', delete it.
         if not thumb_file.startswith("web_"):
             os.remove(os.path.join(thumbs_dir, thumb_file))
             continue
-            
-        # Standard cleanup for orphaned files
         original_name = thumb_file.replace("web_", "", 1).rsplit(".", 1)[0]
-        # Check if any original file with that name exists
         if not any(f.startswith(original_name) for f in os.listdir(fulls_dir)):
             os.remove(os.path.join(thumbs_dir, thumb_file))
             
@@ -49,7 +48,13 @@ for folder in FOLDERS:
             
         title, ext = os.path.splitext(filename)
         
-        # MAKE IT WEB SAFE: Remove spaces and weird characters, and add the "web_" prefix
+        # --- THE BRACKET TRICK: Look for a YouTube ID like [dQw4w9WgXcQ] ---
+        youtube_id = ""
+        yt_match = re.search(r'\[([a-zA-Z0-9_-]{11})\]', title)
+        if yt_match:
+            youtube_id = yt_match.group(1)
+            
+        # Make the filename web safe
         safe_title = re.sub(r'[^A-Za-z0-9]', '_', title)
         new_filename = f"web_{safe_title}.jpg"
         
@@ -57,7 +62,6 @@ for folder in FOLDERS:
         new_full_path = os.path.join(fulls_dir, new_filename)
         thumb_path = os.path.join(thumbs_dir, new_filename)
         
-        # Optimize and rename the original file so everything matches perfectly
         if not os.path.exists(new_full_path):
             print(f"🗜 Optimizing & Renaming: {filename} -> {new_filename}")
             subprocess.run(['sips', '-Z', '2560', '-s', 'format', 'jpeg', '-s', 'formatOptions', '80', orig_path, '--out', new_full_path], capture_output=True)
@@ -69,7 +73,8 @@ for folder in FOLDERS:
             subprocess.run(['sips', '-Z', '600', '-s', 'formatOptions', '70', new_full_path, '--out', thumb_path], capture_output=True)
         
         avg_color = get_avg_color(thumb_path)
-        images_data.append({"file": new_filename, "title": title, "color": avg_color})
+        # We now save the youtube_id directly into your website's database!
+        images_data.append({"file": new_filename, "title": title, "color": avg_color, "youtubeId": youtube_id})
         
     arranged_images = []
     if images_data:
@@ -85,10 +90,11 @@ for folder in FOLDERS:
     
     js_content += f"const {var_name} = [\n"
     for img in arranged_images:
-        js_content += f'  {{ file: "{img["file"]}", title: "{img["title"]}", desc: "" }},\n'
+        # Pass the YouTube ID to the Javascript
+        js_content += f'  {{ file: "{img["file"]}", title: "{img["title"]}", youtubeId: "{img["youtubeId"]}" }},\n'
     js_content += "];\n\n"
 
 with open("data.js", "w") as f:
     f.write(js_content)
 
-print("✅ Success! Images renamed, optimized, and beautifully contrasted.")
+print("✅ Success! Images, Videos, and Categories processed!")

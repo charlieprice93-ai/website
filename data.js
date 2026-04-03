@@ -1,69 +1,99 @@
 // AUTO-GENERATED FILE. DO NOT EDIT MANUALLY.
 
 const realEstateImages = [
-  { file: "web_DSC03156.jpg", title: "DSC03156", desc: "" },
-  { file: "web_DSC06646.jpg", title: "DSC06646", desc: "" },
-  { file: "web_03.jpg", title: "03", desc: "" },
-  { file: "web_01.jpg", title: "01", desc: "" },
-  { file: "web_DSC08429_EXPORT_25mb.jpg", title: "DSC08429 EXPORT 25mb", desc: "" },
-  { file: "web_DSC00278EXPORT.jpg", title: "DSC00278EXPORT", desc: "" },
-  { file: "web_DSC06592.jpg", title: "DSC06592", desc: "" },
-  { file: "web_DSC06971EXPORT.jpg", title: "DSC06971EXPORT", desc: "" },
-  { file: "web_DSC00567.jpg", title: "DSC00567", desc: "" },
-  { file: "web_DSC08576_EXPORT_25mb.jpg", title: "DSC08576 EXPORT 25mb", desc: "" },
-  { file: "web_02.jpg", title: "02", desc: "" },
-  { file: "web_DSC06396.jpg", title: "DSC06396", desc: "" },
-  { file: "web_DSC06446.jpg", title: "DSC06446", desc: "" },
-  { file: "web_DSC06534.jpg", title: "DSC06534", desc: "" },
-  { file: "web_DSC04276.jpg", title: "DSC04276", desc: "" },
-  { file: "web_DSC06547.jpg", title: "DSC06547", desc: "" },
-  { file: "web_DSC02987.jpg", title: "DSC02987", desc: "" },
-  { file: "web_DSC06648.jpg", title: "DSC06648", desc: "" },
-  { file: "web_DSC06515.jpg", title: "DSC06515", desc: "" },
-  { file: "web_DSC06527.jpg", title: "DSC06527", desc: "" },
-  { file: "web_DSC08552_EXPORT_25mb.jpg", title: "DSC08552 EXPORT 25mb", desc: "" },
+  { file: "web_web_DSC06547.jpg", title: "web_DSC06547", youtubeId: "" },
+  { file: "web_web_DSC06646.jpg", title: "web_DSC06646", youtubeId: "" },
+  { file: "web_web_03.jpg", title: "web_03", youtubeId: "" },
+  { file: "web_web_01.jpg", title: "web_01", youtubeId: "" },
+  { file: "web_web_DSC08429_EXPORT_25mb.jpg", title: "web_DSC08429_EXPORT_25mb", youtubeId: "" },
+  { file: "web_web_DSC00278EXPORT.jpg", title: "web_DSC00278EXPORT", youtubeId: "" },
+  { file: "web_web_DSC06592.jpg", title: "web_DSC06592", youtubeId: "" },
+  { file: "web_web_DSC06971EXPORT.jpg", title: "web_DSC06971EXPORT", youtubeId: "" },
+  { file: "web_web_DSC00567.jpg", title: "web_DSC00567", youtubeId: "" },
+  { file: "web_web_DSC08576_EXPORT_25mb.jpg", title: "web_DSC08576_EXPORT_25mb", youtubeId: "" },
+  { file: "web_web_DSC03156.jpg", title: "web_DSC03156", youtubeId: "" },
+  { file: "web_web_DSC06396.jpg", title: "web_DSC06396", youtubeId: "" },
+  { file: "web_web_02.jpg", title: "web_02", youtubeId: "" },
+  { file: "web_web_DSC06534.jpg", title: "web_DSC06534", youtubeId: "" },
+  { file: "web_web_DSC04276.jpg", title: "web_DSC04276", youtubeId: "" },
+  { file: "web_web_DSC02987.jpg", title: "web_DSC02987", youtubeId: "" },
+  { file: "web_web_DSC06648.jpg", title: "web_DSC06648", youtubeId: "" },
+  { file: "web_web_DSC06515.jpg", title: "web_DSC06515", youtubeId: "" },
+  { file: "web_web_DSC06446.jpg", title: "web_DSC06446", youtubeId: "" },
+  { file: "web_web_DSC08552_EXPORT_25mb.jpg", title: "web_DSC08552_EXPORT_25mb", youtubeId: "" },
+  { file: "web_web_DSC06527.jpg", title: "web_DSC06527", youtubeId: "" },
 ];
 
 const travelImages = [
-  { file: "web_DSC07360EXPORT.jpg", title: "DSC07360EXPORT", desc: "" },
-  { file: "web_DSC02489EXPORT.jpg", title: "DSC02489EXPORT", desc: "" },
-  { file: "web_DSC02652EXPORT.jpg", title: "DSC02652EXPORT", desc: "" },
-  { file: "web_2_February.jpg", title: "2 February", desc: "" },
-  { file: "web_DJI_20250518202449_0118_DEXPORT.jpg", title: "DJI_20250518202449_0118_DEXPORT", desc: "" },
-  { file: "web_10_October.jpg", title: "10 October", desc: "" },
-  { file: "web_DSC07176EXPORT.jpg", title: "DSC07176EXPORT", desc: "" },
-  { file: "web_DSC08712EXPORT.jpg", title: "DSC08712EXPORT", desc: "" },
-  { file: "web_3_March.jpg", title: "3 March", desc: "" },
-  { file: "web_DJI_0005.jpg", title: "DJI_0005", desc: "" },
-  { file: "web_IMG_20200426_192826.jpg", title: "IMG_20200426_192826", desc: "" },
-  { file: "web_DJI_0043.jpg", title: "DJI_0043", desc: "" },
-  { file: "web_3.jpg", title: "3", desc: "" },
-  { file: "web_9.jpg", title: "9", desc: "" },
-];
-
-const videoImages = [
+  { file: "web_web_10_October.jpg", title: "web_10_October", youtubeId: "" },
+  { file: "web_web_DSC02652EXPORT.jpg", title: "web_DSC02652EXPORT", youtubeId: "" },
+  { file: "web_web_DSC02489EXPORT.jpg", title: "web_DSC02489EXPORT", youtubeId: "" },
+  { file: "web_web_DSC07360EXPORT.jpg", title: "web_DSC07360EXPORT", youtubeId: "" },
+  { file: "web_web_2_February.jpg", title: "web_2_February", youtubeId: "" },
+  { file: "web_web_DJI_20250518202449_0118_DEXPORT.jpg", title: "web_DJI_20250518202449_0118_DEXPORT", youtubeId: "" },
+  { file: "web_web_DSC08712EXPORT.jpg", title: "web_DSC08712EXPORT", youtubeId: "" },
+  { file: "web_web_DSC07176EXPORT.jpg", title: "web_DSC07176EXPORT", youtubeId: "" },
+  { file: "web_web_DJI_0005.jpg", title: "web_DJI_0005", youtubeId: "" },
+  { file: "web_fishbourne2ndboatdocking.jpg", title: "fishbourne2ndboatdocking", youtubeId: "" },
+  { file: "web_web_IMG_20200426_192826.jpg", title: "web_IMG_20200426_192826", youtubeId: "" },
+  { file: "web_fishbourne2boats_2.jpg", title: "fishbourne2boats#2", youtubeId: "" },
+  { file: "web_web_3_March.jpg", title: "web_3_March", youtubeId: "" },
+  { file: "web_web_DJI_0043.jpg", title: "web_DJI_0043", youtubeId: "" },
+  { file: "web_web_3.jpg", title: "web_3", youtubeId: "" },
+  { file: "web_web_9.jpg", title: "web_9", youtubeId: "" },
 ];
 
 const theatreImages = [
-  { file: "web_DSC02199_EXPORT.jpg", title: "DSC02199 EXPORT", desc: "" },
-  { file: "web_DJI_0055.jpg", title: "DJI_0055", desc: "" },
-  { file: "web_DSC02898.jpg", title: "DSC02898", desc: "" },
-  { file: "web_DSC09988_EXPORT.jpg", title: "DSC09988 EXPORT", desc: "" },
-  { file: "web_DSC04034_EXPORT.jpg", title: "DSC04034 EXPORT", desc: "" },
-  { file: "web__DSC1845.jpg", title: "_DSC1845", desc: "" },
-  { file: "web_DSC02358_EXPORT.jpg", title: "DSC02358 EXPORT", desc: "" },
-  { file: "web__DSC1899.jpg", title: "_DSC1899", desc: "" },
-  { file: "web_DSC02880.jpg", title: "DSC02880", desc: "" },
-  { file: "web_DSC02786_EXPORT.jpg", title: "DSC02786 EXPORT", desc: "" },
-  { file: "web_DSC02519_EXPORT.jpg", title: "DSC02519 EXPORT", desc: "" },
-  { file: "web_DSC02848_EXPORT.jpg", title: "DSC02848 EXPORT", desc: "" },
-  { file: "web_DSC03066_EXPORT.jpg", title: "DSC03066 EXPORT", desc: "" },
-  { file: "web_DSC03627_EXPORT.jpg", title: "DSC03627 EXPORT", desc: "" },
-  { file: "web_DSC02355_EXPORT.jpg", title: "DSC02355 EXPORT", desc: "" },
-  { file: "web_DSC02620_EXPORT.jpg", title: "DSC02620 EXPORT", desc: "" },
-  { file: "web_DSC02341_EXPORT.jpg", title: "DSC02341 EXPORT", desc: "" },
-  { file: "web_DSC03489_EXPORT.jpg", title: "DSC03489 EXPORT", desc: "" },
-  { file: "web_DSC02585_EXPORT.jpg", title: "DSC02585 EXPORT", desc: "" },
-  { file: "web_DSC03465_EXPORT.jpg", title: "DSC03465 EXPORT", desc: "" },
+  { file: "web_web__DSC1845.jpg", title: "web__DSC1845", youtubeId: "" },
+  { file: "web_web_DSC04034_EXPORT.jpg", title: "web_DSC04034_EXPORT", youtubeId: "" },
+  { file: "web_web_DJI_0055.jpg", title: "web_DJI_0055", youtubeId: "" },
+  { file: "web_web_DSC02898.jpg", title: "web_DSC02898", youtubeId: "" },
+  { file: "web_web_DSC09988_EXPORT.jpg", title: "web_DSC09988_EXPORT", youtubeId: "" },
+  { file: "web_web_DSC02358_EXPORT.jpg", title: "web_DSC02358_EXPORT", youtubeId: "" },
+  { file: "web_web__DSC1899.jpg", title: "web__DSC1899", youtubeId: "" },
+  { file: "web_web_DSC02880.jpg", title: "web_DSC02880", youtubeId: "" },
+  { file: "web_web_DSC02786_EXPORT.jpg", title: "web_DSC02786_EXPORT", youtubeId: "" },
+  { file: "web_web_DSC02519_EXPORT.jpg", title: "web_DSC02519_EXPORT", youtubeId: "" },
+  { file: "web_web_DSC02848_EXPORT.jpg", title: "web_DSC02848_EXPORT", youtubeId: "" },
+  { file: "web_web_DSC03066_EXPORT.jpg", title: "web_DSC03066_EXPORT", youtubeId: "" },
+  { file: "web_web_DSC03627_EXPORT.jpg", title: "web_DSC03627_EXPORT", youtubeId: "" },
+  { file: "web_web_DSC02355_EXPORT.jpg", title: "web_DSC02355_EXPORT", youtubeId: "" },
+  { file: "web_web_DSC02620_EXPORT.jpg", title: "web_DSC02620_EXPORT", youtubeId: "" },
+  { file: "web_web_DSC02341_EXPORT.jpg", title: "web_DSC02341_EXPORT", youtubeId: "" },
+  { file: "web_web_DSC02199_EXPORT.jpg", title: "web_DSC02199_EXPORT", youtubeId: "" },
+  { file: "web_web_DSC02585_EXPORT.jpg", title: "web_DSC02585_EXPORT", youtubeId: "" },
+  { file: "web_web_DSC03489_EXPORT.jpg", title: "web_DSC03489_EXPORT", youtubeId: "" },
+  { file: "web_web_DSC03465_EXPORT.jpg", title: "web_DSC03465_EXPORT", youtubeId: "" },
+];
+
+const videoTravelImages = [
+  { file: "web_Wightlink_Ship_Launch__1u0SryIxWFo_.jpg", title: "Wightlink Ship Launch [1u0SryIxWFo]", youtubeId: "1u0SryIxWFo" },
+  { file: "web_Isle_of_Wight_NHS_Recruitment__AnrCy8_xAEs_.jpg", title: "Isle of Wight NHS Recruitment [AnrCy8-xAEs]", youtubeId: "AnrCy8-xAEs" },
+  { file: "web_Wightlink_Summer__o3sHpt3QEKU_.jpg", title: "Wightlink Summer [o3sHpt3QEKU]", youtubeId: "o3sHpt3QEKU" },
+];
+
+const videoMusicImages = [
+  { file: "web_Ulysess_Wells__Leander_Live__XY8tgTsi0CY_.jpg", title: "Ulysess Wells  Leander Live [XY8tgTsi0CY]", youtubeId: "XY8tgTsi0CY" },
+  { file: "web_Ulysess_Wells__Miles_Away__0l91G80ADbs_.jpg", title: "Ulysess Wells  Miles Away [0l91G80ADbs]", youtubeId: "0l91G80ADbs" },
+  { file: "web_Ulysess_Wells__Mend_a_Man__AZ20qykULMU_.jpg", title: "Ulysess Wells  Mend a Man [AZ20qykULMU]", youtubeId: "AZ20qykULMU" },
+  { file: "web_Ulysess_Wells__You_Wanted_It_Over__BXnJ5hQBvxM_.jpg", title: "Ulysess Wells  You Wanted It Over [BXnJ5hQBvxM]", youtubeId: "BXnJ5hQBvxM" },
+  { file: "web_Ulysess_Wells__Blame__hWBesC77UUc_.jpg", title: "Ulysess Wells  Blame [hWBesC77UUc]", youtubeId: "hWBesC77UUc" },
+  { file: "web_Ulysess_Wells__Sexy_Beautiful_People__gOYoloG8FE0_.jpg", title: "Ulysess Wells  Sexy Beautiful People [gOYoloG8FE0]", youtubeId: "gOYoloG8FE0" },
+];
+
+const videoShortsImages = [
+  { file: "web_Cliffedge__gLqr11IlPl8_.jpg", title: "Cliffedge [gLqr11IlPl8]", youtubeId: "gLqr11IlPl8" },
+];
+
+const videoTheatreImages = [
+  { file: "web_Promotion_for_the_Freshwater_5_tour__5W_z8EhCpf8_.jpg", title: "Promotion for the Freshwater 5 tour [5W_z8EhCpf8]", youtubeId: "5W_z8EhCpf8" },
+  { file: "web_Joel_Morris_Recital__0iW1bZAvH48_.jpg", title: "Joel Morris Recital [0iW1bZAvH48]", youtubeId: "0iW1bZAvH48" },
+  { file: "web_Promotion_for_Damien_Nettles_RD__zEPv_VO_0B4_.jpg", title: "Promotion for Damien Nettles RD [zEPv-VO-0B4]", youtubeId: "zEPv-VO-0B4" },
+];
+
+const webDesignImages = [
+];
+
+const brandingImages = [
 ];
 

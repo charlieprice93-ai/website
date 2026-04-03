@@ -24,75 +24,89 @@
 				left: 0 !important;
 				transform: none !important;
 			}
-			#thumbnails article .thumbnail {
+			#thumbnails article .thumbnail, 
+			#thumbnails article .video-trigger {
 				width: 100% !important;
 				aspect-ratio: 1 / 1 !important;
 				display: block;
+				cursor: pointer;
+				position: relative;
 			}
-			#thumbnails article .thumbnail img {
+			#thumbnails article img {
 				width: 100% !important;
 				height: 100% !important;
 				object-fit: cover !important; 
 			}
 
-			/* 2. The Blurred Cinematic Viewer */
+			/* The Play Button Overlay for Videos */
+			.play-button {
+				position: absolute;
+				top: 50%; left: 50%;
+				transform: translate(-50%, -50%);
+				color: white;
+				font-size: 3em;
+				text-shadow: 0px 4px 15px rgba(0,0,0,0.8);
+				opacity: 0.8;
+				transition: opacity 0.2s;
+				pointer-events: none;
+			}
+			.video-trigger:hover .play-button { opacity: 1; }
+
+			/* 2. The Blurred Cinematic Viewer (For Photos) */
 			#viewer .slide .image {
 				background-size: cover !important;
 				background-position: center !important;
 				position: relative;
 			}
 			#viewer .slide .image::before {
-				content: "";
-				position: absolute;
-				top: 0; left: 0; width: 100%; height: 100%;
-				backdrop-filter: blur(40px);
-				-webkit-backdrop-filter: blur(40px); 
-				background: rgba(0, 0, 0, 0.65); 
-				z-index: 1;
+				content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+				backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); 
+				background: rgba(0, 0, 0, 0.65); z-index: 1;
 			}
 			#viewer .slide .image::after {
-				content: "";
-				position: absolute;
-				top: 0; left: 0; width: 100%; height: 100%;
-				background-image: inherit; 
-				background-size: contain !important; 
-				background-repeat: no-repeat !important;
-				background-position: center !important;
-				z-index: 2;
+				content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+				background-image: inherit; background-size: contain !important; 
+				background-repeat: no-repeat !important; background-position: center !important; z-index: 2;
 			}
 
 			/* 3. Main Navigation Styling */
-			.main-categories {
-				font-size: 1.25em;
-				font-weight: normal;
-				margin: 1em 0;
+			.main-categories { font-size: 1.25em; font-weight: normal; margin: 1em 0; }
+			.main-categories a { color: #a0a0a1; border-bottom: none; text-decoration: none; transition: color 0.2s ease; }
+			.main-categories a:hover { color: #333; }
+			.main-categories span { margin: 0 0.5em; color: #a0a0a1; opacity: 0.5; }
+			
+			/* 4. Fullscreen Video Portal Overlay */
+			#video-portal {
+				display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+				background: rgba(0, 0, 0, 0.95); z-index: 99999;
+				backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
 			}
-			.main-categories a {
-				color: #a0a0a1; /* Subtle grey for inactive tabs */
-				border-bottom: none;
-				text-decoration: none;
-				transition: color 0.2s ease;
+			#video-portal .close-btn {
+				position: absolute; top: 20px; right: 30px; color: white; font-size: 50px;
+				cursor: pointer; font-family: sans-serif; opacity: 0.7; transition: 0.2s;
 			}
-			.main-categories a:hover {
-				color: #333; /* Darkens slightly on hover */
-			}
-			.main-categories span {
-				margin: 0 0.5em;
-				color: #a0a0a1;
-				opacity: 0.5;
+			#video-portal .close-btn:hover { opacity: 1; }
+			#video-portal iframe {
+				position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+				width: 80%; height: 80%; border: none; max-width: 1200px;
 			}
 		</style>
 	</head>
 	<body class="is-preload-0 is-preload-1 is-preload-2">
-		<div id="main">
 
+		<div id="video-portal">
+			<div class="close-btn" onclick="closeVideo()">&times;</div>
+			<iframe id="youtube-player" src="" allow="autoplay; fullscreen; encrypted-media"></iframe>
+		</div>
+
+		<div id="main">
 			<header id="header">
 				<h1>Charlie Price</h1>
 				<p style="margin-bottom: 0.5em;">Based on the Isle of Wight, UK</p>
 				
 				<div class="main-categories">
 					<a href="#" id="link-nav-photo" onclick="switchMain(event, 'nav-photo', 'tab-real-estate')" style="font-weight: bold; text-decoration: underline; color: #333;">Photography</a> <span>/</span>
-					<a href="#" id="link-nav-video" onclick="switchMain(event, 'nav-video', 'tab-commercial-video')">Videography</a> <span>/</span>
+					<a href="#" id="link-nav-video" onclick="switchMain(event, 'nav-video', 'tab-video-travel')">Videography</a> <span>/</span>
 					<a href="#" id="link-nav-design" onclick="switchMain(event, 'nav-design', 'tab-web-design')">Design</a>
 				</div>
 
@@ -104,10 +118,12 @@
 					</ul>
 				</nav>
 
-				<nav id="nav-video" class="sub-nav" style="margin: 2em 0; display: none;">
+			<nav id="nav-video" class="sub-nav" style="margin: 2em 0; display: none;">
 					<ul style="list-style: none; padding: 0; margin: 0; line-height: 2;">
-						<li><a href="#" onclick="switchTab(event, 'tab-commercial-video', this)" style="font-weight: bold; border-bottom: none;">Commercial</a></li>
-						<li><a href="#" onclick="switchTab(event, 'tab-events-video', this)" style="border-bottom: none;">Events</a></li>
+						<li><a href="#" onclick="switchTab(event, 'tab-video-travel', this)" style="font-weight: bold; border-bottom: none;">Travel & Tourism</a></li>
+						<li><a href="#" onclick="switchTab(event, 'tab-video-music', this)" style="border-bottom: none;">Music Videos</a></li>
+						<li><a href="#" onclick="switchTab(event, 'tab-video-shorts', this)" style="border-bottom: none;">Short Films</a></li>
+						<li><a href="#" onclick="switchTab(event, 'tab-video-theatre', this)" style="border-bottom: none;">Theatre</a></li>
 					</ul>
 				</nav>
 
@@ -131,7 +147,6 @@
 					<li>&copy; Charlie Price.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a>.</li>
 				</ul>
 			</footer>
-
 		</div>
 
 		<script src="data.js"></script>
@@ -143,82 +158,88 @@
 				if (!dataArray || dataArray.length === 0) return "";
 				let html = "";
 				dataArray.forEach(img => {
-					html += `
-					<article class="portfolio-item ${categoryClass}" style="display: none;">
-						<a class="thumbnail" href="images/${folder}/fulls/${img.file}">
-							<img src="images/${folder}/thumbs/${img.file}" alt="" loading="lazy" />
-						</a>
-						<h2></h2><p></p>
-					</article>`;
+					// 🚀 THE MAGIC: If it has a YouTube ID, it builds a Video Player Trigger. If not, it builds a standard Photo.
+					if (img.youtubeId && img.youtubeId !== "") {
+						html += `
+						<article class="portfolio-item ${categoryClass}" style="display: none;">
+							<a class="video-trigger" onclick="openVideo('${img.youtubeId}')">
+								<img src="images/${folder}/thumbs/${img.file}" alt="" loading="lazy" />
+								<div class="play-button">▶</div>
+							</a>
+							<h2></h2><p></p>
+						</article>`;
+					} else {
+						html += `
+						<article class="portfolio-item ${categoryClass}" style="display: none;">
+							<a class="thumbnail" href="images/${folder}/fulls/${img.file}">
+								<img src="images/${folder}/thumbs/${img.file}" alt="" loading="lazy" />
+							</a>
+							<h2></h2><p></p>
+						</article>`;
+					}
 				});
 				return html;
 			}
 
-			// Instantly load ALL categories safely (checks if the arrays exist first)
+// Load ALL categories safely
 			gallery.innerHTML = 
-				// Photography
 				buildGroup((typeof realEstateImages !== 'undefined' ? realEstateImages : null), 'real-estate', 'tab-real-estate') +
 				buildGroup((typeof travelImages !== 'undefined' ? travelImages : null), 'travel', 'tab-travel') +
 				buildGroup((typeof theatreImages !== 'undefined' ? theatreImages : null), 'theatre', 'tab-theatre') +
-				// Videography (Placeholders)
-				buildGroup((typeof commercialVideoImages !== 'undefined' ? commercialVideoImages : null), 'commercial-video', 'tab-commercial-video') +
-				buildGroup((typeof eventsVideoImages !== 'undefined' ? eventsVideoImages : null), 'events-video', 'tab-events-video') +
-				// Design (Placeholders)
+				buildGroup((typeof videoTravelImages !== 'undefined' ? videoTravelImages : null), 'video-travel', 'tab-video-travel') +
+				buildGroup((typeof videoMusicImages !== 'undefined' ? videoMusicImages : null), 'video-music', 'tab-video-music') +
+				buildGroup((typeof videoShortsImages !== 'undefined' ? videoShortsImages : null), 'video-shorts', 'tab-video-shorts') +
+				buildGroup((typeof videoTheatreImages !== 'undefined' ? videoTheatreImages : null), 'video-theatre', 'tab-video-theatre') +
 				buildGroup((typeof webDesignImages !== 'undefined' ? webDesignImages : null), 'web-design', 'tab-web-design') +
 				buildGroup((typeof brandingImages !== 'undefined' ? brandingImages : null), 'branding', 'tab-branding');
-
-			// Turn on the Real Estate tab by default on first load
+				
 			document.querySelectorAll('.tab-real-estate').forEach(item => item.style.display = 'block');
 
-			// ENGINE 1: Switching Main Categories (Photo / Video / Design)
+			// ENGINE: Category Switching
 			function switchMain(e, navId, defaultTabClass) {
 				if(e) e.preventDefault();
-
-				// Reset main links styling
 				document.querySelectorAll('.main-categories a').forEach(a => {
-					a.style.fontWeight = 'normal';
-					a.style.textDecoration = 'none';
-					a.style.color = '#a0a0a1'; // Return to grey
+					a.style.fontWeight = 'normal'; a.style.textDecoration = 'none'; a.style.color = '#a0a0a1'; 
 				});
 				const activeLink = document.getElementById('link-' + navId);
-				activeLink.style.fontWeight = 'bold';
-				activeLink.style.textDecoration = 'underline';
-				activeLink.style.color = '#333'; // Dark text for the active tab
+				activeLink.style.fontWeight = 'bold'; activeLink.style.textDecoration = 'underline'; activeLink.style.color = '#333'; 
 
-				// Hide all sub-menus, then show the correct one
 				document.querySelectorAll('.sub-nav').forEach(nav => nav.style.display = 'none');
 				const activeNav = document.getElementById(navId);
 				activeNav.style.display = 'block';
 
-				// Automatically trigger the first sub-tab of the new menu
 				const firstSubLink = activeNav.querySelector('a');
 				switchTab(null, defaultTabClass, firstSubLink);
 			}
 
-			// ENGINE 2: Switching Sub Categories (Real Estate / Travel / etc.)
 			function switchTab(e, tabClass, linkEl) {
 				if(e) e.preventDefault(); 
-
-				// Swap the bold text on the current active sub-menu
 				const parentNav = linkEl.closest('.sub-nav');
 				parentNav.querySelectorAll('a').forEach(a => a.style.fontWeight = 'normal');
 				linkEl.style.fontWeight = 'bold';
 
-				// Fade the grid to black
 				gallery.style.opacity = 0;
-
-				// Wait 300ms, swap the photos, and fade back in
 				setTimeout(() => {
-					document.querySelectorAll('.portfolio-item').forEach(item => {
-						item.style.display = 'none';
-					});
-					
-					document.querySelectorAll('.' + tabClass).forEach(item => {
-						item.style.display = 'block';
-					});
-					
+					document.querySelectorAll('.portfolio-item').forEach(item => item.style.display = 'none');
+					document.querySelectorAll('.' + tabClass).forEach(item => item.style.display = 'block');
 					gallery.style.opacity = 1;
 				}, 300);
+			}
+
+			// ENGINE: Video Portal
+			function openVideo(youtubeId) {
+				const portal = document.getElementById('video-portal');
+				const player = document.getElementById('youtube-player');
+				// Auto-plays the video in HD, hides the "Related Videos" at the end, and uses a clean interface
+				player.src = "https://www.youtube.com/embed/" + youtubeId + "?autoplay=1&rel=0&showinfo=0&modestbranding=1";
+				portal.style.display = 'block';
+			}
+
+			function closeVideo() {
+				const portal = document.getElementById('video-portal');
+				const player = document.getElementById('youtube-player');
+				portal.style.display = 'none';
+				player.src = ""; // This forces the video to stop playing in the background
 			}
 		</script>
 
