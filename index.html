@@ -11,7 +11,7 @@
 			/* 1. Flawless Square CSS Grid & Smooth Cross-Fade Animation */
 			#thumbnails {
 				display: grid !important;
-				grid-template-columns: repeat(2, 1fr) !important; /* Forces exactly 2 columns */
+				grid-template-columns: repeat(2, 1fr) !important; 
 				gap: 0 !important;
 				transition: opacity 0.3s ease-in-out !important;
 				opacity: 1;
@@ -35,13 +35,12 @@
 				object-fit: cover !important; 
 			}
 
-			/* 2. The Blurred Cinematic Viewer (Targeting the inner .image div) */
+			/* 2. The Blurred Cinematic Viewer */
 			#viewer .slide .image {
 				background-size: cover !important;
 				background-position: center !important;
 				position: relative;
 			}
-			/* Layer 1: The Frosted Glass */
 			#viewer .slide .image::before {
 				content: "";
 				position: absolute;
@@ -51,16 +50,35 @@
 				background: rgba(0, 0, 0, 0.65); 
 				z-index: 1;
 			}
-			/* Layer 2: The Sharp, Height-Capped Image */
 			#viewer .slide .image::after {
 				content: "";
 				position: absolute;
 				top: 0; left: 0; width: 100%; height: 100%;
-				background-image: inherit; /* Steals the specific photo URL from the inner div */
-				background-size: contain !important; /* THIS forces it to fit within the screen height! */
+				background-image: inherit; 
+				background-size: contain !important; 
 				background-repeat: no-repeat !important;
 				background-position: center !important;
 				z-index: 2;
+			}
+
+			/* 3. Main Navigation Styling */
+			.main-categories {
+				font-size: 1.25em;
+				font-weight: normal;
+				margin: 1em 0;
+				color: #a0a0a1; /* Subtle grey for inactive tabs */
+			}
+			.main-categories a {
+				color: inherit;
+				border-bottom: none;
+				transition: color 0.2s ease;
+			}
+			.main-categories a:hover {
+				color: #ffffff;
+			}
+			.main-categories span {
+				margin: 0 0.5em;
+				opacity: 0.5;
 			}
 		</style>
 	</head>
@@ -69,16 +87,36 @@
 
 			<header id="header">
 				<h1>Charlie Price</h1>
-				<h3>Photography, Videography & Design</h3>
-				<p>Based on the Isle of Wight, UK</p>
-				<nav style="margin: 2em 0;">
+				<p style="margin-bottom: 0.5em;">Based on the Isle of Wight, UK</p>
+				
+				<div class="main-categories">
+					<a href="#" id="link-nav-photo" onclick="switchMain(event, 'nav-photo', 'tab-real-estate')" style="font-weight: bold; color: #ffffff;">Photography</a> <span>/</span>
+					<a href="#" id="link-nav-video" onclick="switchMain(event, 'nav-video', 'tab-commercial-video')">Videography</a> <span>/</span>
+					<a href="#" id="link-nav-design" onclick="switchMain(event, 'nav-design', 'tab-web-design')">Design</a>
+				</div>
+
+				<nav id="nav-photo" class="sub-nav" style="margin: 2em 0;">
 					<ul style="list-style: none; padding: 0; margin: 0; line-height: 2;">
 						<li><a href="#" onclick="switchTab(event, 'tab-real-estate', this)" style="font-weight: bold; border-bottom: none;">Real Estate</a></li>
 						<li><a href="#" onclick="switchTab(event, 'tab-travel', this)" style="border-bottom: none;">Travel & Lifestyle</a></li>
-						<li><a href="#" onclick="switchTab(event, 'tab-video', this)" style="border-bottom: none;">Videography</a></li>
 						<li><a href="#" onclick="switchTab(event, 'tab-theatre', this)" style="border-bottom: none;">Film & Theatre</a></li>
 					</ul>
 				</nav>
+
+				<nav id="nav-video" class="sub-nav" style="margin: 2em 0; display: none;">
+					<ul style="list-style: none; padding: 0; margin: 0; line-height: 2;">
+						<li><a href="#" onclick="switchTab(event, 'tab-commercial-video', this)" style="font-weight: bold; border-bottom: none;">Commercial</a></li>
+						<li><a href="#" onclick="switchTab(event, 'tab-events-video', this)" style="border-bottom: none;">Events</a></li>
+					</ul>
+				</nav>
+
+				<nav id="nav-design" class="sub-nav" style="margin: 2em 0; display: none;">
+					<ul style="list-style: none; padding: 0; margin: 0; line-height: 2;">
+						<li><a href="#" onclick="switchTab(event, 'tab-web-design', this)" style="font-weight: bold; border-bottom: none;">Web Design</a></li>
+						<li><a href="#" onclick="switchTab(event, 'tab-branding', this)" style="border-bottom: none;">Branding</a></li>
+					</ul>
+				</nav>
+
 				<ul class="icons">
 					<li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
 					<li><a href="#" class="icon fa-envelope"><span class="label">Email</span></a></li>
@@ -100,12 +138,10 @@
 		<script>
 			const gallery = document.getElementById("thumbnails");
 
-			// We assign a class to each article so the template viewer can find them seamlessly
 			function buildGroup(dataArray, folder, categoryClass) {
-				if (typeof dataArray === 'undefined') return "";
+				if (typeof dataArray === 'undefined' || !dataArray) return "";
 				let html = "";
 				dataArray.forEach(img => {
-					// Give them the category class, and hide them by default
 					html += `
 					<article class="portfolio-item ${categoryClass}" style="display: none;">
 						<a class="thumbnail" href="images/${folder}/fulls/${img.file}">
@@ -117,40 +153,67 @@
 				return html;
 			}
 
-			// Instantly load ALL categories into the hidden DOM
+			// Instantly load ALL categories (Using window.variable keeps it from crashing if the array doesn't exist yet)
 			gallery.innerHTML = 
-				buildGroup(realEstateImages, 'real-estate', 'tab-real-estate') +
-				buildGroup(travelImages, 'travel', 'tab-travel') +
-				buildGroup(videoImages, 'video', 'tab-video') +
-				buildGroup(theatreImages, 'theatre', 'tab-theatre');
+				// Photography
+				buildGroup(window.realEstateImages, 'real-estate', 'tab-real-estate') +
+				buildGroup(window.travelImages, 'travel', 'tab-travel') +
+				buildGroup(window.theatreImages, 'theatre', 'tab-theatre') +
+				// Videography (Placeholders)
+				buildGroup(window.commercialVideoImages, 'commercial-video', 'tab-commercial-video') +
+				buildGroup(window.eventsVideoImages, 'events-video', 'tab-events-video') +
+				// Design (Placeholders)
+				buildGroup(window.webDesignImages, 'web-design', 'tab-web-design') +
+				buildGroup(window.brandingImages, 'branding', 'tab-branding');
 
 			// Turn on the Real Estate tab by default on first load
 			document.querySelectorAll('.tab-real-estate').forEach(item => item.style.display = 'block');
 
-			// The Seamless Transition Engine
-			function switchTab(e, tabClass, linkEl) {
-				if(e) e.preventDefault(); // Stops the page jumping to the top
+			// ENGINE 1: Switching Main Categories (Photo / Video / Design)
+			function switchMain(e, navId, defaultTabClass) {
+				if(e) e.preventDefault();
 
-				// 1. Swap the bold text on the menu
-				document.querySelectorAll('nav a').forEach(a => a.style.fontWeight = 'normal');
+				// Reset main links styling
+				document.querySelectorAll('.main-categories a').forEach(a => {
+					a.style.fontWeight = 'normal';
+					a.style.color = 'inherit';
+				});
+				const activeLink = document.getElementById('link-' + navId);
+				activeLink.style.fontWeight = 'bold';
+				activeLink.style.color = '#ffffff';
+
+				// Hide all sub-menus, then show the correct one
+				document.querySelectorAll('.sub-nav').forEach(nav => nav.style.display = 'none');
+				const activeNav = document.getElementById(navId);
+				activeNav.style.display = 'block';
+
+				// Automatically trigger the first sub-tab of the new menu
+				const firstSubLink = activeNav.querySelector('a');
+				switchTab(null, defaultTabClass, firstSubLink);
+			}
+
+			// ENGINE 2: Switching Sub Categories (Real Estate / Travel / etc.)
+			function switchTab(e, tabClass, linkEl) {
+				if(e) e.preventDefault(); 
+
+				// Swap the bold text on the current active sub-menu
+				const parentNav = linkEl.closest('.sub-nav');
+				parentNav.querySelectorAll('a').forEach(a => a.style.fontWeight = 'normal');
 				linkEl.style.fontWeight = 'bold';
 
-				// 2. Fade the grid to black
+				// Fade the grid to black
 				gallery.style.opacity = 0;
 
-				// 3. Wait 300ms, swap the photos, and fade back in
+				// Wait 300ms, swap the photos, and fade back in
 				setTimeout(() => {
-					// Hide all photos
 					document.querySelectorAll('.portfolio-item').forEach(item => {
 						item.style.display = 'none';
 					});
 					
-					// Turn on the chosen category
 					document.querySelectorAll('.' + tabClass).forEach(item => {
 						item.style.display = 'block';
 					});
 					
-					// Fade back in
 					gallery.style.opacity = 1;
 				}, 300);
 			}
