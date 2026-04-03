@@ -50,11 +50,7 @@
 
 			if (typeof realEstateImages !== 'undefined' && gallery) {
 				
-				// 1. SHUFFLE THE IMAGES RANDOMLY
-				const shuffledImages = realEstateImages.sort(() => 0.5 - Math.random());
-
-				// 2. BUILD THE HTML WITH LAZY LOADING
-				shuffledImages.forEach(img => {
+			realEstateImages.forEach(img => {
 					galleryHTML += `
 					<article>
 						<a class="thumbnail" href="images/real-estate/fulls/${img.file}">
