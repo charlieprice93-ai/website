@@ -75,27 +75,27 @@
 			.main-categories a:hover { color: #333; }
 			.main-categories span { margin: 0 0.5em; color: #a0a0a1; opacity: 0.5; }
 			
-			/* 4. Fullscreen Video Portal Overlay */
+			/* 4. Native Embedded Video Portal */
 			#video-portal {
-				display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-				background: rgba(0, 0, 0, 0.95); z-index: 99999;
-				backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+				display: none; 
+				position: absolute; /* Attaches to the viewer instead of the screen */
+				top: 0; left: 0; width: 100%; height: 100%;
+				background: #000000; 
+				z-index: 50; /* Sits above the photos */
 			}
-			#video-portal .close-btn {
-				position: absolute; top: 20px; right: 30px; color: white; font-size: 50px;
-				cursor: pointer; font-family: sans-serif; opacity: 0.7; transition: 0.2s;
-			}
-			#video-portal .close-btn:hover { opacity: 1; }
 			#video-portal iframe {
 				position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-				width: 80%; height: 80%; border: none; max-width: 1200px;
+				width: 100%; height: 100%; border: none;
+			}
+			/* Forces the template's native arrows and close button to sit ON TOP of the video */
+			#viewer .inner {
+				z-index: 99999 !important; 
 			}
 		</style>
 	</head>
 	<body class="is-preload-0 is-preload-1 is-preload-2">
 
 		<div id="video-portal">
-			<div class="close-btn" onclick="closeVideo()">&times;</div>
 			<iframe id="youtube-player" src="" allow="autoplay; fullscreen; encrypted-media"></iframe>
 		</div>
 
@@ -118,7 +118,7 @@
 					</ul>
 				</nav>
 
-			<nav id="nav-video" class="sub-nav" style="margin: 2em 0; display: none;">
+				<nav id="nav-video" class="sub-nav" style="margin: 2em 0; display: none;">
 					<ul style="list-style: none; padding: 0; margin: 0; line-height: 2;">
 						<li><a href="#" onclick="switchTab(event, 'tab-video-travel', this)" style="font-weight: bold; border-bottom: none;">Travel & Tourism</a></li>
 						<li><a href="#" onclick="switchTab(event, 'tab-video-music', this)" style="border-bottom: none;">Music Videos</a></li>
@@ -158,11 +158,12 @@
 				if (!dataArray || dataArray.length === 0) return "";
 				let html = "";
 				dataArray.forEach(img => {
-					// 🚀 THE MAGIC: The Merged Video Button
+					// 🚀 THE MAGIC: The link now allows main.js to open the viewer normally, 
+					// then uses setTimeout to inject the video a split second later!
 					if (img.youtubeId && img.youtubeId !== "") {
 						html += `
 						<article class="portfolio-item ${categoryClass}" style="display: none;">
-							<a class="thumbnail video-trigger" href="images/${folder}/fulls/${img.file}" onclick="openVideo('${img.youtubeId}'); event.preventDefault(); event.stopPropagation();">
+							<a class="thumbnail video-trigger" href="images/${folder}/fulls/${img.file}" onclick="setTimeout(() => openVideo('${img.youtubeId}'), 50);">
 								<img src="images/${folder}/thumbs/${img.file}" alt="" loading="lazy" />
 								<div class="play-button">▶</div>
 							</a>
@@ -200,7 +201,6 @@
 			function switchMain(e, navId, defaultTabClass) {
 				if(e) e.preventDefault();
 
-				// 🐛 THE FIX: Close the pop-up viewer if it is currently open!
 				const viewerClose = document.querySelector('#viewer .close');
 				if (viewerClose) viewerClose.click();
 
@@ -221,7 +221,6 @@
 			function switchTab(e, tabClass, linkEl) {
 				if(e) e.preventDefault(); 
 				
-				// 🐛 THE FIX: Close the pop-up viewer if it is currently open!
 				const viewerClose = document.querySelector('#viewer .close');
 				if (viewerClose) viewerClose.click();
 
@@ -237,11 +236,18 @@
 				}, 300);
 			}
 
-			// ENGINE: Video Portal
+			// ENGINE: Native Video Portal
 			function openVideo(youtubeId) {
+				const viewer = document.getElementById('viewer');
 				const portal = document.getElementById('video-portal');
+				
+				// Dynamically move the portal INSIDE the left-hand viewer pane
+				if (viewer && portal) {
+					viewer.appendChild(portal);
+				}
+				
 				const player = document.getElementById('youtube-player');
-				// Auto-plays the video in HD, hides the "Related Videos" at the end, and uses a clean interface
+				// Auto-play HD video
 				player.src = "https://www.youtube.com/embed/" + youtubeId + "?autoplay=1&rel=0&showinfo=0&modestbranding=1";
 				portal.style.display = 'block';
 			}
@@ -249,9 +255,24 @@
 			function closeVideo() {
 				const portal = document.getElementById('video-portal');
 				const player = document.getElementById('youtube-player');
-				portal.style.display = 'none';
-				player.src = ""; // This forces the video to stop playing in the background
+				if (portal) portal.style.display = 'none';
+				if (player) player.src = ""; // Forces the video to stop playing
 			}
+
+			// 🚀 THE MAGIC: Listeners to shut off the video if the user navigates away
+			document.addEventListener('click', function(e) {
+				// If they click the Close (X) button, Next Arrow, or Previous Arrow inside the viewer
+				if (e.target.closest('.toggle') || e.target.closest('.nav-next') || e.target.closest('.nav-previous')) {
+					closeVideo();
+				}
+			});
+
+			document.addEventListener('keydown', function(e) {
+				// If they use the keyboard arrows or escape key to navigate/close
+				if (['Escape', 'ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown', ' '].includes(e.key)) {
+					closeVideo();
+				}
+			});
 		</script>
 
 		<script src="assets/js/jquery.min.js"></script>
