@@ -8,7 +8,6 @@
 		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
 
 		<style>
-			/* 1. Flawless Square CSS Grid & Smooth Cross-Fade Animation */
 			#thumbnails {
 				display: grid !important;
 				grid-template-columns: repeat(2, 1fr) !important; 
@@ -38,7 +37,6 @@
 				object-fit: cover !important; 
 			}
 
-			/* The Play Button / Interactive 3D Overlay */
 			.play-button {
 				position: absolute;
 				top: 50%; left: 50%;
@@ -52,7 +50,6 @@
 			}
 			.media-trigger:hover .play-button { opacity: 1; }
 
-			/* 2. The Blurred Cinematic Viewer (For Photos) */
 			#viewer .slide .image {
 				background-size: cover !important;
 				background-position: center !important;
@@ -69,13 +66,11 @@
 				background-repeat: no-repeat !important; background-position: center !important; z-index: 2;
 			}
 
-			/* 3. Main Navigation Styling */
 			.main-categories { font-size: 1.25em; font-weight: normal; margin: 1em 0; }
 			.main-categories a { color: #a0a0a1; border-bottom: none; text-decoration: none; transition: color 0.2s ease; }
 			.main-categories a:hover { color: #333; }
 			.main-categories span { margin: 0 0.5em; color: #a0a0a1; opacity: 0.5; }
 			
-			/* 4. Universal Media Portal */
 			#media-portal {
 				display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
 				background: #000000; z-index: 50;
@@ -97,6 +92,11 @@
 			<header id="header">
 				<h1>Charlie Price</h1>
 				<p style="margin-bottom: 0.5em;">Based on the Isle of Wight, UK</p>
+				
+				<details style="margin-bottom: 2em; font-size: 0.9em; color: #a0a0a1;">
+					<summary style="cursor: pointer; outline: none; transition: color 0.2s ease;">About</summary>
+					<p id="about-text" style="margin-top: 1em; line-height: 1.6; color: #888;"></p>
+				</details>
 				
 				<div class="main-categories">
 					<a href="#" id="link-nav-photo" onclick="switchMain(event, 'nav-photo', 'tab-real-estate')" style="font-weight: bold; text-decoration: underline; color: #333;">Photography</a> <span>/</span>
@@ -129,9 +129,12 @@
 					</ul>
 				</nav>
 
+				<div id="category-desc" style="margin: 2em 0 1em 0; padding-top: 2em; border-top: 1px solid #eee; font-style: italic; color: #888; font-size: 0.9em; display: none;">
+				</div>
+
 				<ul class="icons">
-					<li><a href="https://www.instagram.com/charliepr1ce" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
-					<li><a href="mailto:charlieprice93@gmail.com" class="icon fa-envelope"><span class="label">Email</span></a></li>
+					<li><a href="https://www.instagram.com/yourusername" target="_blank" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
+					<li><a href="mailto:your.email@example.com" class="icon fa-envelope"><span class="label">Email</span></a></li>
 				</ul>
 			</header>
 
@@ -153,11 +156,8 @@
 				if (!dataArray || dataArray.length === 0) return "";
 				let html = "";
 				dataArray.forEach(img => {
-					// 🚀 THE UPGRADE: It looks for mediaId instead of youtubeId
 					if (img.mediaId && img.mediaId !== "") {
-						// 🎮 Custom Play Icon logic: If it's a web link, use a 3D icon instead of a Play button
 						let icon = img.mediaId.startsWith("http") ? "◧" : "▶"; 
-						
 						html += `
 						<article class="portfolio-item ${categoryClass}" style="display: none;">
 							<a class="thumbnail media-trigger" href="images/${folder}/fulls/${img.file}" onclick="setTimeout(() => openMedia('${img.mediaId}'), 50);">
@@ -179,7 +179,6 @@
 				return html;
 			}
 
-			// Load ALL categories safely
 			gallery.innerHTML = 
 				buildGroup((typeof realEstateImages !== 'undefined' ? realEstateImages : null), 'real-estate', 'tab-real-estate') +
 				buildGroup((typeof travelImages !== 'undefined' ? travelImages : null), 'travel', 'tab-travel') +
@@ -194,7 +193,24 @@
 
 			document.querySelectorAll('.tab-real-estate').forEach(item => item.style.display = 'block');
 
-			// ENGINE: Category Switching
+// 🚀 ENGINE: Text Box Injector
+			function updateDescription(tabClass) {
+				const descBox = document.getElementById('category-desc');
+				if (typeof categoryDescriptions !== 'undefined' && categoryDescriptions[tabClass]) {
+					descBox.innerHTML = categoryDescriptions[tabClass];
+					descBox.style.display = 'block';
+				} else {
+					descBox.style.display = 'none';
+				}
+			}
+			
+			// Load the default Real Estate text on first load
+			updateDescription('tab-real-estate');
+
+			// 🚀 INJECT THE ABOUT SECTION
+			if (typeof categoryDescriptions !== 'undefined' && categoryDescriptions['tab-about']) {
+				document.getElementById('about-text').innerHTML = categoryDescriptions['tab-about'];
+			}
 			function switchMain(e, navId, defaultTabClass) {
 				if(e) e.preventDefault();
 				const viewerClose = document.querySelector('#viewer .close');
@@ -214,6 +230,7 @@
 					const firstSubLink = activeNav.querySelector('a');
 					switchTab(null, defaultTabClass, firstSubLink);
 				} else {
+					updateDescription(defaultTabClass); // Update text if no sub-menu
 					gallery.style.opacity = 0;
 					setTimeout(() => {
 						document.querySelectorAll('.portfolio-item').forEach(item => item.style.display = 'none');
@@ -232,6 +249,8 @@
 				parentNav.querySelectorAll('a').forEach(a => a.style.fontWeight = 'normal');
 				linkEl.style.fontWeight = 'bold';
 
+				updateDescription(tabClass); // Update text
+
 				gallery.style.opacity = 0;
 				setTimeout(() => {
 					document.querySelectorAll('.portfolio-item').forEach(item => item.style.display = 'none');
@@ -240,7 +259,6 @@
 				}, 300);
 			}
 
-			// 🚀 ENGINE: Smart Media Portal (Routes YouTube vs Matterport natively)
 			function openMedia(mediaId) {
 				const viewer = document.getElementById('viewer');
 				const portal = document.getElementById('media-portal');
@@ -248,9 +266,8 @@
 				
 				const player = document.getElementById('media-player');
 				
-				// Smart Router: Web Link vs YouTube ID
 				if (mediaId.startsWith("http")) {
-					player.src = mediaId; // Instantly loads the Matterport/Vieweet tour!
+					player.src = mediaId; 
 				} else {
 					player.src = "https://www.youtube.com/embed/" + mediaId + "?autoplay=1&rel=0&showinfo=0&modestbranding=1";
 				}

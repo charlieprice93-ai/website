@@ -11,6 +11,25 @@ FOLDERS = [
 
 js_content = "// AUTO-GENERATED FILE. DO NOT EDIT MANUALLY.\n\n"
 
+# 🚀 NEW: PARSE DESCRIPTIONS INTO JAVASCRIPT
+descriptions = {}
+if os.path.exists("descriptions.txt"):
+    with open("descriptions.txt", "r") as f:
+        for line in f.readlines():
+            if not line.strip() or line.strip().startswith('#'):
+                continue
+            parts = line.split(',', 1)
+            if len(parts) == 2:
+                folder = parts[0].strip()
+                desc = parts[1].strip()
+                descriptions[f"tab-{folder}"] = desc
+
+js_content += "const categoryDescriptions = {\n"
+for tab_class, desc in descriptions.items():
+    safe_desc = desc.replace('"', '\\"').replace('\n', ' ')
+    js_content += f'  "{tab_class}": "{safe_desc}",\n'
+js_content += "};\n\n"
+
 def get_avg_color(img_path):
     try:
         with Image.open(img_path) as img:
@@ -48,7 +67,6 @@ for folder in FOLDERS:
         title, ext = os.path.splitext(filename)
         clean_title = title[4:] if title.startswith("web_") else title
         
-        # 🚀 THE PREFIX TRANSLATOR
         media_id = ""
         media_match = re.search(r'\[(.*?)\]', clean_title)
         if media_match:
@@ -92,7 +110,6 @@ for folder in FOLDERS:
     var_parts = folder.split('-')
     var_name = var_parts[0] + "".join(word.capitalize() for word in var_parts[1:]) + "Images"
     
-    # 🐛 THE FIX: If the variable starts with a number, add an underscore!
     if var_name[0].isdigit():
         var_name = "_" + var_name
         
@@ -104,4 +121,4 @@ for folder in FOLDERS:
 with open("data.js", "w") as f:
     f.write(js_content)
 
-print("✅ Success! Images, Videos, and Interactive Tours processed!")
+print("✅ Success! Images, Videos, Text Descriptions, and Interactive Tours processed!")

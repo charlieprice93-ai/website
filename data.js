@@ -1,5 +1,19 @@
 // AUTO-GENERATED FILE. DO NOT EDIT MANUALLY.
 
+const categoryDescriptions = {
+  "tab-about": "I am a freelance creative based on the Isle of Wight, specializing in premium photography, videography, and design. Whether you need luxury real estate photography across the Island, cinematic promotional films, or interactive 3D property tours, I deliver high-end visual solutions for Isle of Wight businesses and global clients.",
+  "tab-real-estate": "Professional Isle of Wight property photography capturing luxury homes, estate agency listings, and premium holiday lets across the Island.",
+  "tab-travel": "Cinematic travel and lifestyle photography showcasing the natural beauty of the Isle of Wight and global destinations.",
+  "tab-theatre": "Dynamic production stills, rehearsal coverage, and promotional theatre photography for Isle of Wight performing arts and stage productions.",
+  "tab-video-travel": "Immersive 4K drone and ground videography tailored for Isle of Wight tourism boards, local resorts, and commercial campaigns.",
+  "tab-video-music": "Striking music videos and dynamic live performance videography for Isle of Wight musicians, bands, and touring artists.",
+  "tab-video-shorts": "Cinematic short film production and directing, utilizing breathtaking Isle of Wight locations and high-end visual storytelling.",
+  "tab-video-theatre": "Engaging promotional video trailers and live performance recordings for Isle of Wight theatre companies.",
+  "tab-web-branding": "Bespoke website and poster design and cohesive brand identity creation helping Isle of Wight businesses stand out in a digital world.",
+  "tab-floor-plans": "Highly accurate 2D and 3D architectural floor plans, essential for Isle of Wight real estate listings and property developments.",
+  "tab-3d-tours": "Interactive spatial walkthroughs using Matterport and Vieweet to create immersive virtual tours for Isle of Wight properties and venues.",
+};
+
 const realEstateImages = [
   { file: "web_web_DSC00278EXPORT.jpg", title: "web_DSC00278EXPORT", mediaId: "" },
   { file: "web_web_03.jpg", title: "web_03", mediaId: "" },
