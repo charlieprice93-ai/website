@@ -53,17 +53,13 @@ for folder in FOLDERS:
         media_match = re.search(r'\[(.*?)\]', clean_title)
         if media_match:
             raw_id = media_match.group(1)
-            # If it's a Matterport tour
             if raw_id.startswith("mp_"):
                 media_id = f"https://my.matterport.com/show/?m={raw_id[3:]}"
-            # If it's a Vieweet tour
             elif raw_id.startswith("vw_"):
                 media_id = f"https://3dtour.vieweet.com/?tour={raw_id[3:]}"
-            # Otherwise, assume it's a standard YouTube ID
             else:
                 media_id = raw_id
             
-        # Clean the title safely (removed the slashes from the safe list)
         safe_title = re.sub(r'[^A-Za-z0-9\[\]\-_]', '_', clean_title)
         new_filename = f"web_{safe_title}.jpg"
         
@@ -96,6 +92,10 @@ for folder in FOLDERS:
     var_parts = folder.split('-')
     var_name = var_parts[0] + "".join(word.capitalize() for word in var_parts[1:]) + "Images"
     
+    # 🐛 THE FIX: If the variable starts with a number, add an underscore!
+    if var_name[0].isdigit():
+        var_name = "_" + var_name
+        
     js_content += f"const {var_name} = [\n"
     for img in arranged_images:
         js_content += f'  {{ file: "{img["file"]}", title: "{img["title"]}", mediaId: "{img["mediaId"]}" }},\n'

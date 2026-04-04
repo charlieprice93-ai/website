@@ -100,8 +100,8 @@ const floorPlansImages = [
   { file: "web_Abbey_View__Elenors_Grove__Ryde__PO33_4HB.jpg", title: "Abbey_View__Elenors_Grove__Ryde__PO33_4HB", mediaId: "" },
 ];
 
-const 3dToursImages = [
-  { file: "web_DSC08731EXPORT[vw_NCTGTXD].jpg", title: "DSC08731EXPORT[vw_NCTGTXD]", mediaId: "https://3dtour.vieweet.com/?tour=NCTGTXD" },
+const _3dToursImages = [
   { file: "web_DSC01172EXPORT[mp_jdQjbPumpME].jpg", title: "DSC01172EXPORT[mp_jdQjbPumpME]", mediaId: "https://my.matterport.com/show/?m=jdQjbPumpME" },
+  { file: "web_DSC08731EXPORT[vw_NCTGTXD].jpg", title: "DSC08731EXPORT[vw_NCTGTXD]", mediaId: "https://3dtour.vieweet.com/?tour=NCTGTXD" },
 ];
 
