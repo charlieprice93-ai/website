@@ -4,9 +4,9 @@ from PIL import Image
 import re
 
 FOLDERS = [
-    "real-estate", "travel", "theatre", 
+    "real-estate", "floor-plans", "travel", "theatre", 
     "video-travel", "video-music", "video-shorts", "video-theatre",
-    "web-design", "branding"
+    "design"
 ]
 
 js_content = "// AUTO-GENERATED FILE. DO NOT EDIT MANUALLY.\n\n"

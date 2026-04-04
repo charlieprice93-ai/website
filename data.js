@@ -22,6 +22,10 @@ const realEstateImages = [
   { file: "web_web_DSC06527.jpg", title: "web_DSC06527", youtubeId: "" },
 ];
 
+const floorPlansImages = [
+  { file: "web_Abbey_View__Elenors_Grove__Ryde__PO33_4HB.jpg", title: "Abbey_View__Elenors_Grove__Ryde__PO33_4HB", youtubeId: "" },
+];
+
 const travelImages = [
   { file: "web_web_3.jpg", title: "web_3", youtubeId: "" },
   { file: "web_web_DSC02652EXPORT.jpg", title: "web_DSC02652EXPORT", youtubeId: "" },
@@ -90,9 +94,9 @@ const videoTheatreImages = [
   { file: "web_Joel_Morris_Recital_[0iW1bZAvH48].jpg", title: "Joel_Morris_Recital_[0iW1bZAvH48]", youtubeId: "0iW1bZAvH48" },
 ];
 
-const webDesignImages = [
-];
-
-const brandingImages = [
+const designImages = [
+  { file: "web_203mm_x_286mm__inc__bleed__Harwood_Court_Poster.jpg", title: "203mm_x_286mm__inc__bleed__Harwood_Court_Poster", youtubeId: "" },
+  { file: "web_Quarter_Page_Annette_Sandown_Poster-1.jpg", title: "Quarter_Page_Annette_Sandown_Poster-1", youtubeId: "" },
+  { file: "web_Quarter_Page_Annette_Ventnor_Poster-1.jpg", title: "Quarter_Page_Annette_Ventnor_Poster-1", youtubeId: "" },
 ];
 
