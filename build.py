@@ -46,15 +46,24 @@ for folder in FOLDERS:
             continue
             
         title, ext = os.path.splitext(filename)
-        
         clean_title = title[4:] if title.startswith("web_") else title
         
-        youtube_id = ""
-        yt_match = re.search(r'\[([a-zA-Z0-9_-]{11})\]', clean_title)
-        if yt_match:
-            youtube_id = yt_match.group(1)
+        # 🚀 THE PREFIX TRANSLATOR
+        media_id = ""
+        media_match = re.search(r'\[(.*?)\]', clean_title)
+        if media_match:
+            raw_id = media_match.group(1)
+            # If it's a Matterport tour
+            if raw_id.startswith("mp_"):
+                media_id = f"https://my.matterport.com/show/?m={raw_id[3:]}"
+            # If it's a Vieweet tour
+            elif raw_id.startswith("vw_"):
+                media_id = f"https://3dtour.vieweet.com/?tour={raw_id[3:]}"
+            # Otherwise, assume it's a standard YouTube ID
+            else:
+                media_id = raw_id
             
-        # THE FIX: Allow brackets [] and dashes - to survive the web-safe renaming!
+        # Clean the title safely (removed the slashes from the safe list)
         safe_title = re.sub(r'[^A-Za-z0-9\[\]\-_]', '_', clean_title)
         new_filename = f"web_{safe_title}.jpg"
         
@@ -73,7 +82,7 @@ for folder in FOLDERS:
             subprocess.run(['sips', '-Z', '600', '-s', 'formatOptions', '70', new_full_path, '--out', thumb_path], capture_output=True)
         
         avg_color = get_avg_color(thumb_path)
-        images_data.append({"file": new_filename, "title": clean_title, "color": avg_color, "youtubeId": youtube_id})
+        images_data.append({"file": new_filename, "title": clean_title, "color": avg_color, "mediaId": media_id})
         
     arranged_images = []
     if images_data:
@@ -89,10 +98,10 @@ for folder in FOLDERS:
     
     js_content += f"const {var_name} = [\n"
     for img in arranged_images:
-        js_content += f'  {{ file: "{img["file"]}", title: "{img["title"]}", youtubeId: "{img["youtubeId"]}" }},\n'
+        js_content += f'  {{ file: "{img["file"]}", title: "{img["title"]}", mediaId: "{img["mediaId"]}" }},\n'
     js_content += "];\n\n"
 
 with open("data.js", "w") as f:
     f.write(js_content)
 
-print("✅ Success! Images, Videos, and Categories processed!")
+print("✅ Success! Images, Videos, and Interactive Tours processed!")

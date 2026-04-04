@@ -25,7 +25,7 @@
 				transform: none !important;
 			}
 			#thumbnails article .thumbnail, 
-			#thumbnails article .video-trigger {
+			#thumbnails article .media-trigger {
 				width: 100% !important;
 				aspect-ratio: 1 / 1 !important;
 				display: block;
@@ -38,7 +38,7 @@
 				object-fit: cover !important; 
 			}
 
-			/* The Play Button Overlay for Videos */
+			/* The Play Button / Interactive 3D Overlay */
 			.play-button {
 				position: absolute;
 				top: 50%; left: 50%;
@@ -50,7 +50,7 @@
 				transition: opacity 0.2s;
 				pointer-events: none;
 			}
-			.video-trigger:hover .play-button { opacity: 1; }
+			.media-trigger:hover .play-button { opacity: 1; }
 
 			/* 2. The Blurred Cinematic Viewer (For Photos) */
 			#viewer .slide .image {
@@ -75,12 +75,12 @@
 			.main-categories a:hover { color: #333; }
 			.main-categories span { margin: 0 0.5em; color: #a0a0a1; opacity: 0.5; }
 			
-			/* 4. Native Embedded Video Portal */
-			#video-portal {
+			/* 4. Universal Media Portal */
+			#media-portal {
 				display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
 				background: #000000; z-index: 50;
 			}
-			#video-portal iframe {
+			#media-portal iframe {
 				position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
 				width: 100%; height: 100%; border: none;
 			}
@@ -89,8 +89,8 @@
 	</head>
 	<body class="is-preload-0 is-preload-1 is-preload-2">
 
-		<div id="video-portal">
-			<iframe id="youtube-player" src="" allow="autoplay; fullscreen; encrypted-media"></iframe>
+		<div id="media-portal">
+			<iframe id="media-player" src="" allow="autoplay; fullscreen; encrypted-media; xr-spatial-tracking"></iframe>
 		</div>
 
 		<div id="main">
@@ -153,12 +153,16 @@
 				if (!dataArray || dataArray.length === 0) return "";
 				let html = "";
 				dataArray.forEach(img => {
-					if (img.youtubeId && img.youtubeId !== "") {
+					// 🚀 THE UPGRADE: It looks for mediaId instead of youtubeId
+					if (img.mediaId && img.mediaId !== "") {
+						// 🎮 Custom Play Icon logic: If it's a web link, use a 3D icon instead of a Play button
+						let icon = img.mediaId.startsWith("http") ? "◧" : "▶"; 
+						
 						html += `
 						<article class="portfolio-item ${categoryClass}" style="display: none;">
-							<a class="thumbnail video-trigger" href="images/${folder}/fulls/${img.file}" onclick="setTimeout(() => openVideo('${img.youtubeId}'), 50);">
+							<a class="thumbnail media-trigger" href="images/${folder}/fulls/${img.file}" onclick="setTimeout(() => openMedia('${img.mediaId}'), 50);">
 								<img src="images/${folder}/thumbs/${img.file}" alt="" loading="lazy" />
-								<div class="play-button">▶</div>
+								<div class="play-button">${icon}</div>
 							</a>
 							<h2></h2><p></p>
 						</article>`;
@@ -193,7 +197,6 @@
 			// ENGINE: Category Switching
 			function switchMain(e, navId, defaultTabClass) {
 				if(e) e.preventDefault();
-
 				const viewerClose = document.querySelector('#viewer .close');
 				if (viewerClose) viewerClose.click();
 
@@ -205,15 +208,23 @@
 
 				document.querySelectorAll('.sub-nav').forEach(nav => nav.style.display = 'none');
 				const activeNav = document.getElementById(navId);
-				activeNav.style.display = 'block';
-
-				const firstSubLink = activeNav.querySelector('a');
-				switchTab(null, defaultTabClass, firstSubLink);
+				
+				if (activeNav) {
+					activeNav.style.display = 'block';
+					const firstSubLink = activeNav.querySelector('a');
+					switchTab(null, defaultTabClass, firstSubLink);
+				} else {
+					gallery.style.opacity = 0;
+					setTimeout(() => {
+						document.querySelectorAll('.portfolio-item').forEach(item => item.style.display = 'none');
+						document.querySelectorAll('.' + defaultTabClass).forEach(item => item.style.display = 'block');
+						gallery.style.opacity = 1;
+					}, 300);
+				}
 			}
 
 			function switchTab(e, tabClass, linkEl) {
 				if(e) e.preventDefault(); 
-				
 				const viewerClose = document.querySelector('#viewer .close');
 				if (viewerClose) viewerClose.click();
 
@@ -229,33 +240,40 @@
 				}, 300);
 			}
 
-			// ENGINE: Native Video Portal
-			function openVideo(youtubeId) {
+			// 🚀 ENGINE: Smart Media Portal (Routes YouTube vs Matterport natively)
+			function openMedia(mediaId) {
 				const viewer = document.getElementById('viewer');
-				const portal = document.getElementById('video-portal');
+				const portal = document.getElementById('media-portal');
 				if (viewer && portal) viewer.appendChild(portal);
 				
-				const player = document.getElementById('youtube-player');
-				player.src = "https://www.youtube.com/embed/" + youtubeId + "?autoplay=1&rel=0&showinfo=0&modestbranding=1";
+				const player = document.getElementById('media-player');
+				
+				// Smart Router: Web Link vs YouTube ID
+				if (mediaId.startsWith("http")) {
+					player.src = mediaId; // Instantly loads the Matterport/Vieweet tour!
+				} else {
+					player.src = "https://www.youtube.com/embed/" + mediaId + "?autoplay=1&rel=0&showinfo=0&modestbranding=1";
+				}
+				
 				portal.style.display = 'block';
 			}
 
-			function closeVideo() {
-				const portal = document.getElementById('video-portal');
-				const player = document.getElementById('youtube-player');
+			function closeMedia() {
+				const portal = document.getElementById('media-portal');
+				const player = document.getElementById('media-player');
 				if (portal) portal.style.display = 'none';
 				if (player) player.src = ""; 
 			}
 
 			document.addEventListener('click', function(e) {
 				if (e.target.closest('.toggle') || e.target.closest('.nav-next') || e.target.closest('.nav-previous')) {
-					closeVideo();
+					closeMedia();
 				}
 			});
 
 			document.addEventListener('keydown', function(e) {
 				if (['Escape', 'ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown', ' '].includes(e.key)) {
-					closeVideo();
+					closeMedia();
 				}
 			});
 		</script>
