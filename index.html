@@ -154,7 +154,7 @@
 		<script>
 			const gallery = document.getElementById("thumbnails");
 
-function buildGroup(dataArray, folder, categoryClass) {
+			function buildGroup(dataArray, folder, categoryClass) {
 				if (!dataArray || dataArray.length === 0) return "";
 				let html = "";
 				dataArray.forEach(img => {
@@ -186,7 +186,7 @@ function buildGroup(dataArray, folder, categoryClass) {
 				return html;
 			}
 
-// Load ALL categories safely
+			// Load ALL categories safely
 			gallery.innerHTML = 
 				buildGroup((typeof realEstateImages !== 'undefined' ? realEstateImages : null), 'real-estate', 'tab-real-estate') +
 				buildGroup((typeof travelImages !== 'undefined' ? travelImages : null), 'travel', 'tab-travel') +
@@ -203,6 +203,11 @@ function buildGroup(dataArray, folder, categoryClass) {
 			// ENGINE: Category Switching
 			function switchMain(e, navId, defaultTabClass) {
 				if(e) e.preventDefault();
+
+				// 🐛 THE FIX: Close the pop-up viewer if it is currently open!
+				const viewerClose = document.querySelector('#viewer .close');
+				if (viewerClose) viewerClose.click();
+
 				document.querySelectorAll('.main-categories a').forEach(a => {
 					a.style.fontWeight = 'normal'; a.style.textDecoration = 'none'; a.style.color = '#a0a0a1'; 
 				});
@@ -219,6 +224,11 @@ function buildGroup(dataArray, folder, categoryClass) {
 
 			function switchTab(e, tabClass, linkEl) {
 				if(e) e.preventDefault(); 
+				
+				// 🐛 THE FIX: Close the pop-up viewer if it is currently open!
+				const viewerClose = document.querySelector('#viewer .close');
+				if (viewerClose) viewerClose.click();
+
 				const parentNav = linkEl.closest('.sub-nav');
 				parentNav.querySelectorAll('a').forEach(a => a.style.fontWeight = 'normal');
 				linkEl.style.fontWeight = 'bold';
