@@ -125,3 +125,13 @@ const _3dToursImages = [
   { file: "web_DSC01172EXPORT[mp_jdQjbPumpME].jpg", title: "DSC01172EXPORT[mp_jdQjbPumpME]", mediaId: "https://my.matterport.com/show/?m=jdQjbPumpME" },
 ];
 
+const categoryLogos = {
+  "tab-real-estate": ["images/real-estate/thumbs/web_eea logo.png", "images/real-estate/thumbs/web_springboklogo.png", "images/real-estate/thumbs/web_propertyboxlogo.png", "images/real-estate/thumbs/web_wbplogo.png", "images/real-estate/thumbs/web_rokmarshlogo.png", "images/real-estate/thumbs/web_hrdlogo.png", "images/real-estate/thumbs/web_purpleBricksNew.png"],
+  "tab-travel": ["images/travel/thumbs/web_topdecklogo.jpg", "images/travel/thumbs/web_wightlinklogo.jpg", "images/travel/thumbs/web_nhstrustlogo.jpg", "images/travel/thumbs/web_sunsail.png"],
+  "tab-theatre": ["images/theatre/thumbs/web_mikehowleylogo.jpg", "images/theatre/thumbs/web_deadmanlogo.jpg"],
+  "tab-video-travel": ["images/video-travel/thumbs/web_topdecklogo.jpg", "images/video-travel/thumbs/web_wightlinklogo.jpg", "images/video-travel/thumbs/web_nhstrustlogo.jpg", "images/video-travel/thumbs/web_sunsail.png"],
+  "tab-video-theatre": ["images/video-theatre/thumbs/web_joelmorrislogo.png", "images/video-theatre/thumbs/web_brightonrocks.jpg", "images/video-theatre/thumbs/web_mikehowleylogo.jpg", "images/video-theatre/thumbs/web_barnes.jpg", "images/video-theatre/thumbs/web_montreal.jpg", "images/video-theatre/thumbs/web_deadmanlogo.jpg"],
+  "tab-floor-plans": ["images/floor-plans/thumbs/web_rayon logo.png"],
+  "tab-3d-tours": ["images/3d-tours/thumbs/web_thetalogo.jpg", "images/3d-tours/thumbs/web_vieweetlogo.png", "images/3d-tours/thumbs/web_matterportlogo.png"],
+};
+

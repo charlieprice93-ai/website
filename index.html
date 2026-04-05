@@ -100,6 +100,25 @@
 			details[open] > summary::before {
 				transform: rotate(90deg); /* Animates the arrow pointing down when clicked */
 			}
+			/* 4. Category Blurb Logos */
+			.blurb-logos {
+				margin-top: 1.5em;
+				display: flex;
+				gap: 1.5em;
+				flex-wrap: wrap;
+				align-items: center;
+			}
+			.blurb-logos img {
+				height: 35px; 
+				width: auto;
+				opacity: 0.5; 
+				filter: grayscale(100%);
+				transition: all 0.3s ease;
+			}
+			.blurb-logos img:hover {
+				opacity: 1;
+				filter: grayscale(0%);
+			}
 		</style>
 	</head>
 	<body class="is-preload-0 is-preload-1 is-preload-2">
@@ -214,22 +233,32 @@
 			document.querySelectorAll('.tab-real-estate').forEach(item => item.style.display = 'block');
 
 // 🚀 ENGINE: Text Box Injector
+		// 🚀 ENGINE: Text Box & Logo Injector
 			function updateDescription(tabClass) {
 				const descBox = document.getElementById('category-desc');
+				let html = "";
+				
+				// 1. Inject Text (if it exists)
 				if (typeof categoryDescriptions !== 'undefined' && categoryDescriptions[tabClass]) {
-					descBox.innerHTML = categoryDescriptions[tabClass];
+					html += categoryDescriptions[tabClass];
+				}
+				
+				// 2. Inject Logos (if they exist)
+				if (typeof categoryLogos !== 'undefined' && categoryLogos[tabClass]) {
+					html += '<div class="blurb-logos">';
+					categoryLogos[tabClass].forEach(logoSrc => {
+						html += `<img src="${logoSrc}" alt="Client Logo" />`;
+					});
+					html += '</div>';
+				}
+				
+				// 3. Show or Hide the box
+				if (html !== "") {
+					descBox.innerHTML = html;
 					descBox.style.display = 'block';
 				} else {
 					descBox.style.display = 'none';
 				}
-			}
-			
-			// Load the default Real Estate text on first load
-			updateDescription('tab-real-estate');
-
-			// 🚀 INJECT THE ABOUT SECTION
-			if (typeof categoryDescriptions !== 'undefined' && categoryDescriptions['tab-about']) {
-				document.getElementById('about-text').innerHTML = categoryDescriptions['tab-about'];
 			}
 function switchMain(e, navId, defaultTabClass) {
 				if(e) e.preventDefault();

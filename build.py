@@ -2,6 +2,7 @@ import os
 import subprocess
 from PIL import Image
 import re
+import json
 
 FOLDERS = [
     "real-estate", "travel", "theatre", 
@@ -11,7 +12,7 @@ FOLDERS = [
 
 js_content = "// AUTO-GENERATED FILE. DO NOT EDIT MANUALLY.\n\n"
 
-# 🚀 NEW: PARSE DESCRIPTIONS INTO JAVASCRIPT
+# PARSE DESCRIPTIONS INTO JAVASCRIPT
 descriptions = {}
 if os.path.exists("descriptions.txt"):
     with open("descriptions.txt", "r") as f:
@@ -29,6 +30,8 @@ for tab_class, desc in descriptions.items():
     safe_desc = desc.replace('"', '\\"').replace('\n', ' ')
     js_content += f'  "{tab_class}": "{safe_desc}",\n'
 js_content += "};\n\n"
+
+category_logos = {} # 🚀 NEW: Setup global logo storage
 
 def get_avg_color(img_path):
     try:
@@ -59,6 +62,7 @@ for folder in FOLDERS:
             os.remove(os.path.join(thumbs_dir, thumb_file))
             
     images_data = []
+    blurb_logos = [] # 🚀 NEW: Collect logos for this specific folder
     
     for filename in os.listdir(fulls_dir):
         if filename.startswith('.') or not os.path.isfile(os.path.join(fulls_dir, filename)):
@@ -66,6 +70,11 @@ for folder in FOLDERS:
             
         title, ext = os.path.splitext(filename)
         clean_title = title[4:] if title.startswith("web_") else title
+        
+        # 🚀 NEW: Check if it's a blurb logo
+        is_blurb = "[blurb]" in clean_title.lower()
+        if is_blurb:
+            clean_title = re.sub(r'\[blurb\]', '', clean_title, flags=re.IGNORECASE).strip()
         
         media_id = ""
         media_match = re.search(r'\[(.*?)\]', clean_title)
@@ -75,15 +84,16 @@ for folder in FOLDERS:
                 media_id = f"https://my.matterport.com/show/?m={raw_id[3:]}"
             elif raw_id.startswith("vw_"):
                 media_id = f"https://3dtour.vieweet.com/?tour={raw_id[3:]}"
-                # 🚀 NEW: Tell Python how to handle Rayon links
-            # 🚀 UPDATED: Using the correct Rayon presentation URL structure
             elif raw_id.startswith("ry_"):
                 media_id = f"https://www.rayon.design/app/model/{raw_id[3:]}/presentation"
             else:
                 media_id = raw_id
             
-        safe_title = re.sub(r'[^A-Za-z0-9\[\]\-_]', '_', clean_title)
-        new_filename = f"web_{safe_title}.jpg"
+        safe_title = re.sub(r'[^A-Za-z0-9\[\]\-_ ]', '_', clean_title)
+        
+        # 🚀 NEW: Preserve PNG files, convert everything else to JPG
+        target_ext = ".png" if ext.lower() == ".png" else ".jpg"
+        new_filename = f"web_{safe_title}{target_ext}"
         
         orig_path = os.path.join(fulls_dir, filename)
         new_full_path = os.path.join(fulls_dir, new_filename)
@@ -92,15 +102,29 @@ for folder in FOLDERS:
         if orig_path != new_full_path:
             if not os.path.exists(new_full_path):
                 print(f"🗜 Optimizing & Renaming: {filename} -> {new_filename}")
-                subprocess.run(['sips', '-Z', '2560', '-s', 'format', 'jpeg', '-s', 'formatOptions', '80', orig_path, '--out', new_full_path], capture_output=True)
+                if target_ext == ".png":
+                    subprocess.run(['sips', '-Z', '2560', orig_path, '--out', new_full_path], capture_output=True)
+                else:
+                    subprocess.run(['sips', '-Z', '2560', '-s', 'format', 'jpeg', '-s', 'formatOptions', '80', orig_path, '--out', new_full_path], capture_output=True)
             os.remove(orig_path)
                 
         if not os.path.exists(thumb_path):
             print(f"📸 Generating thumbnail: {new_filename}")
-            subprocess.run(['sips', '-Z', '600', '-s', 'formatOptions', '70', new_full_path, '--out', thumb_path], capture_output=True)
+            if target_ext == ".png":
+                subprocess.run(['sips', '-Z', '600', new_full_path, '--out', thumb_path], capture_output=True)
+            else:
+                subprocess.run(['sips', '-Z', '600', '-s', 'formatOptions', '70', new_full_path, '--out', thumb_path], capture_output=True)
         
-        avg_color = get_avg_color(thumb_path)
-        images_data.append({"file": new_filename, "title": clean_title, "color": avg_color, "mediaId": media_id})
+        # 🚀 NEW: Sort logos away from the main image grid
+        if is_blurb:
+            blurb_logos.append(f"images/{folder}/thumbs/{new_filename}")
+        else:
+            avg_color = get_avg_color(thumb_path)
+            images_data.append({"file": new_filename, "title": clean_title, "color": avg_color, "mediaId": media_id})
+        
+    # Add folder's logos to the master list
+    if blurb_logos:
+        category_logos[f"tab-{folder}"] = blurb_logos
         
     arranged_images = []
     if images_data:
@@ -112,14 +136,9 @@ for folder in FOLDERS:
             
             for img in images_data:
                 c_color = img["color"]
-                
-                # Distance to the previous image (left or diagonal)
                 dist_prev = color_distance(arranged_images[idx - 1]["color"], c_color)
-                
-                # Distance to the image directly above it (2 spots back in a 2-col grid)
                 if idx >= 2:
                     dist_above = color_distance(arranged_images[idx - 2]["color"], c_color)
-                    # We want to maximize the MINIMUM distance to ensure it contrasts against BOTH neighbors
                     score = min(dist_prev, dist_above)
                 else:
                     score = dist_prev
@@ -142,7 +161,13 @@ for folder in FOLDERS:
         js_content += f'  {{ file: "{img["file"]}", title: "{img["title"]}", mediaId: "{img["mediaId"]}" }},\n'
     js_content += "];\n\n"
 
+# 🚀 NEW: Write logos to javascript file
+js_content += "const categoryLogos = {\n"
+for tab_class, logos in category_logos.items():
+    js_content += f'  "{tab_class}": {json.dumps(logos)},\n'
+js_content += "};\n\n"
+
 with open("data.js", "w") as f:
     f.write(js_content)
 
-print("✅ Success! Images, Videos, Text Descriptions, and Interactive Tours processed!")
+print("✅ Success! Images, Videos, Text Descriptions, Logos, and Interactive Tours processed!")
