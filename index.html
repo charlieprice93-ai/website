@@ -231,7 +231,7 @@
 			if (typeof categoryDescriptions !== 'undefined' && categoryDescriptions['tab-about']) {
 				document.getElementById('about-text').innerHTML = categoryDescriptions['tab-about'];
 			}
-			function switchMain(e, navId, defaultTabClass) {
+function switchMain(e, navId, defaultTabClass) {
 				if(e) e.preventDefault();
 				const viewerClose = document.querySelector('#viewer .close');
 				if (viewerClose) viewerClose.click();
@@ -256,6 +256,12 @@
 						document.querySelectorAll('.portfolio-item').forEach(item => item.style.display = 'none');
 						document.querySelectorAll('.' + defaultTabClass).forEach(item => item.style.display = 'block');
 						gallery.style.opacity = 1;
+
+						// 🚀 NEW: Auto-select the first image (Desktop only)
+						if (window.innerWidth > 980) {
+							const firstImg = document.querySelector('.' + defaultTabClass + ' .thumbnail');
+							if (firstImg) firstImg.click();
+						}
 					}, 300);
 				}
 			}
@@ -276,9 +282,14 @@
 					document.querySelectorAll('.portfolio-item').forEach(item => item.style.display = 'none');
 					document.querySelectorAll('.' + tabClass).forEach(item => item.style.display = 'block');
 					gallery.style.opacity = 1;
+
+					// 🚀 NEW: Auto-select the first image (Desktop only)
+					if (window.innerWidth > 980) {
+						const firstImg = document.querySelector('.' + tabClass + ' .thumbnail');
+						if (firstImg) firstImg.click();
+					}
 				}, 300);
 			}
-
 			function openMedia(mediaId) {
 				const viewer = document.getElementById('viewer');
 				const portal = document.getElementById('media-portal');
