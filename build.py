@@ -31,7 +31,7 @@ for tab_class, desc in descriptions.items():
     js_content += f'  "{tab_class}": "{safe_desc}",\n'
 js_content += "};\n\n"
 
-category_logos = {} # 🚀 NEW: Setup global logo storage
+category_logos = {} 
 
 def get_avg_color(img_path):
     try:
@@ -42,6 +42,14 @@ def get_avg_color(img_path):
 
 def color_distance(c1, c2):
     return sum((a - b) ** 2 for a, b in zip(c1, c2))
+
+# 🚀 NEW: Helper to calculate Logo Aspect Ratio (Width / Height)
+def get_aspect_ratio(img_path):
+    try:
+        with Image.open(img_path) as img:
+            return img.width / img.height
+    except Exception:
+        return 1.0
 
 for folder in FOLDERS:
     fulls_dir = f"images/{folder}/fulls"
@@ -62,7 +70,7 @@ for folder in FOLDERS:
             os.remove(os.path.join(thumbs_dir, thumb_file))
             
     images_data = []
-    blurb_logos = [] # 🚀 NEW: Collect logos for this specific folder
+    blurb_logos = [] 
     
     for filename in os.listdir(fulls_dir):
         if filename.startswith('.') or not os.path.isfile(os.path.join(fulls_dir, filename)):
@@ -71,7 +79,6 @@ for folder in FOLDERS:
         title, ext = os.path.splitext(filename)
         clean_title = title[4:] if title.startswith("web_") else title
         
-        # 🚀 NEW: Check if it's a blurb logo
         is_blurb = "[blurb]" in clean_title.lower()
         if is_blurb:
             clean_title = re.sub(r'\[blurb\]', '', clean_title, flags=re.IGNORECASE).strip()
@@ -91,7 +98,6 @@ for folder in FOLDERS:
             
         safe_title = re.sub(r'[^A-Za-z0-9\[\]\-_ ]', '_', clean_title)
         
-        # 🚀 NEW: Preserve PNG files, convert everything else to JPG
         target_ext = ".png" if ext.lower() == ".png" else ".jpg"
         new_filename = f"web_{safe_title}{target_ext}"
         
@@ -115,16 +121,27 @@ for folder in FOLDERS:
             else:
                 subprocess.run(['sips', '-Z', '600', '-s', 'formatOptions', '70', new_full_path, '--out', thumb_path], capture_output=True)
         
-        # 🚀 NEW: Sort logos away from the main image grid
+        # 🚀 NEW: Record aspect ratio for logos
         if is_blurb:
-            blurb_logos.append(f"images/{folder}/thumbs/{new_filename}")
+            aspect = get_aspect_ratio(thumb_path)
+            blurb_logos.append({"path": f"images/{folder}/thumbs/{new_filename}", "aspect": aspect})
         else:
             avg_color = get_avg_color(thumb_path)
             images_data.append({"file": new_filename, "title": clean_title, "color": avg_color, "mediaId": media_id})
         
-    # Add folder's logos to the master list
+    # 🚀 NEW: Smart Size Sorter (Alternates Wide -> Narrow -> Wide)
     if blurb_logos:
-        category_logos[f"tab-{folder}"] = blurb_logos
+        blurb_logos.sort(key=lambda x: x["aspect"], reverse=True)
+        arranged_logos = []
+        left = 0
+        right = len(blurb_logos) - 1
+        while left <= right:
+            arranged_logos.append(blurb_logos[left]["path"])
+            left += 1
+            if left <= right:
+                arranged_logos.append(blurb_logos[right]["path"])
+                right -= 1
+        category_logos[f"tab-{folder}"] = arranged_logos
         
     arranged_images = []
     if images_data:
@@ -161,7 +178,6 @@ for folder in FOLDERS:
         js_content += f'  {{ file: "{img["file"]}", title: "{img["title"]}", mediaId: "{img["mediaId"]}" }},\n'
     js_content += "];\n\n"
 
-# 🚀 NEW: Write logos to javascript file
 js_content += "const categoryLogos = {\n"
 for tab_class, logos in category_logos.items():
     js_content += f'  "{tab_class}": {json.dumps(logos)},\n'

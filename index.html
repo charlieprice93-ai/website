@@ -100,24 +100,30 @@
 			details[open] > summary::before {
 				transform: rotate(90deg); /* Animates the arrow pointing down when clicked */
 			}
-			/* 4. Category Blurb Logos */
+		/* 4. Category Blurb Logos */
 			.blurb-logos {
-				margin-top: 1.5em;
+				margin-top: 2em;
 				display: flex;
-				gap: 1.5em;
+				gap: 2.5em; /* Wider gap to accommodate the zoom effect */
 				flex-wrap: wrap;
+				justify-content: center; /* 🚀 NEW: Centers the logos */
 				align-items: center;
 			}
 			.blurb-logos img {
-				height: 35px; 
-				width: auto;
+				height: 45px; /* 🚀 NEW: Larger base size */
+				max-width: 140px; /* Prevents super wide text-logos from breaking the layout */
+				object-fit: contain;
 				opacity: 0.5; 
 				filter: grayscale(100%);
-				transition: all 0.3s ease;
+				transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* A smooth, springy animation */
+				transform-origin: center;
 			}
 			.blurb-logos img:hover {
 				opacity: 1;
 				filter: grayscale(0%);
+				transform: scale(1.6); /* 🚀 NEW: Dramatic pop-out effect to thumbnail size */
+				z-index: 10;
+				position: relative;
 			}
 		</style>
 	</head>
