@@ -83,6 +83,23 @@
 				width: 100%; height: 100%; border: none;
 			}
 			#viewer .inner { z-index: 99999 !important; }
+			/* 3. Custom Accordion Arrow Override */
+			details > summary {
+				list-style: none; /* Hides the default arrow on modern browsers */
+			}
+			details > summary::-webkit-details-marker {
+				display: none; /* Hides the default arrow on older Safari/iOS */
+			}
+			details > summary::before {
+				content: '▸'; /* A clean, geometric text triangle */
+				display: inline-block;
+				margin-right: 0.5em;
+				transition: transform 0.2s ease;
+				font-size: 1.1em;
+			}
+			details[open] > summary::before {
+				transform: rotate(90deg); /* Animates the arrow pointing down when clicked */
+			}
 		</style>
 	</head>
 	<body class="is-preload-0 is-preload-1 is-preload-2">
@@ -137,8 +154,8 @@
 
 				<ul class="icons">
 					<li><a href="https://www.instagram.com/charliepr1ce" target="_blank" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
-					<li><a href="mailto:charlieprice93@gmail.com" class="icon fa-envelope"><span class="label">Email</span></a></li>
-				</ul>
+					<li><a href="#" onclick="copyEmail(event)" class="icon fa-envelope"><span class="label">Email</span></a></li>
+</ul>
 			</header>
 
 			<section id="thumbnails"></section>
@@ -296,6 +313,21 @@
 					closeMedia();
 				}
 			});
+			function copyEmail(e) {
+				e.preventDefault();
+				const email = "charlieprice93@gmail.com";
+				
+				// 1. Copy the email to the user's clipboard
+				navigator.clipboard.writeText(email).then(() => {
+					// 2. Show a polite alert
+					alert("Email address copied to clipboard: " + email);
+					// 3. Still attempt to open their mail app
+					window.location.href = "mailto:" + email;
+				}).catch(err => {
+					// Fallback if their browser blocks clipboard access
+					window.location.href = "mailto:" + email;
+				});
+			}
 		</script>
 
 		<script src="assets/js/jquery.min.js"></script>
