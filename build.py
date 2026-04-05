@@ -102,10 +102,30 @@ for folder in FOLDERS:
     if images_data:
         arranged_images.append(images_data.pop(0))
         while images_data:
-            last_color = arranged_images[-1]["color"]
-            furthest_img = max(images_data, key=lambda x: color_distance(last_color, x["color"]))
-            arranged_images.append(furthest_img)
-            images_data.remove(furthest_img)
+            idx = len(arranged_images)
+            best_img = None
+            best_score = -1
+            
+            for img in images_data:
+                c_color = img["color"]
+                
+                # Distance to the previous image (left or diagonal)
+                dist_prev = color_distance(arranged_images[idx - 1]["color"], c_color)
+                
+                # Distance to the image directly above it (2 spots back in a 2-col grid)
+                if idx >= 2:
+                    dist_above = color_distance(arranged_images[idx - 2]["color"], c_color)
+                    # We want to maximize the MINIMUM distance to ensure it contrasts against BOTH neighbors
+                    score = min(dist_prev, dist_above)
+                else:
+                    score = dist_prev
+                    
+                if score > best_score:
+                    best_score = score
+                    best_img = img
+                    
+            arranged_images.append(best_img)
+            images_data.remove(best_img)
             
     var_parts = folder.split('-')
     var_name = var_parts[0] + "".join(word.capitalize() for word in var_parts[1:]) + "Images"
