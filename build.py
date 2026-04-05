@@ -76,8 +76,9 @@ for folder in FOLDERS:
             elif raw_id.startswith("vw_"):
                 media_id = f"https://3dtour.vieweet.com/?tour={raw_id[3:]}"
                 # 🚀 NEW: Tell Python how to handle Rayon links
+            # 🚀 UPDATED: Using the correct Rayon presentation URL structure
             elif raw_id.startswith("ry_"):
-                media_id = f"https://rayon.design/r/{raw_id[3:]}?embedded=true"
+                media_id = f"https://www.rayon.design/app/model/{raw_id[3:]}/presentation"
             else:
                 media_id = raw_id
             

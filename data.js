@@ -112,7 +112,7 @@ const webBrandingImages = [
 
 const floorPlansImages = [
   { file: "web_Screenshot_2026-04-05_at_20_50_27.jpg", title: "Screenshot_2026-04-05_at_20_50_27", mediaId: "" },
-  { file: "web_Floorplan_Concept_1_[ry_3fdda6cb-417f-4169-bc2d-063da5d2db36_presentation].jpg", title: "Floorplan_Concept_1_[ry_3fdda6cb-417f-4169-bc2d-063da5d2db36:presentation]", mediaId: "https://rayon.design/r/3fdda6cb-417f-4169-bc2d-063da5d2db36:presentation?embedded=true" },
+  { file: "web_Floorplan_Concept_1_[ry_3fdda6cb-417f-4169-bc2d-063da5d2db36_presentation].jpg", title: "Floorplan_Concept_1_[ry_3fdda6cb-417f-4169-bc2d-063da5d2db36_presentation]", mediaId: "https://www.rayon.design/app/model/3fdda6cb-417f-4169-bc2d-063da5d2db36_presentation/presentation" },
   { file: "web_Screenshot_2026-04-05_at_20_47_20.jpg", title: "Screenshot_2026-04-05_at_20_47_20", mediaId: "" },
   { file: "web_Screenshot_2026-04-05_at_20_47_59.jpg", title: "Screenshot_2026-04-05_at_20_47_59", mediaId: "" },
 ];
