@@ -234,7 +234,7 @@
 function switchMain(e, navId, defaultTabClass) {
 				if(e) e.preventDefault();
 				const viewerClose = document.querySelector('#viewer .close');
-				if (viewerClose) viewerClose.click();
+				if (viewerClose) viewerClose.click();closeMedia();
 
 				document.querySelectorAll('.main-categories a').forEach(a => {
 					a.style.fontWeight = 'normal'; a.style.textDecoration = 'none'; a.style.color = '#a0a0a1'; 
@@ -269,7 +269,7 @@ function switchMain(e, navId, defaultTabClass) {
 			function switchTab(e, tabClass, linkEl) {
 				if(e) e.preventDefault(); 
 				const viewerClose = document.querySelector('#viewer .close');
-				if (viewerClose) viewerClose.click();
+				if (viewerClose) viewerClose.click();closeMedia();
 
 				const parentNav = linkEl.closest('.sub-nav');
 				parentNav.querySelectorAll('a').forEach(a => a.style.fontWeight = 'normal');
@@ -300,7 +300,7 @@ function switchMain(e, navId, defaultTabClass) {
 				if (mediaId.startsWith("http")) {
 					player.src = mediaId; 
 				} else {
-					player.src = "https://www.youtube.com/embed/" + mediaId + "?autoplay=1&rel=0&showinfo=0&modestbranding=1";
+					player.src = "https://www.youtube.com/embed/" + mediaId + "?autoplay=1&mute=1&rel=0&showinfo=0&modestbranding=1";
 				}
 				
 				portal.style.display = 'block';
