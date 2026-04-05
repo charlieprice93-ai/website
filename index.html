@@ -313,8 +313,14 @@ function switchMain(e, navId, defaultTabClass) {
 				if (player) player.src = ""; 
 			}
 
-			document.addEventListener('click', function(e) {
-				if (e.target.closest('.toggle') || e.target.closest('.nav-next') || e.target.closest('.nav-previous')) {
+		document.addEventListener('click', function(e) {
+				// Close if they click the 'X' toggle, nav arrows, OR a standard photo thumbnail
+				if (
+					e.target.closest('.toggle') || 
+					e.target.closest('.nav-next') || 
+					e.target.closest('.nav-previous') || 
+					(e.target.closest('.thumbnail') && !e.target.closest('.media-trigger'))
+				) {
 					closeMedia();
 				}
 			});
