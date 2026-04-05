@@ -290,7 +290,13 @@ function switchMain(e, navId, defaultTabClass) {
 					}
 				}, 300);
 			}
-			function openMedia(mediaId) {
+		function openMedia(mediaId) {
+				// 🚀 NEW: Catch Rayon links and force them into a new tab
+				if (mediaId.includes("rayon.design")) {
+					window.open(mediaId, '_blank');
+					return; // This stops the black iframe portal from opening
+				}
+
 				const viewer = document.getElementById('viewer');
 				const portal = document.getElementById('media-portal');
 				if (viewer && portal) viewer.appendChild(portal);
