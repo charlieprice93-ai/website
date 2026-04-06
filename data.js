@@ -127,9 +127,9 @@ const _3dToursImages = [
 
 const categoryLogos = {
   "tab-real-estate": ["images/real-estate/thumbs/web_springboklogo[blurb].png", "images/real-estate/thumbs/web_wbplogo[blurb].png", "images/real-estate/thumbs/web_rokmarshlogo[blurb].png", "images/real-estate/thumbs/web_purpleBricksNew[blurb].png", "images/real-estate/thumbs/web_propertyboxlogo[blurb].png", "images/real-estate/thumbs/web_hrdlogo[blurb].png", "images/real-estate/thumbs/web_eea logo[blurb].png"],
-  "tab-travel": ["images/travel/thumbs/web_nhstrustlogo[blurb].jpg", "images/travel/thumbs/web_sunsail[blurb].png", "images/travel/thumbs/web_topdecklogo[blurb].jpg", "images/travel/thumbs/web_wightlinklogo[blurb].jpg"],
+  "tab-travel": ["images/travel/thumbs/web_wightlinklogo[blurb].png", "images/travel/thumbs/web_sunsail[blurb].png", "images/travel/thumbs/web_nhstrustlogo[blurb].jpg", "images/travel/thumbs/web_topdecklogo[blurb].jpg"],
   "tab-theatre": ["images/theatre/thumbs/web_deadmanlogo[blurb].jpg", "images/theatre/thumbs/web_mikehowleylogo[blurb].jpg"],
-  "tab-video-travel": ["images/video-travel/thumbs/web_nhstrustlogo[blurb].jpg", "images/video-travel/thumbs/web_sunsail[blurb].png", "images/video-travel/thumbs/web_topdecklogo[blurb].jpg", "images/video-travel/thumbs/web_wightlinklogo[blurb].jpg"],
+  "tab-video-travel": ["images/video-travel/thumbs/web_wightlinklogo[blurb].png", "images/video-travel/thumbs/web_sunsail[blurb].png", "images/video-travel/thumbs/web_nhstrustlogo[blurb].jpg", "images/video-travel/thumbs/web_topdecklogo[blurb].jpg"],
   "tab-video-shorts": ["images/video-shorts/thumbs/web_deadmanlogo[blurb].jpg", "images/video-shorts/thumbs/web_barnes[blurb].jpg", "images/video-shorts/thumbs/web_mikehowleylogo[blurb].jpg", "images/video-shorts/thumbs/web_brightonrocks[blurb].jpg", "images/video-shorts/thumbs/web_montreal[blurb].jpg"],
   "tab-video-theatre": ["images/video-theatre/thumbs/web_deadmanlogo[blurb].jpg", "images/video-theatre/thumbs/web_joelmorrislogo[blurb].png", "images/video-theatre/thumbs/web_mikehowleylogo[blurb].jpg"],
   "tab-floor-plans": ["images/floor-plans/thumbs/web_rayon logo[blurb].png"],

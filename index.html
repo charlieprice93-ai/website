@@ -202,8 +202,10 @@
 				let html = "";
 				dataArray.forEach(img => {
 					if (img.mediaId && img.mediaId !== "") {
-						let icon = img.mediaId.startsWith("http") ? "◧" : "▶"; 
-						html += `
+// 🚀 FIX: Replaced hijackable text characters with bulletproof SVGs
+						let icon = img.mediaId.startsWith("http") 
+							? `<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>` 
+							: `<svg viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`;						html += `
 						<article class="portfolio-item ${categoryClass}" style="display: none;">
 							<a class="thumbnail media-trigger" href="images/${folder}/fulls/${img.file}" onclick="setTimeout(() => openMedia('${img.mediaId}'), 50);">
 								<img src="images/${folder}/thumbs/${img.file}" alt="" loading="lazy" />
@@ -237,7 +239,10 @@
 				buildGroup((typeof _3dToursImages !== 'undefined' ? _3dToursImages : null), '3d-tours', 'tab-3d-tours');
 
 			document.querySelectorAll('.tab-real-estate').forEach(item => item.style.display = 'block');
-
+// 🚀 INJECT THE ABOUT SECTION
+			if (typeof categoryDescriptions !== 'undefined' && categoryDescriptions['tab-about']) {
+				document.getElementById('about-text').innerHTML = categoryDescriptions['tab-about'];
+			}
 // 🚀 ENGINE: Text Box Injector
 		// 🚀 ENGINE: Text Box & Logo Injector
 			function updateDescription(tabClass) {
