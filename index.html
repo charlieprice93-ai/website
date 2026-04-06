@@ -137,7 +137,12 @@
 			<header id="header">
 				<h1>Charlie Price</h1>
 				<p style="margin-bottom: 0.5em;">Isle of Wight, UK</p>
-				
+
+				<ul class="icons" style="margin-top: 0.5em; margin-bottom: 1.5em;">
+					<li><a href="https://www.instagram.com/charliepr1ce" target="_blank" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
+					<li><a href="#" onclick="copyEmail(event)" class="icon fa-envelope"><span class="label">Email</span></a></li>
+				</ul>
+
 				<details style="margin-bottom: 2em; font-size: 0.9em; color: #a0a0a1;">
 					<summary style="cursor: pointer; outline: none; transition: color 0.2s ease;">About</summary>
 					<p id="about-text" style="margin-top: 1em; line-height: 1.6; color: #888;"></p>
@@ -177,17 +182,13 @@
 				<div id="category-desc" style="margin: 2em 0 1em 0; padding-top: 2em; border-top: 1px solid #eee; font-style: italic; color: #888; font-size: 0.9em; display: none;">
 				</div>
 
-				<ul class="icons">
-					<li><a href="https://www.instagram.com/charliepr1ce" target="_blank" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
-					<li><a href="#" onclick="copyEmail(event)" class="icon fa-envelope"><span class="label">Email</span></a></li>
-</ul>
 			</header>
 
 			<section id="thumbnails"></section>
 
 			<footer id="footer">
 				<ul class="copyright">
-					<li>&copy; Charlie Price.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a>.</li>
+					<li>&copy; Charlie Price.</li>
 				</ul>
 			</footer>
 		</div>
@@ -245,16 +246,34 @@
 			}
 // 🚀 ENGINE: Text Box Injector
 		// 🚀 ENGINE: Text Box & Logo Injector
+// 🚀 ENGINE: Text Box & Logo Injector
 			function updateDescription(tabClass) {
 				const descBox = document.getElementById('category-desc');
 				let html = "";
 				
-				// 1. Inject Text (if it exists)
+				// 1. Inject Text with Smart Split (if it exists)
 				if (typeof categoryDescriptions !== 'undefined' && categoryDescriptions[tabClass]) {
-					html += categoryDescriptions[tabClass];
+					let fullText = categoryDescriptions[tabClass];
+					let splitIndex = fullText.indexOf('<br><br>');
+					
+					if (splitIndex !== -1) {
+						// Split the text at the very first <br><br>
+						let firstPart = fullText.substring(0, splitIndex);
+						let restPart = fullText.substring(splitIndex + 8); // skips over the 8 characters of <br><br>
+						
+						html += `<p style="margin: 0; color: #888;">${firstPart}</p>`;
+						html += `
+						<details style="margin-top: 1em; font-size: 1em; color: #a0a0a1;">
+							<summary style="cursor: pointer; outline: none; transition: color 0.2s ease;">Read More</summary>
+							<p style="margin-top: 1em; margin-bottom: 0; line-height: 1.6; color: #888;">${restPart}</p>
+						</details>`;
+					} else {
+						// If there is no <br><br>, just show the text normally
+						html += `<p style="margin: 0; color: #888;">${fullText}</p>`;
+					}
 				}
 				
-				// 2. Inject Logos (if they exist)
+				// 2. Inject Logos (if they exist) - Outside the Read More block!
 				if (typeof categoryLogos !== 'undefined' && categoryLogos[tabClass]) {
 					html += '<div class="blurb-logos">';
 					categoryLogos[tabClass].forEach(logoSrc => {
@@ -270,8 +289,7 @@
 				} else {
 					descBox.style.display = 'none';
 				}
-			}
-function switchMain(e, navId, defaultTabClass) {
+			}function switchMain(e, navId, defaultTabClass) {
 				if(e) e.preventDefault();
 				const viewerClose = document.querySelector('#viewer .close');
 				if (viewerClose) viewerClose.click();closeMedia();
