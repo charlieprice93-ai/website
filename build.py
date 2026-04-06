@@ -80,8 +80,6 @@ for folder in FOLDERS:
         clean_title = title[4:] if title.startswith("web_") else title
         
         is_blurb = "[blurb]" in clean_title.lower()
-        if is_blurb:
-            clean_title = re.sub(r'\[blurb\]', '', clean_title, flags=re.IGNORECASE).strip()
         
         media_id = ""
         media_match = re.search(r'\[(.*?)\]', clean_title)
