@@ -100,27 +100,28 @@
 			details[open] > summary::before {
 				transform: rotate(90deg); /* Animates the arrow pointing down when clicked */
 			}
-		/* 4. Category Blurb Logos */
+	/* 4. Category Blurb Logos */
 			.blurb-logos {
 				margin-top: 2em;
 				display: flex;
-				gap: 2.5em; /* Wider gap to accommodate the zoom effect */
+				gap: 1.5em; /* 🚀 FIX: Reduced gap so they fit on the same line */
 				flex-wrap: wrap;
-				justify-content: center; /* 🚀 NEW: Centers the logos */
+				justify-content: center; 
 				align-items: center;
 			}
-.blurb-logos img {
-				width: 130px;  /* 🚀 FIX: Standardised bounding box width */
-				height: 50px;  /* 🚀 FIX: Standardised bounding box height */
-				object-fit: contain; /* Ensures no logo gets stretched or squashed */
+			.blurb-logos img {
+				width: 100px;  /* 🚀 FIX: Reduced from 130px to fit the sidebar width */
+				height: 40px;  /* 🚀 FIX: Scaled down proportionally */
+				object-fit: contain; 
 				opacity: 0.5; 
 				filter: grayscale(100%);
 				transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); 
 				transform-origin: center;
-			}			.blurb-logos img:hover {
+			}			
+			.blurb-logos img:hover {
 				opacity: 1;
 				filter: grayscale(0%);
-				transform: scale(1.6); /* 🚀 NEW: Dramatic pop-out effect to thumbnail size */
+				transform: scale(1.6); 
 				z-index: 10;
 				position: relative;
 			}

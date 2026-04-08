@@ -44,8 +44,15 @@ for line in lines:
             safe_title = re.sub(r'[^A-Za-z0-9 ]', '', title)
             target_path = os.path.join(target_dir, f"{safe_title} [{yt_id}].jpg")
             
-            # Skip if we already downloaded it previously
-            if os.path.exists(target_path):
+            # Skip if we already downloaded it previously (even if build.py renamed it!)
+            already_exists = False
+            if os.path.exists(target_dir):
+                for existing_file in os.listdir(target_dir):
+                    if f"[{yt_id}]" in existing_file:
+                        already_exists = True
+                        break
+                        
+            if already_exists:
                 print(f"⏩ Already exists, skipping: {safe_title}")
                 continue
                 
