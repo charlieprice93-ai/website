@@ -82,26 +82,41 @@ const videoTravelImages = [
   { file: "web_Wightlink_Ship_Launch_[1u0SryIxWFo].jpg", title: "Wightlink_Ship_Launch_[1u0SryIxWFo]", mediaId: "1u0SryIxWFo" },
   { file: "web_Isle_of_Wight_NHS_Recruitment_[AnrCy8-xAEs].jpg", title: "Isle_of_Wight_NHS_Recruitment_[AnrCy8-xAEs]", mediaId: "AnrCy8-xAEs" },
   { file: "web_Wightlink_Summer_[o3sHpt3QEKU].jpg", title: "Wightlink_Summer_[o3sHpt3QEKU]", mediaId: "o3sHpt3QEKU" },
+  { file: "web_Wightlink Ship Launch [1u0SryIxWFo].jpg", title: "Wightlink Ship Launch [1u0SryIxWFo]", mediaId: "1u0SryIxWFo" },
+  { file: "web_Isle of Wight NHS Recruitment [AnrCy8-xAEs].jpg", title: "Isle of Wight NHS Recruitment [AnrCy8-xAEs]", mediaId: "AnrCy8-xAEs" },
+  { file: "web_Wightlink Summer [o3sHpt3QEKU].jpg", title: "Wightlink Summer [o3sHpt3QEKU]", mediaId: "o3sHpt3QEKU" },
 ];
 
 const videoMusicImages = [
   { file: "web_Ulysess_Wells__Mend_a_Man_[AZ20qykULMU].jpg", title: "Ulysess_Wells__Mend_a_Man_[AZ20qykULMU]", mediaId: "AZ20qykULMU" },
   { file: "web_Ulysess_Wells__Blame_[hWBesC77UUc].jpg", title: "Ulysess_Wells__Blame_[hWBesC77UUc]", mediaId: "hWBesC77UUc" },
   { file: "web_Ulysess_Wells__You_Wanted_It_Over_[BXnJ5hQBvxM].jpg", title: "Ulysess_Wells__You_Wanted_It_Over_[BXnJ5hQBvxM]", mediaId: "BXnJ5hQBvxM" },
-  { file: "web_Ulysess_Wells__Miles_Away_[0l91G80ADbs].jpg", title: "Ulysess_Wells__Miles_Away_[0l91G80ADbs]", mediaId: "0l91G80ADbs" },
+  { file: "web_Ulysess Wells  Mend a Man [AZ20qykULMU].jpg", title: "Ulysess Wells  Mend a Man [AZ20qykULMU]", mediaId: "AZ20qykULMU" },
   { file: "web_Ulysess_Wells__Sexy_Beautiful_People_[gOYoloG8FE0].jpg", title: "Ulysess_Wells__Sexy_Beautiful_People_[gOYoloG8FE0]", mediaId: "gOYoloG8FE0" },
+  { file: "web_Ulysess Wells  You Wanted It Over [BXnJ5hQBvxM].jpg", title: "Ulysess Wells  You Wanted It Over [BXnJ5hQBvxM]", mediaId: "BXnJ5hQBvxM" },
+  { file: "web_Ulysess_Wells__Miles_Away_[0l91G80ADbs].jpg", title: "Ulysess_Wells__Miles_Away_[0l91G80ADbs]", mediaId: "0l91G80ADbs" },
+  { file: "web_Ulysess Wells  Sexy Beautiful People [gOYoloG8FE0].jpg", title: "Ulysess Wells  Sexy Beautiful People [gOYoloG8FE0]", mediaId: "gOYoloG8FE0" },
+  { file: "web_Ulysess Wells  Blame [hWBesC77UUc].jpg", title: "Ulysess Wells  Blame [hWBesC77UUc]", mediaId: "hWBesC77UUc" },
+  { file: "web_Ulysess Wells  Miles Away [0l91G80ADbs].jpg", title: "Ulysess Wells  Miles Away [0l91G80ADbs]", mediaId: "0l91G80ADbs" },
+  { file: "web_Ulysess Wells  Leander Live [XY8tgTsi0CY].jpg", title: "Ulysess Wells  Leander Live [XY8tgTsi0CY]", mediaId: "XY8tgTsi0CY" },
   { file: "web_Ulysess_Wells__Leander_Live_[XY8tgTsi0CY].jpg", title: "Ulysess_Wells__Leander_Live_[XY8tgTsi0CY]", mediaId: "XY8tgTsi0CY" },
 ];
 
 const videoShortsImages = [
+  { file: "web_Cliffedge [gLqr11IlPl8].jpg", title: "Cliffedge [gLqr11IlPl8]", mediaId: "gLqr11IlPl8" },
   { file: "web_Open_Water_[8vUtS2Y6cO4].jpg", title: "Open_Water_[8vUtS2Y6cO4]", mediaId: "8vUtS2Y6cO4" },
+  { file: "web_The Last Knight [5Ank6cu1j-M].jpg", title: "The Last Knight [5Ank6cu1j-M]", mediaId: "5Ank6cu1j-M" },
   { file: "web_Cliffedge_[gLqr11IlPl8].jpg", title: "Cliffedge_[gLqr11IlPl8]", mediaId: "gLqr11IlPl8" },
+  { file: "web_Open Water [8vUtS2Y6cO4].jpg", title: "Open Water [8vUtS2Y6cO4]", mediaId: "8vUtS2Y6cO4" },
 ];
 
 const videoTheatreImages = [
-  { file: "web_Promotion_for_Damien_Nettles_RD_[zEPv-VO-0B4].jpg", title: "Promotion_for_Damien_Nettles_RD_[zEPv-VO-0B4]", mediaId: "zEPv-VO-0B4" },
+  { file: "web_Promotion for the Freshwater 5 tour [5W_z8EhCpf8].jpg", title: "Promotion for the Freshwater 5 tour [5W_z8EhCpf8]", mediaId: "5W_z8EhCpf8" },
+  { file: "web_Joel Morris Recital [0iW1bZAvH48].jpg", title: "Joel Morris Recital [0iW1bZAvH48]", mediaId: "0iW1bZAvH48" },
+  { file: "web_Promotion for Damien Nettles RD [zEPv-VO-0B4].jpg", title: "Promotion for Damien Nettles RD [zEPv-VO-0B4]", mediaId: "zEPv-VO-0B4" },
   { file: "web_Promotion_for_the_Freshwater_5_tour_[5W_z8EhCpf8].jpg", title: "Promotion_for_the_Freshwater_5_tour_[5W_z8EhCpf8]", mediaId: "5W_z8EhCpf8" },
   { file: "web_Joel_Morris_Recital_[0iW1bZAvH48].jpg", title: "Joel_Morris_Recital_[0iW1bZAvH48]", mediaId: "0iW1bZAvH48" },
+  { file: "web_Promotion_for_Damien_Nettles_RD_[zEPv-VO-0B4].jpg", title: "Promotion_for_Damien_Nettles_RD_[zEPv-VO-0B4]", mediaId: "zEPv-VO-0B4" },
 ];
 
 const webBrandingImages = [

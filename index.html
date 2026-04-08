@@ -109,16 +109,15 @@
 				justify-content: center; /* 🚀 NEW: Centers the logos */
 				align-items: center;
 			}
-			.blurb-logos img {
-				height: 45px; /* 🚀 NEW: Larger base size */
-				max-width: 140px; /* Prevents super wide text-logos from breaking the layout */
-				object-fit: contain;
+.blurb-logos img {
+				width: 130px;  /* 🚀 FIX: Standardised bounding box width */
+				height: 50px;  /* 🚀 FIX: Standardised bounding box height */
+				object-fit: contain; /* Ensures no logo gets stretched or squashed */
 				opacity: 0.5; 
 				filter: grayscale(100%);
-				transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* A smooth, springy animation */
+				transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); 
 				transform-origin: center;
-			}
-			.blurb-logos img:hover {
+			}			.blurb-logos img:hover {
 				opacity: 1;
 				filter: grayscale(0%);
 				transform: scale(1.6); /* 🚀 NEW: Dramatic pop-out effect to thumbnail size */
