@@ -150,6 +150,41 @@
 			    object-fit: cover; 
 			    flex-shrink: 0; 
 			}
+			/* 6. Sub-Categories Styling */
+			.sub-categories { font-size: 1.05em; font-weight: normal; margin: 1em 0; }
+			.sub-categories a { color: #a0a0a1; border-bottom: none; text-decoration: none; transition: color 0.2s ease; }
+			.sub-categories a:hover { color: #333; }
+			.sub-categories span { margin: 0 0.5em; color: #a0a0a1; opacity: 0.5; }
+
+			/* 7. Blurb Logos Carousel */
+			.blurb-logos {
+				position: relative;
+				margin-top: 1.5em;
+				height: 50px; /* Keeps the container fixed height so content doesn't jump */
+				display: flex;
+				justify-content: center;
+				align-items: center;
+			}
+			.blurb-logo-slide {
+				position: absolute;
+				opacity: 0;
+				width: 110px; 
+				height: 45px;
+				object-fit: contain;
+				filter: grayscale(100%);
+				transition: opacity 0.8s ease, transform 0.3s ease;
+				pointer-events: none;
+			}
+			.blurb-logo-slide.active {
+				opacity: 0.5; 
+				pointer-events: auto;
+				z-index: 2;
+			}
+			.blurb-logo-slide.active:hover {
+				opacity: 1;
+				filter: grayscale(0%);
+				transform: scale(1.15); 
+			}
 		</style>
 	</head>
 	<body class="is-preload-0 is-preload-1 is-preload-2">
@@ -169,6 +204,7 @@
 					<div style="text-align: right;">
 						<p style="margin: 0; line-height: 1;">Isle of Wight, UK</p>
 						<ul class="icons" style="margin-top: 0.5em; margin-bottom: 0;">
+							<li><a href="#" onclick="openWA(event)" class="icon brands fa-whatsapp"><span class="label">WhatsApp</span></a></li>
 							<li><a href="https://www.instagram.com/charliepr1ce" target="_blank" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
 							<li><a href="#" onclick="copyEmail(event)" class="icon fa-envelope"><span class="label">Email</span></a></li>
 						</ul>
@@ -182,32 +218,26 @@
 					<a href="#" id="link-nav-design" onclick="switchMain(event, 'nav-design', 'tab-web-branding')">Design & Planning</a>
 				</div>
 
-				<nav id="nav-photo" class="sub-nav" style="margin: 2em 0;">
-					<ul style="list-style: none; padding: 0; margin: 0; line-height: 2;">
-						<li><a href="#" onclick="switchTab(event, 'tab-real-estate', this)" style="font-weight: bold; border-bottom: none;">Real Estate</a></li>
-						<li><a href="#" onclick="switchTab(event, 'tab-travel', this)" style="border-bottom: none;">Travel & Lifestyle</a></li>
-						<li><a href="#" onclick="switchTab(event, 'tab-theatre', this)" style="border-bottom: none;">Film & Theatre</a></li>
-					</ul>
+				<nav id="nav-photo" class="sub-nav sub-categories" style="display: block;">
+					<a href="#" onclick="switchTab(event, 'tab-real-estate', this)" style="font-weight: bold; text-decoration: underline; color: #333;">Real Estate</a> <span>/</span>
+					<a href="#" onclick="switchTab(event, 'tab-travel', this)">Travel & Lifestyle</a> <span>/</span>
+					<a href="#" onclick="switchTab(event, 'tab-theatre', this)">Film & Theatre</a>
 				</nav>
 
-				<nav id="nav-video" class="sub-nav" style="margin: 2em 0; display: none;">
-					<ul style="list-style: none; padding: 0; margin: 0; line-height: 2;">
-						<li><a href="#" onclick="switchTab(event, 'tab-video-travel', this)" style="font-weight: bold; border-bottom: none;">Travel & Tourism</a></li>
-						<li><a href="#" onclick="switchTab(event, 'tab-video-music', this)" style="border-bottom: none;">Music Videos</a></li>
-						<li><a href="#" onclick="switchTab(event, 'tab-video-shorts', this)" style="border-bottom: none;">Short Films</a></li>
-						<li><a href="#" onclick="switchTab(event, 'tab-video-theatre', this)" style="border-bottom: none;">Theatre</a></li>
-					</ul>
+				<nav id="nav-video" class="sub-nav sub-categories" style="display: none;">
+					<a href="#" onclick="switchTab(event, 'tab-video-travel', this)">Travel & Tourism</a> <span>/</span>
+					<a href="#" onclick="switchTab(event, 'tab-video-music', this)">Music Videos</a> <span>/</span>
+					<a href="#" onclick="switchTab(event, 'tab-video-shorts', this)">Short Films</a> <span>/</span>
+					<a href="#" onclick="switchTab(event, 'tab-video-theatre', this)">Theatre</a>
 				</nav>
 
-				<nav id="nav-design" class="sub-nav" style="margin: 2em 0; display: none;">
-					<ul style="list-style: none; padding: 0; margin: 0; line-height: 2;">
-						<li><a href="#" onclick="switchTab(event, 'tab-web-branding', this)" style="font-weight: bold; border-bottom: none;">Web & Branding</a></li>
-						<li><a href="#" onclick="switchTab(event, 'tab-floor-plans', this)" style="border-bottom: none;">Floor Plans</a></li>
-						<li><a href="#" onclick="switchTab(event, 'tab-3d-tours', this)" style="border-bottom: none;">3D Virtual Tours</a></li>
-					</ul>
+				<nav id="nav-design" class="sub-nav sub-categories" style="display: none;">
+					<a href="#" onclick="switchTab(event, 'tab-web-branding', this)">Web & Branding</a> <span>/</span>
+					<a href="#" onclick="switchTab(event, 'tab-floor-plans', this)">Floor Plans</a> <span>/</span>
+					<a href="#" onclick="switchTab(event, 'tab-3d-tours', this)">3D Virtual Tours</a>
 				</nav>
 
-				<div id="category-desc" style="margin: 0.5em 0 1.5em 0; font-style: italic; color: #888; font-size: 0.9em; display: none; line-height: 1.5; font-weight: normal;">
+				<div id="category-desc" style="margin: 1.5em 0; font-style: italic; color: #888; font-size: 0.9em; display: none; line-height: 1.5; font-weight: normal;">
 				</div>
 
 			</header>
@@ -325,12 +355,15 @@
 				}
 			}
 // 🚀 ENGINE: Text Box Injector
-		// 🚀 ENGINE: Text Box & Logo Injector
+	// 🚀 GLOBAL VARIABLE for the 5-second logo carousel
+			let logoCarouselInterval = null;
+
+			// 🚀 ENGINE: Text Box & Logo Injector (Updated for Static Placement & Carousel)
 			function updateDescription(tabClass, targetEl) {
 				const descBox = document.getElementById('category-desc');
 				let html = "";
 				
-				// 1. Inject Text with Smart Split (if it exists)
+				// 1. Inject Text with Smart Split
 				if (typeof categoryDescriptions !== 'undefined' && categoryDescriptions[tabClass]) {
 					let fullText = categoryDescriptions[tabClass];
 					let splitIndex = fullText.indexOf('<br><br>');
@@ -350,59 +383,62 @@
 					}
 				}
 				
-				// 2. Inject Logos (if they exist)
-				if (typeof categoryLogos !== 'undefined' && categoryLogos[tabClass]) {
+				// 2. Inject Logos (Formatted for Carousel)
+				if (typeof categoryLogos !== 'undefined' && categoryLogos[tabClass] && categoryLogos[tabClass].length > 0) {
 					html += '<div class="blurb-logos">';
-					categoryLogos[tabClass].forEach(logoSrc => {
-						html += `<img src="${logoSrc}" alt="Client Logo" />`;
+					categoryLogos[tabClass].forEach((logoSrc, index) => {
+						let activeClass = index === 0 ? "active" : "";
+						html += `<img src="${logoSrc}" class="blurb-logo-slide ${activeClass}" alt="Client Logo" />`;
 					});
 					html += '</div>';
 				}
 				
-				// 3. Show or Hide the box AND MOVE IT 🚀
+				// 3. Show/Hide Box & Initialize 5-Second Carousel
 				if (html !== "") {
 					descBox.innerHTML = html;
 					descBox.style.display = 'block';
-					// Physically detach the box and snap it directly under the active link
-					if (targetEl && targetEl.parentNode) {
-						targetEl.parentNode.appendChild(descBox);
+
+					// Clear any existing carousel timer to prevent overlapping flashes
+					if (logoCarouselInterval) clearInterval(logoCarouselInterval);
+
+					// Start new carousel if multiple logos exist
+					let logoSlides = descBox.querySelectorAll('.blurb-logo-slide');
+					if (logoSlides.length > 1) {
+						let currentLogoIdx = 0;
+						logoCarouselInterval = setInterval(() => {
+							logoSlides[currentLogoIdx].classList.remove('active');
+							currentLogoIdx = (currentLogoIdx + 1) % logoSlides.length;
+							logoSlides[currentLogoIdx].classList.add('active');
+						}, 5000); // 5 seconds
 					}
 				} else {
 					descBox.style.display = 'none';
 				}
 			}
+
 			function switchMain(e, navId, defaultTabClass) {
 				if(e) e.preventDefault();
 				const viewerClose = document.querySelector('#viewer .close');
 				if (viewerClose) viewerClose.click();closeMedia();
 
+				// Reset all Main links
 				document.querySelectorAll('.main-categories a').forEach(a => {
 					a.style.fontWeight = 'normal'; a.style.textDecoration = 'none'; a.style.color = '#a0a0a1'; 
 				});
 				const activeLink = document.getElementById('link-' + navId);
-				activeLink.style.fontWeight = 'bold'; activeLink.style.textDecoration = 'underline'; activeLink.style.color = '#333'; 
+				if (activeLink) {
+					activeLink.style.fontWeight = 'bold'; activeLink.style.textDecoration = 'underline'; activeLink.style.color = '#333'; 
+				}
 
+				// Hide all Sub Navs
 				document.querySelectorAll('.sub-nav').forEach(nav => nav.style.display = 'none');
 				const activeNav = document.getElementById(navId);
 				
 				if (activeNav) {
 					activeNav.style.display = 'block';
 					const firstSubLink = activeNav.querySelector('a');
-					switchTab(null, defaultTabClass, firstSubLink);
-				} else {
-					updateDescription(defaultTabClass, activeLink); // Update text if no sub-menu
-					gallery.style.opacity = 0;
-					setTimeout(() => {
-						document.querySelectorAll('.portfolio-item').forEach(item => item.style.display = 'none');
-						document.querySelectorAll('.' + defaultTabClass).forEach(item => item.style.display = 'block');
-						gallery.style.opacity = 1;
-
-						// 🚀 NEW: Auto-select the first image (Desktop only)
-						if (window.innerWidth > 980) {
-							const firstImg = document.querySelector('.' + defaultTabClass + ' .thumbnail');
-							if (firstImg) firstImg.click();
-						}
-					}, 300);
+					// Trigger switchTab on the first element of the new menu
+					if (firstSubLink) switchTab(null, defaultTabClass, firstSubLink);
 				}
 			}
 
@@ -411,24 +447,43 @@
 				const viewerClose = document.querySelector('#viewer .close');
 				if (viewerClose) viewerClose.click();closeMedia();
 
-				const parentNav = linkEl.closest('.sub-nav');
-				parentNav.querySelectorAll('a').forEach(a => a.style.fontWeight = 'normal');
-				linkEl.style.fontWeight = 'bold';
+				// 🚀 Update Sub-Nav Styles (Remove underline from siblings, add to active)
+				if (linkEl) {
+					const parentNav = linkEl.closest('.sub-nav');
+					if (parentNav) {
+						parentNav.querySelectorAll('a').forEach(a => {
+							a.style.fontWeight = 'normal';
+							a.style.textDecoration = 'none';
+							a.style.color = '#a0a0a1';
+						});
+					}
+					linkEl.style.fontWeight = 'bold';
+					linkEl.style.textDecoration = 'underline';
+					linkEl.style.color = '#333';
+				}
 
 				updateDescription(tabClass, linkEl);
+				
 				gallery.style.opacity = 0;
 				setTimeout(() => {
 					document.querySelectorAll('.portfolio-item').forEach(item => item.style.display = 'none');
 					document.querySelectorAll('.' + tabClass).forEach(item => item.style.display = 'block');
 					gallery.style.opacity = 1;
 
-					// 🚀 NEW: Auto-select the first image (Desktop only)
 					if (window.innerWidth > 980) {
 						const firstImg = document.querySelector('.' + tabClass + ' .thumbnail');
 						if (firstImg) firstImg.click();
 					}
 				}, 300);
 			}
+
+			// 🚀 FIX: Auto-load Real Estate content correctly on initial page visit
+			document.addEventListener("DOMContentLoaded", function() {
+				const firstPhotoTab = document.querySelector('#nav-photo a');
+				if (firstPhotoTab) {
+					switchTab(null, 'tab-real-estate', firstPhotoTab);
+				}
+			});
 		function openMedia(mediaId) {
 				// 🚀 NEW: Catch Rayon links and force them into a new tab
 				if (mediaId.includes("rayon.design")) {
@@ -489,6 +544,19 @@
 					// Fallback if their browser blocks clipboard access
 					window.location.href = "mailto:" + email;
 				});
+			}
+			function openWA(e) {
+				e.preventDefault();
+				
+				// 🚀 ANTI-SCRAPER: Break your number up into strings. 
+				// Change these to your actual number (Do not include the + or 0 at the start)
+				const countryCode = "44"; 
+				const part1 = "7837"; 
+				const part2 = "442271"; 
+				
+				// Reassemble and open the chat
+				const secureNumber = countryCode + part1 + part2;
+				window.open("https://wa.me/" + secureNumber, "_blank");
 			}
 		</script>
 
