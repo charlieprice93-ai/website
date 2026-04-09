@@ -125,12 +125,13 @@
 				z-index: 10;
 				position: relative;
 			}
-			/* 5. Reviews Carousel */
+		/* 5. Reviews Carousel */
 			#reviews-carousel {
 				position: relative; margin: 2em 0; padding: 1.5em; 
 				background: rgba(255, 255, 255, 0.03); border-radius: 8px; 
-				text-align: center; display: flex; align-items: center; justify-content: center;
-				min-height: 160px; /* Gives it enough room so the sidebar doesn't jump */
+				text-align: right; /* 🚀 Switched to right-aligned */
+				display: flex; align-items: center; justify-content: flex-end; /* 🚀 Pushes content right */
+				min-height: 160px; 
 			}
 			.review-slide {
 				position: absolute; opacity: 0; transition: opacity 0.8s ease; 
@@ -303,8 +304,8 @@
 					let activeClass = index === 0 ? "active" : "";
 					html += `
 					<div class="review-slide ${activeClass}">
-						<div class="stars">${fiveStars}</div>
 						<p class="review-text">"${review.text}"</p>
+						<div class="stars" style="margin: 0.8em 0 0.5em 0;">${fiveStars}</div>
 						<p class="review-loc">— Vendor, ${review.location}</p>
 					</div>`;
 				});
