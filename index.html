@@ -156,31 +156,40 @@
 			.sub-categories a:hover { color: #333; }
 			.sub-categories span { margin: 0 0.5em; color: #a0a0a1; opacity: 0.5; }
 
-			/* 7. Blurb Logos Carousel */
+			/* 7. Blurb Logos Carousel (Updated for groups of 3) */
 			.blurb-logos {
 				position: relative;
 				margin-top: 1.5em;
-				height: 50px; /* Keeps the container fixed height so content doesn't jump */
+				height: 60px; /* Increased to accommodate larger logos */
 				display: flex;
 				justify-content: center;
 				align-items: center;
 			}
-			.blurb-logo-slide {
+			.logo-group {
 				position: absolute;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				gap: 2.5em; /* Spacing between the 3 logos */
 				opacity: 0;
-				width: 110px; 
-				height: 45px;
-				object-fit: contain;
-				filter: grayscale(100%);
-				transition: opacity 0.8s ease, transform 0.3s ease;
+				transition: opacity 0.8s ease;
 				pointer-events: none;
+				width: 100%;
 			}
-			.blurb-logo-slide.active {
-				opacity: 0.5; 
+			.logo-group.active {
+				opacity: 1; 
 				pointer-events: auto;
 				z-index: 2;
 			}
-			.blurb-logo-slide.active:hover {
+			.blurb-logo {
+				width: 130px; /* Increased from 110px */
+				height: 55px; /* Increased from 45px */
+				object-fit: contain;
+				opacity: 0.5;
+				filter: grayscale(100%);
+				transition: all 0.3s ease;
+			}
+			.blurb-logo:hover {
 				opacity: 1;
 				filter: grayscale(0%);
 				transform: scale(1.15); 
@@ -383,13 +392,23 @@
 					}
 				}
 				
-				// 2. Inject Logos (Formatted for Carousel)
+				// 2. Inject Logos (Formatted for Carousel in Groups of 3)
 				if (typeof categoryLogos !== 'undefined' && categoryLogos[tabClass] && categoryLogos[tabClass].length > 0) {
+					const logos = categoryLogos[tabClass];
 					html += '<div class="blurb-logos">';
-					categoryLogos[tabClass].forEach((logoSrc, index) => {
-						let activeClass = index === 0 ? "active" : "";
-						html += `<img src="${logoSrc}" class="blurb-logo-slide ${activeClass}" alt="Client Logo" />`;
-					});
+					
+					// Chunk logos into arrays of up to 3
+					const chunkSize = 3;
+					for (let i = 0; i < logos.length; i += chunkSize) {
+						const chunk = logos.slice(i, i + chunkSize);
+						const activeClass = i === 0 ? "active" : "";
+						
+						html += `<div class="logo-group ${activeClass}">`;
+						chunk.forEach(logoSrc => {
+							html += `<img src="${logoSrc}" class="blurb-logo" alt="Client Logo" />`;
+						});
+						html += `</div>`;
+					}
 					html += '</div>';
 				}
 				
@@ -401,14 +420,14 @@
 					// Clear any existing carousel timer to prevent overlapping flashes
 					if (logoCarouselInterval) clearInterval(logoCarouselInterval);
 
-					// Start new carousel if multiple logos exist
-					let logoSlides = descBox.querySelectorAll('.blurb-logo-slide');
-					if (logoSlides.length > 1) {
-						let currentLogoIdx = 0;
+					// Start new carousel only if there is more than 1 group (i.e., more than 3 logos total)
+					let logoGroups = descBox.querySelectorAll('.logo-group');
+					if (logoGroups.length > 1) {
+						let currentGroupIdx = 0;
 						logoCarouselInterval = setInterval(() => {
-							logoSlides[currentLogoIdx].classList.remove('active');
-							currentLogoIdx = (currentLogoIdx + 1) % logoSlides.length;
-							logoSlides[currentLogoIdx].classList.add('active');
+							logoGroups[currentGroupIdx].classList.remove('active');
+							currentGroupIdx = (currentGroupIdx + 1) % logoGroups.length;
+							logoGroups[currentGroupIdx].classList.add('active');
 						}, 5000); // 5 seconds
 					}
 				} else {
