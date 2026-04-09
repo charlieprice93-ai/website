@@ -125,6 +125,21 @@
 				z-index: 10;
 				position: relative;
 			}
+			/* 5. Reviews Carousel */
+			#reviews-carousel {
+				position: relative; margin: 2em 0; padding: 1.5em; 
+				background: rgba(255, 255, 255, 0.03); border-radius: 8px; 
+				text-align: center; display: flex; align-items: center; justify-content: center;
+				min-height: 160px; /* Gives it enough room so the sidebar doesn't jump */
+			}
+			.review-slide {
+				position: absolute; opacity: 0; transition: opacity 0.8s ease; 
+				width: 85%; pointer-events: none;
+			}
+			.review-slide.active { opacity: 1; pointer-events: auto; z-index: 2; }
+			.stars { color: #f5c518; font-size: 1.2em; margin-bottom: 0.8em; }
+			.review-text { font-style: italic; color: #a0a0a1; font-size: 0.95em; line-height: 1.6; margin: 0; }
+			.review-loc { margin-top: 1em; font-size: 0.75em; color: #666; text-transform: uppercase; letter-spacing: 1px; }
 		</style>
 	</head>
 	<body class="is-preload-0 is-preload-1 is-preload-2">
@@ -144,7 +159,7 @@
 				</ul>
 
 				<div id="about-container" style="margin-bottom: 2em; font-size: 0.9em;"></div>
-				
+				<div id="reviews-carousel" style="display: none;"></div>
 				<div class="main-categories">
 					<a href="#" id="link-nav-photo" onclick="switchMain(event, 'nav-photo', 'tab-real-estate')" style="font-weight: bold; text-decoration: underline; color: #333;">Photography</a> <span>/</span>
 					<a href="#" id="link-nav-video" onclick="switchMain(event, 'nav-video', 'tab-video-travel')">Videography</a> <span>/</span>
@@ -258,6 +273,39 @@
 				}
 				
 				document.getElementById('about-container').innerHTML = html;
+			}
+			// 🚀 BUILD THE REVIEWS CAROUSEL
+			if (typeof clientReviews !== 'undefined' && clientReviews.length > 0) {
+				const carousel = document.getElementById('reviews-carousel');
+				let html = "";
+				// Bulletproof SVG Star
+				const starSvg = `<svg viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor" style="vertical-align: middle; margin: 0 2px;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`;
+				const fiveStars = starSvg.repeat(5);
+
+				// Generate slides
+				clientReviews.forEach((review, index) => {
+					let activeClass = index === 0 ? "active" : "";
+					html += `
+					<div class="review-slide ${activeClass}">
+						<div class="stars">${fiveStars}</div>
+						<p class="review-text">"${review.text}"</p>
+						<p class="review-loc">— Vendor, ${review.location}</p>
+					</div>`;
+				});
+				
+				carousel.innerHTML = html;
+				carousel.style.display = 'flex'; // Unhide the container
+
+				// 🚀 Loop logic: fade to next review every 6 seconds
+				let slides = carousel.querySelectorAll('.review-slide');
+				let currentIdx = 0;
+				if (slides.length > 1) {
+					setInterval(() => {
+						slides[currentIdx].classList.remove('active');
+						currentIdx = (currentIdx + 1) % slides.length;
+						slides[currentIdx].classList.add('active');
+					}, 6000); 
+				}
 			}
 // 🚀 ENGINE: Text Box Injector
 		// 🚀 ENGINE: Text Box & Logo Injector
