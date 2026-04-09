@@ -140,6 +140,15 @@
 			.stars { color: #f5c518; font-size: 1.2em; margin-bottom: 0.8em; }
 			.review-text { font-style: italic; color: #a0a0a1; font-size: 0.95em; line-height: 1.6; margin: 0; }
 			.review-loc { margin-top: 1em; font-size: 0.75em; color: #666; text-transform: uppercase; letter-spacing: 1px; }
+			/* Profile Picture */
+#profile-pic {
+    width: 100px; /* Adjust size as needed */
+    height: 100px;
+    border-radius: 50%; /* Makes it circular */
+    object-fit: cover; /* Ensures image isn't distorted */
+    margin: 0 auto 1.5em auto; /* Centers and adds spacing below */
+    display: block; /* Allows centering with margin: auto */
+}
 		</style>
 	</head>
 	<body class="is-preload-0 is-preload-1 is-preload-2">
@@ -150,6 +159,7 @@
 
 		<div id="main">
 			<header id="header">
+				<img id="profile-pic" src="/Users/charlieprice/Desktop/html5up-lens/images/portrait.jpg" alt="Charlie Price Portrait">
 				<h1>Charlie Price</h1>
 				<p style="margin-bottom: 0.5em;">Isle of Wight, UK</p>
 
