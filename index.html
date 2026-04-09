@@ -207,7 +207,7 @@
 					</ul>
 				</nav>
 
-				<div id="category-desc" style="margin: 2em 0 1em 0; padding-top: 2em; border-top: 1px solid #eee; font-style: italic; color: #888; font-size: 0.9em; display: none;">
+				<div id="category-desc" style="margin: 0.5em 0 1.5em 0; font-style: italic; color: #888; font-size: 0.9em; display: none; line-height: 1.5; font-weight: normal;">
 				</div>
 
 			</header>
@@ -326,8 +326,7 @@
 			}
 // 🚀 ENGINE: Text Box Injector
 		// 🚀 ENGINE: Text Box & Logo Injector
-// 🚀 ENGINE: Text Box & Logo Injector
-			function updateDescription(tabClass) {
+			function updateDescription(tabClass, targetEl) {
 				const descBox = document.getElementById('category-desc');
 				let html = "";
 				
@@ -337,9 +336,8 @@
 					let splitIndex = fullText.indexOf('<br><br>');
 					
 					if (splitIndex !== -1) {
-						// Split the text at the very first <br><br>
 						let firstPart = fullText.substring(0, splitIndex);
-						let restPart = fullText.substring(splitIndex + 8); // skips over the 8 characters of <br><br>
+						let restPart = fullText.substring(splitIndex + 8); 
 						
 						html += `<p style="margin: 0; color: #888;">${firstPart}</p>`;
 						html += `
@@ -348,12 +346,11 @@
 							<p style="margin-top: 1em; margin-bottom: 0; line-height: 1.6; color: #888;">${restPart}</p>
 						</details>`;
 					} else {
-						// If there is no <br><br>, just show the text normally
 						html += `<p style="margin: 0; color: #888;">${fullText}</p>`;
 					}
 				}
 				
-				// 2. Inject Logos (if they exist) - Outside the Read More block!
+				// 2. Inject Logos (if they exist)
 				if (typeof categoryLogos !== 'undefined' && categoryLogos[tabClass]) {
 					html += '<div class="blurb-logos">';
 					categoryLogos[tabClass].forEach(logoSrc => {
@@ -362,14 +359,19 @@
 					html += '</div>';
 				}
 				
-				// 3. Show or Hide the box
+				// 3. Show or Hide the box AND MOVE IT 🚀
 				if (html !== "") {
 					descBox.innerHTML = html;
 					descBox.style.display = 'block';
+					// Physically detach the box and snap it directly under the active link
+					if (targetEl && targetEl.parentNode) {
+						targetEl.parentNode.appendChild(descBox);
+					}
 				} else {
 					descBox.style.display = 'none';
 				}
-			}function switchMain(e, navId, defaultTabClass) {
+			}
+			function switchMain(e, navId, defaultTabClass) {
 				if(e) e.preventDefault();
 				const viewerClose = document.querySelector('#viewer .close');
 				if (viewerClose) viewerClose.click();closeMedia();
@@ -388,7 +390,7 @@
 					const firstSubLink = activeNav.querySelector('a');
 					switchTab(null, defaultTabClass, firstSubLink);
 				} else {
-					updateDescription(defaultTabClass); // Update text if no sub-menu
+					updateDescription(defaultTabClass, activeLink); // Update text if no sub-menu
 					gallery.style.opacity = 0;
 					setTimeout(() => {
 						document.querySelectorAll('.portfolio-item').forEach(item => item.style.display = 'none');
@@ -413,8 +415,7 @@
 				parentNav.querySelectorAll('a').forEach(a => a.style.fontWeight = 'normal');
 				linkEl.style.fontWeight = 'bold';
 
-				updateDescription(tabClass); // Update text
-
+				updateDescription(tabClass, linkEl);
 				gallery.style.opacity = 0;
 				setTimeout(() => {
 					document.querySelectorAll('.portfolio-item').forEach(item => item.style.display = 'none');
