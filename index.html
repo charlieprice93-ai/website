@@ -9,27 +9,36 @@
 		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
 
 		<style>
-/* 🚀 The Batcave Dense Grid (Isolated to Overview Tab ONLY) */
+/* 🚀 The Batcave Dense Grid (Main Window Overlay) */
 			#thumbnails.batcave-grid {
+				position: fixed !important;
+				top: 0 !important;
+				left: 0 !important;
+				width: 100vw !important; /* Stretches across the whole screen */
+				height: 100vh !important;
+				z-index: -1 !important; /* Sits perfectly behind the white right-hand sidebar */
 				display: grid !important;
-				grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important; 
+				grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important; 
 				grid-auto-flow: dense !important; 
-				gap: 5px !important; 
-				transition: opacity 0.3s ease-in-out !important;
-				opacity: 1;
-				background: #111; 
-				padding: 5px;
+				gap: 0 !important; /* 🚀 FIX: Removes heavy borders, makes images sit flush */
+				padding: 0 !important;
+				margin: 0 !important;
+				background: transparent !important; 
+				overflow: hidden !important; /* Static wall, no scrolling */
 			}
+			
 			#thumbnails.batcave-grid article {
 				width: 100% !important;
 				height: 100% !important;
 				position: relative !important;
 				top: 0 !important; left: 0 !important; transform: none !important;
-				margin: 0 !important; /* Reverts the template's default margin */
+				margin: 0 !important; 
+				padding: 0 !important;
+				border: none !important;
 				overflow: hidden;
 			}
 			
-			/* This makes landscape images take up twice the space */
+			/* Makes landscape images take up twice the space */
 			.span-2 { grid-column: span 2; grid-row: span 2; }
 			
 			#thumbnails.batcave-grid article .thumbnail, 
@@ -39,6 +48,7 @@
 				display: block;
 				cursor: pointer;
 				position: relative;
+				margin: 0 !important;
 			}
 			#thumbnails.batcave-grid article img {
 				width: 100% !important;
