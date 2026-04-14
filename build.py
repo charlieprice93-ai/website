@@ -192,6 +192,14 @@ if batcave_pool:
         for img in batcave_pool:
             c_color = img["color"]
             dist_prev = color_distance(arranged_batcave[idx - 1]["color"], c_color)
+            
+            # 👇 THIS IS THE FIX: We have to actually calculate the score!
+            if idx >= 2:
+                dist_above = color_distance(arranged_batcave[idx - 2]["color"], c_color)
+                score = min(dist_prev, dist_above)
+            else:
+                score = dist_prev
+                
             if score > best_score:
                 best_score = score
                 best_img = img
