@@ -9,36 +9,38 @@
 		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
 
 		<style>
-			/* 🚀 The Batcave Dense Grid */
-			#thumbnails {
+/* 🚀 The Batcave Dense Grid (Isolated to Overview Tab ONLY) */
+			#thumbnails.batcave-grid {
 				display: grid !important;
 				grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important; 
-				grid-auto-flow: dense !important; /* Pushes small items into gaps left by big ones */
-				gap: 5px !important; /* Tight gap like a monitor wall */
+				grid-auto-flow: dense !important; 
+				gap: 5px !important; 
 				transition: opacity 0.3s ease-in-out !important;
 				opacity: 1;
-				background: #111; /* Dark background between cracks */
+				background: #111; 
 				padding: 5px;
 			}
-			#thumbnails article {
+			#thumbnails.batcave-grid article {
 				width: 100% !important;
 				height: 100% !important;
 				position: relative !important;
 				top: 0 !important; left: 0 !important; transform: none !important;
+				margin: 0 !important; /* Reverts the template's default margin */
 				overflow: hidden;
 			}
+			
 			/* This makes landscape images take up twice the space */
 			.span-2 { grid-column: span 2; grid-row: span 2; }
 			
-			#thumbnails article .thumbnail, 
-			#thumbnails article .media-trigger {
+			#thumbnails.batcave-grid article .thumbnail, 
+			#thumbnails.batcave-grid article .media-trigger {
 				width: 100% !important;
 				height: 100% !important;
 				display: block;
 				cursor: pointer;
 				position: relative;
 			}
-			#thumbnails article img {
+			#thumbnails.batcave-grid article img {
 				width: 100% !important;
 				height: 100% !important;
 				object-fit: cover !important; 
@@ -48,10 +50,10 @@
 			/* 🚀 The Auto-Play YouTube Feed styling */
 			.batcave-feed {
 				position: absolute;
-				top: -10%; left: -10%; /* Oversized to hide YouTube borders */
+				top: -10%; left: -10%; 
 				width: 120%; height: 120%;
 				opacity: 0;
-				pointer-events: none; /* Lets clicks pass through to open the portal */
+				pointer-events: none; 
 				transition: opacity 1.5s ease;
 				z-index: 1;
 			}
@@ -69,8 +71,7 @@
 				pointer-events: none;
 				z-index: 2;
 			}
-			.media-trigger:hover .play-button { opacity: 1; }
-	/* 2. The Blurred Cinematic Viewer (For Photos) */
+			.media-trigger:hover .play-button { opacity: 1; }	/* 2. The Blurred Cinematic Viewer (For Photos) */
 			#viewer .slide .image {
 				background-size: cover !important;
 				background-position: center !important;
@@ -524,17 +525,27 @@
 				stopBatcaveRoulette(); // Stop videos while transitioning
 
 				setTimeout(() => {
+					// Hide everything, then show only the active tab's items
 					document.querySelectorAll('.portfolio-item').forEach(item => item.style.display = 'none');
 					document.querySelectorAll('.' + tabClass).forEach(item => item.style.display = 'block');
-					gallery.style.opacity = 1;
-
-					// Start Roulette if there are videos in this view
-					startBatcaveRoulette();
-
-					if (window.innerWidth > 980) {
-						const firstImg = document.querySelector('.' + tabClass + ' .thumbnail');
-						if (firstImg) firstImg.click();
+					
+					// 🚀 Apply the grid ONLY if it's the Overview tab
+					if (tabClass === 'tab-overview') {
+						gallery.classList.add('batcave-grid');
+						startBatcaveRoulette(); // Start the live videos
+						// We explicitly DO NOT auto-click the first image here so the grid is visible!
+					} else {
+						// 🚀 For all normal tabs, remove the grid and restore normal template behavior
+						gallery.classList.remove('batcave-grid');
+						
+						// Auto-click the first image to open the cinematic viewer (Desktop only)
+						if (window.innerWidth > 980) {
+							const firstImg = document.querySelector('.' + tabClass + ' .thumbnail');
+							if (firstImg) firstImg.click();
+						}
 					}
+
+					gallery.style.opacity = 1;
 				}, 300);
 			}
 
