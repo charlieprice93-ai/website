@@ -3,6 +3,7 @@ import subprocess
 from PIL import Image
 import re
 import json
+import random
 
 FOLDERS = [
     "real-estate", "travel", "theatre", 
@@ -32,6 +33,7 @@ for tab_class, desc in descriptions.items():
 js_content += "};\n\n"
 
 category_logos = {} 
+master_collection = [] # 🚀 NEW: For the Batcave Overview
 
 def get_avg_color(img_path):
     try:
@@ -43,7 +45,6 @@ def get_avg_color(img_path):
 def color_distance(c1, c2):
     return sum((a - b) ** 2 for a, b in zip(c1, c2))
 
-# 🚀 NEW: Helper to calculate Logo Aspect Ratio (Width / Height)
 def get_aspect_ratio(img_path):
     try:
         with Image.open(img_path) as img:
@@ -119,15 +120,16 @@ for folder in FOLDERS:
             else:
                 subprocess.run(['sips', '-Z', '600', '-s', 'formatOptions', '70', new_full_path, '--out', thumb_path], capture_output=True)
         
-        # 🚀 NEW: Record aspect ratio for logos
+        aspect = get_aspect_ratio(thumb_path)
+        
         if is_blurb:
-            aspect = get_aspect_ratio(thumb_path)
             blurb_logos.append({"path": f"images/{folder}/thumbs/{new_filename}", "aspect": aspect})
         else:
             avg_color = get_avg_color(thumb_path)
-            images_data.append({"file": new_filename, "title": clean_title, "color": avg_color, "mediaId": media_id})
+            img_dict = {"folder": folder, "file": new_filename, "title": clean_title, "color": avg_color, "mediaId": media_id, "aspect": aspect}
+            images_data.append(img_dict)
+            master_collection.append(img_dict) # Add to global pool
         
-    # 🚀 NEW: Smart Size Sorter (Alternates Wide -> Narrow -> Wide)
     if blurb_logos:
         blurb_logos.sort(key=lambda x: x["aspect"], reverse=True)
         arranged_logos = []
@@ -173,8 +175,33 @@ for folder in FOLDERS:
         
     js_content += f"const {var_name} = [\n"
     for img in arranged_images:
-        js_content += f'  {{ file: "{img["file"]}", title: "{img["title"]}", mediaId: "{img["mediaId"]}" }},\n'
+        js_content += f'  {{ file: "{img["file"]}", title: "{img["title"]}", mediaId: "{img["mediaId"]}", aspect: {img["aspect"]} }},\n'
     js_content += "];\n\n"
+
+# 🚀 NEW: Build the Batcave Overview (20 mixed, color-sorted items)
+random.shuffle(master_collection)
+batcave_pool = master_collection[:20] 
+
+arranged_batcave = []
+if batcave_pool:
+    arranged_batcave.append(batcave_pool.pop(0))
+    while batcave_pool:
+        idx = len(arranged_batcave)
+        best_img = None
+        best_score = -1
+        for img in batcave_pool:
+            c_color = img["color"]
+            dist_prev = color_distance(arranged_batcave[idx - 1]["color"], c_color)
+            if score > best_score:
+                best_score = score
+                best_img = img
+        arranged_batcave.append(best_img)
+        batcave_pool.remove(best_img)
+
+js_content += f"const overviewImages = [\n"
+for img in arranged_batcave:
+    js_content += f'  {{ folder: "{img["folder"]}", file: "{img["file"]}", title: "{img["title"]}", mediaId: "{img["mediaId"]}", aspect: {img["aspect"]} }},\n'
+js_content += "];\n\n"
 
 js_content += "const categoryLogos = {\n"
 for tab_class, logos in category_logos.items():
@@ -184,4 +211,4 @@ js_content += "};\n\n"
 with open("data.js", "w") as f:
     f.write(js_content)
 
-print("✅ Success! Images, Videos, Text Descriptions, Logos, and Interactive Tours processed!")
+print("✅ Success! Images, Videos, Overview Grid, and Logos processed!")

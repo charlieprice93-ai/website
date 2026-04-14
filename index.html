@@ -9,25 +9,31 @@
 		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
 
 		<style>
+			/* 🚀 The Batcave Dense Grid */
 			#thumbnails {
 				display: grid !important;
-				grid-template-columns: repeat(2, 1fr) !important; 
-				gap: 0 !important;
+				grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important; 
+				grid-auto-flow: dense !important; /* Pushes small items into gaps left by big ones */
+				gap: 5px !important; /* Tight gap like a monitor wall */
 				transition: opacity 0.3s ease-in-out !important;
 				opacity: 1;
+				background: #111; /* Dark background between cracks */
+				padding: 5px;
 			}
 			#thumbnails article {
 				width: 100% !important;
-				height: auto !important;
+				height: 100% !important;
 				position: relative !important;
-				top: 0 !important;
-				left: 0 !important;
-				transform: none !important;
+				top: 0 !important; left: 0 !important; transform: none !important;
+				overflow: hidden;
 			}
+			/* This makes landscape images take up twice the space */
+			.span-2 { grid-column: span 2; grid-row: span 2; }
+			
 			#thumbnails article .thumbnail, 
 			#thumbnails article .media-trigger {
 				width: 100% !important;
-				aspect-ratio: 1 / 1 !important;
+				height: 100% !important;
 				display: block;
 				cursor: pointer;
 				position: relative;
@@ -36,8 +42,21 @@
 				width: 100% !important;
 				height: 100% !important;
 				object-fit: cover !important; 
+				transition: opacity 1s ease;
 			}
 
+			/* 🚀 The Auto-Play YouTube Feed styling */
+			.batcave-feed {
+				position: absolute;
+				top: -10%; left: -10%; /* Oversized to hide YouTube borders */
+				width: 120%; height: 120%;
+				opacity: 0;
+				pointer-events: none; /* Lets clicks pass through to open the portal */
+				transition: opacity 1.5s ease;
+				z-index: 1;
+			}
+			.batcave-feed.playing { opacity: 1; }
+			
 			.play-button {
 				position: absolute;
 				top: 50%; left: 50%;
@@ -48,9 +67,9 @@
 				opacity: 0.8;
 				transition: opacity 0.2s;
 				pointer-events: none;
+				z-index: 2;
 			}
 			.media-trigger:hover .play-button { opacity: 1; }
-
 	/* 2. The Blurred Cinematic Viewer (For Photos) */
 			#viewer .slide .image {
 				background-size: cover !important;
@@ -263,39 +282,48 @@
 		<script src="data.js"></script>
 		<script src="reviews_data.js"></script>
 
-		<script>
+<script>
 			const gallery = document.getElementById("thumbnails");
 
-			function buildGroup(dataArray, folder, categoryClass) {
+			// 🚀 Modified to accept 'folderOverride' for the mixed overview grid
+			function buildGroup(dataArray, defaultFolder, categoryClass) {
 				if (!dataArray || dataArray.length === 0) return "";
 				let html = "";
 				dataArray.forEach(img => {
+					// Use specific folder if provided in the object, otherwise use default
+					let folder = img.folder ? img.folder : defaultFolder;
+					
+					// If aspect ratio > 1.2, make it take up 2 grid spots
+					let spanClass = (img.aspect && img.aspect > 1.2) ? "span-2" : "";
+					
+					let ytDataAttr = (img.mediaId && !img.mediaId.startsWith("http")) ? `data-yt="${img.mediaId}"` : "";
+
 					if (img.mediaId && img.mediaId !== "") {
-// 🚀 FIX: Replaced hijackable text characters with bulletproof SVGs
 						let icon = img.mediaId.startsWith("http") 
 							? `<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>` 
-							: `<svg viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`;						html += `
-						<article class="portfolio-item ${categoryClass}" style="display: none;">
-							<a class="thumbnail media-trigger" href="images/${folder}/fulls/${img.file}" onclick="setTimeout(() => openMedia('${img.mediaId}'), 50);">
+							: `<svg viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`;						
+						html += `
+						<article class="portfolio-item ${categoryClass} ${spanClass}" ${ytDataAttr} style="display: none;">
+							<a class="thumbnail media-trigger" href="images/${folder}/fulls/${img.file}" onclick="setTimeout(() => openMedia('${img.mediaId}'), 50); event.preventDefault();">
 								<img src="images/${folder}/thumbs/${img.file}" alt="" loading="lazy" />
 								<div class="play-button">${icon}</div>
 							</a>
-							<h2></h2><p></p>
 						</article>`;
 					} else {
 						html += `
-						<article class="portfolio-item ${categoryClass}" style="display: none;">
+						<article class="portfolio-item ${categoryClass} ${spanClass}" style="display: none;">
 							<a class="thumbnail" href="images/${folder}/fulls/${img.file}">
 								<img src="images/${folder}/thumbs/${img.file}" alt="" loading="lazy" />
 							</a>
-							<h2></h2><p></p>
 						</article>`;
 					}
 				});
 				return html;
 			}
 
+			// 🚀 Inject Overview first, then everything else
 			gallery.innerHTML = 
+				buildGroup((typeof overviewImages !== 'undefined' ? overviewImages : null), '', 'tab-overview') +
 				buildGroup((typeof realEstateImages !== 'undefined' ? realEstateImages : null), 'real-estate', 'tab-real-estate') +
 				buildGroup((typeof travelImages !== 'undefined' ? travelImages : null), 'travel', 'tab-travel') +
 				buildGroup((typeof theatreImages !== 'undefined' ? theatreImages : null), 'theatre', 'tab-theatre') +
@@ -307,41 +335,67 @@
 				buildGroup((typeof floorPlansImages !== 'undefined' ? floorPlansImages : null), 'floor-plans', 'tab-floor-plans') +
 				buildGroup((typeof _3dToursImages !== 'undefined' ? _3dToursImages : null), '3d-tours', 'tab-3d-tours');
 
-			document.querySelectorAll('.tab-real-estate').forEach(item => item.style.display = 'block');
-// 🚀 INJECT THE ABOUT SECTION WITH SMART SPLIT
-			if (typeof categoryDescriptions !== 'undefined' && categoryDescriptions['tab-about']) {
-				let fullText = categoryDescriptions['tab-about'];
-				let splitIndex = fullText.indexOf('<br><br>');
-				let html = "";
-				
-				if (splitIndex !== -1) {
-					let firstPart = fullText.substring(0, splitIndex);
-					let restPart = fullText.substring(splitIndex + 8); 
-					
-					html += `<p style="margin: 0; color: #888;">${firstPart}</p>`;
-					html += `
-					<details style="margin-top: 1em; font-size: 1em; color: #a0a0a1;">
-						<summary style="cursor: pointer; outline: none; transition: color 0.2s ease;">Read More</summary>
-						<p style="margin-top: 1em; margin-bottom: 0; line-height: 1.6; color: #888;">${restPart}</p>
-					</details>`;
-				} else {
-					html += `<p style="margin: 0; color: #888;">${fullText}</p>`;
-				}
-				
-				document.getElementById('about-container').innerHTML = html;
+			// Add Overview link to main navigation dynamically
+			const mainNav = document.querySelector('.main-categories');
+			if(mainNav) {
+				mainNav.innerHTML = `<a href="#" id="link-nav-overview" onclick="switchMain(event, 'nav-overview', 'tab-overview')" style="font-weight: bold; text-decoration: underline; color: #333;">Overview</a> <span>/</span> ` + mainNav.innerHTML;
 			}
-			
-// 🚀 ENGINE: Text Box Injector
-	// 🚀 GLOBAL VARIABLES for the carousels
+
+			// Create dummy sub-nav for Overview so it works with your switch logic
+			const header = document.getElementById('header');
+			if(header) {
+				header.insertAdjacentHTML('beforeend', `<nav id="nav-overview" class="sub-nav sub-categories" style="display: block;"></nav>`);
+			}
+
+			let batcaveInterval = null;
+
+			// 🚀 The Batcave YouTube Roulette
+			function startBatcaveRoulette() {
+				if(batcaveInterval) clearInterval(batcaveInterval);
+				
+				batcaveInterval = setInterval(() => {
+					// Clean up previous playing videos
+					document.querySelectorAll('.batcave-feed.playing').forEach(iframe => {
+						iframe.classList.remove('playing');
+						setTimeout(() => iframe.remove(), 1500); // Wait for fade out, then destroy to save RAM
+					});
+
+					// Find all visible YouTube spots in the current tab
+					const availableSpots = Array.from(document.querySelectorAll('.portfolio-item[data-yt]')).filter(el => el.style.display === 'block');
+					
+					if (availableSpots.length > 0) {
+						// Pick 1 random spot (increase to 2 if you want chaos)
+						const targetSpot = availableSpots[Math.floor(Math.random() * availableSpots.length)];
+						const ytId = targetSpot.getAttribute('data-yt');
+						const linkWrap = targetSpot.querySelector('a');
+
+						// Inject iframe (muted, looping, no controls)
+						const iframeHtml = `<iframe class="batcave-feed" src="https://www.youtube.com/embed/${ytId}?autoplay=1&mute=1&controls=0&showinfo=0&modestbranding=1&loop=1&playlist=${ytId}" allow="autoplay" frameborder="0"></iframe>`;
+						linkWrap.insertAdjacentHTML('afterbegin', iframeHtml);
+						
+						// Trigger fade in after a tiny delay to let YT connect
+						setTimeout(() => {
+							const newIframe = linkWrap.querySelector('.batcave-feed');
+							if(newIframe) newIframe.classList.add('playing');
+						}, 500);
+					}
+				}, 7000); // 🚀 Swaps every 7 seconds
+			}
+
+			function stopBatcaveRoulette() {
+				if(batcaveInterval) clearInterval(batcaveInterval);
+				document.querySelectorAll('.batcave-feed').forEach(iframe => iframe.remove());
+			}
+
+			// 🚀 ENGINE: Text Box Injector
 			let logoCarouselInterval = null;
 			let reviewCarouselInterval = null;
 
-			// 🚀 ENGINE: Text Box, Reviews & Logo Injector
 			function updateDescription(tabClass, targetEl) {
 				const descBox = document.getElementById('category-desc');
 				let html = "";
 				
-				// 1. Inject Text with Smart Split
+				// 1. Inject Text
 				if (typeof categoryDescriptions !== 'undefined' && categoryDescriptions[tabClass]) {
 					let fullText = categoryDescriptions[tabClass];
 					let splitIndex = fullText.indexOf('<br><br>');
@@ -349,29 +403,20 @@
 					if (splitIndex !== -1) {
 						let firstPart = fullText.substring(0, splitIndex);
 						let restPart = fullText.substring(splitIndex + 8); 
-						
 						html += `<p style="margin: 0; color: #888;">${firstPart}</p>`;
-						html += `
-						<details style="margin-top: 1em; font-size: 1em; color: #a0a0a1;">
-							<summary style="cursor: pointer; outline: none; transition: color 0.2s ease;">Read More</summary>
-							<p style="margin-top: 1em; margin-bottom: 0; line-height: 1.6; color: #888;">${restPart}</p>
-						</details>`;
+						html += `<details style="margin-top: 1em; font-size: 1em; color: #a0a0a1;"><summary style="cursor: pointer; outline: none;">Read More</summary><p style="margin-top: 1em; margin-bottom: 0; line-height: 1.6; color: #888;">${restPart}</p></details>`;
 					} else {
 						html += `<p style="margin: 0; color: #888;">${fullText}</p>`;
 					}
 				}
 
-				// 🚀 2. Inject Reviews (ONLY for Real Estate tab)
+				// 2. Inject Reviews
 				if (tabClass === 'tab-real-estate' && typeof clientReviews !== 'undefined' && clientReviews.length > 0) {
 					const starSvg = `<svg viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor" style="vertical-align: middle; margin: 0 2px;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`;
 					const fiveStars = starSvg.repeat(5);
-
-					// Note: Using your existing CSS classes for #reviews-carousel and .review-slide
 					html += `<div id="reviews-carousel">`;
 					clientReviews.forEach((review, index) => {
-						let activeClass = index === 0 ? "active" : "";
-						html += `
-						<div class="review-slide ${activeClass}">
+						html += `<div class="review-slide ${index === 0 ? "active" : ""}">
 							<p class="review-text">"${review.text}"</p>
 							<div class="stars" style="margin: 0.8em 0 0.5em 0;">${fiveStars}</div>
 							<p class="review-loc">— Vendor, ${review.location}</p>
@@ -380,41 +425,27 @@
 					html += `</div>`;
 				}
 				
-				// 3. Inject Logos (Formatted for Carousel in Groups of 3)
+				// 3. Inject Logos
 				if (typeof categoryLogos !== 'undefined' && categoryLogos[tabClass] && categoryLogos[tabClass].length > 0) {
 					const logos = categoryLogos[tabClass];
 					html += '<div class="blurb-logos">';
-					
-					// Chunk logos into arrays of up to 3
-					const chunkSize = 3;
-					for (let i = 0; i < logos.length; i += chunkSize) {
-						const chunk = logos.slice(i, i + chunkSize);
-						const activeClass = i === 0 ? "active" : "";
-						
-						html += `<div class="logo-group ${activeClass}">`;
-						chunk.forEach(logoSrc => {
-							html += `<img src="${logoSrc}" class="blurb-logo" alt="Client Logo" />`;
-						});
+					for (let i = 0; i < logos.length; i += 3) {
+						const chunk = logos.slice(i, i + 3);
+						html += `<div class="logo-group ${i === 0 ? "active" : ""}">`;
+						chunk.forEach(logoSrc => html += `<img src="${logoSrc}" class="blurb-logo" alt="Client Logo" />`);
 						html += `</div>`;
 					}
 					html += '</div>';
 				}
 				
-				// 4. Show/Hide Box & Initialize Carousels
 				if (html !== "") {
 					descBox.innerHTML = html;
 					descBox.style.display = 'block';
-
-					// Detach and snap right below the active link
-					if (targetEl && targetEl.parentNode) {
-						targetEl.parentNode.appendChild(descBox);
-					}
-
-					// Clear any existing carousel timers
+					if (targetEl && targetEl.parentNode) targetEl.parentNode.appendChild(descBox);
+					
 					if (logoCarouselInterval) clearInterval(logoCarouselInterval);
 					if (reviewCarouselInterval) clearInterval(reviewCarouselInterval);
 
-					// Start Logo Carousel (10 seconds)
 					let logoGroups = descBox.querySelectorAll('.logo-group');
 					if (logoGroups.length > 1) {
 						let currentGroupIdx = 0;
@@ -425,7 +456,6 @@
 						}, 10000); 
 					}
 
-					// Start Review Carousel (30 seconds)
 					let reviewSlides = descBox.querySelectorAll('.review-slide');
 					if (reviewSlides.length > 1) {
 						let currentReviewIdx = 0;
@@ -445,7 +475,6 @@
 				const viewerClose = document.querySelector('#viewer .close');
 				if (viewerClose) viewerClose.click();closeMedia();
 
-				// Reset all Main links
 				document.querySelectorAll('.main-categories a').forEach(a => {
 					a.style.fontWeight = 'normal'; a.style.textDecoration = 'none'; a.style.color = '#a0a0a1'; 
 				});
@@ -454,15 +483,18 @@
 					activeLink.style.fontWeight = 'bold'; activeLink.style.textDecoration = 'underline'; activeLink.style.color = '#333'; 
 				}
 
-				// Hide all Sub Navs
 				document.querySelectorAll('.sub-nav').forEach(nav => nav.style.display = 'none');
 				const activeNav = document.getElementById(navId);
 				
 				if (activeNav) {
 					activeNav.style.display = 'block';
 					const firstSubLink = activeNav.querySelector('a');
-					// Trigger switchTab on the first element of the new menu
-					if (firstSubLink) switchTab(null, defaultTabClass, firstSubLink);
+					// If there's a sub-link, trigger it. Otherwise, just load the default tab (Overview needs this)
+					if (firstSubLink) {
+						switchTab(null, defaultTabClass, firstSubLink);
+					} else {
+						switchTab(null, defaultTabClass, null);
+					}
 				}
 			}
 
@@ -471,28 +503,33 @@
 				const viewerClose = document.querySelector('#viewer .close');
 				if (viewerClose) viewerClose.click();closeMedia();
 
-				// 🚀 Update Sub-Nav Styles (Remove underline from siblings, add to active)
 				if (linkEl) {
 					const parentNav = linkEl.closest('.sub-nav');
 					if (parentNav) {
 						parentNav.querySelectorAll('a').forEach(a => {
-							a.style.fontWeight = 'normal';
-							a.style.textDecoration = 'none';
-							a.style.color = '#a0a0a1';
+							a.style.fontWeight = 'normal'; a.style.textDecoration = 'none'; a.style.color = '#a0a0a1';
 						});
 					}
-					linkEl.style.fontWeight = 'bold';
-					linkEl.style.textDecoration = 'underline';
-					linkEl.style.color = '#333';
+					linkEl.style.fontWeight = 'bold'; linkEl.style.textDecoration = 'underline'; linkEl.style.color = '#333';
 				}
 
-				updateDescription(tabClass, linkEl);
+				// If Overview, use the "About" blurb
+				if(tabClass === 'tab-overview') {
+					updateDescription('tab-about', document.getElementById('nav-overview'));
+				} else {
+					updateDescription(tabClass, linkEl);
+				}
 				
 				gallery.style.opacity = 0;
+				stopBatcaveRoulette(); // Stop videos while transitioning
+
 				setTimeout(() => {
 					document.querySelectorAll('.portfolio-item').forEach(item => item.style.display = 'none');
 					document.querySelectorAll('.' + tabClass).forEach(item => item.style.display = 'block');
 					gallery.style.opacity = 1;
+
+					// Start Roulette if there are videos in this view
+					startBatcaveRoulette();
 
 					if (window.innerWidth > 980) {
 						const firstImg = document.querySelector('.' + tabClass + ' .thumbnail');
@@ -501,18 +538,15 @@
 				}, 300);
 			}
 
-			// 🚀 FIX: Auto-load Real Estate content correctly on initial page visit
 			document.addEventListener("DOMContentLoaded", function() {
-				const firstPhotoTab = document.querySelector('#nav-photo a');
-				if (firstPhotoTab) {
-					switchTab(null, 'tab-real-estate', firstPhotoTab);
-				}
+				// Auto-load the Overview tab on page start
+				switchMain(null, 'nav-overview', 'tab-overview');
 			});
-		function openMedia(mediaId) {
-				// 🚀 NEW: Catch Rayon links and force them into a new tab
+
+			function openMedia(mediaId) {
 				if (mediaId.includes("rayon.design")) {
 					window.open(mediaId, '_blank');
-					return; // This stops the black iframe portal from opening
+					return; 
 				}
 
 				const viewer = document.getElementById('viewer');
@@ -524,7 +558,8 @@
 				if (mediaId.startsWith("http")) {
 					player.src = mediaId; 
 				} else {
-					player.src = "https://www.youtube.com/embed/" + mediaId + "?autoplay=1&mute=1&rel=0&showinfo=0&modestbranding=1";
+					// Main cinematic player - autoplay but WITH sound and controls
+					player.src = "https://www.youtube.com/embed/" + mediaId + "?autoplay=1&rel=0&showinfo=0&modestbranding=1";
 				}
 				
 				portal.style.display = 'block';
@@ -537,14 +572,8 @@
 				if (player) player.src = ""; 
 			}
 
-		document.addEventListener('click', function(e) {
-				// Close if they click the 'X' toggle, nav arrows, OR a standard photo thumbnail
-				if (
-					e.target.closest('.toggle') || 
-					e.target.closest('.nav-next') || 
-					e.target.closest('.nav-previous') || 
-					(e.target.closest('.thumbnail') && !e.target.closest('.media-trigger'))
-				) {
+			document.addEventListener('click', function(e) {
+				if (e.target.closest('.toggle') || e.target.closest('.nav-next') || e.target.closest('.nav-previous') || (e.target.closest('.thumbnail') && !e.target.closest('.media-trigger'))) {
 					closeMedia();
 				}
 			});
@@ -554,36 +583,25 @@
 					closeMedia();
 				}
 			});
+
 			function copyEmail(e) {
 				e.preventDefault();
 				const email = "charlieprice93@gmail.com";
-				
-				// 1. Copy the email to the user's clipboard
 				navigator.clipboard.writeText(email).then(() => {
-					// 2. Show a polite alert
 					alert("Email address copied to clipboard: " + email);
-					// 3. Still attempt to open their mail app
 					window.location.href = "mailto:" + email;
-				}).catch(err => {
-					// Fallback if their browser blocks clipboard access
-					window.location.href = "mailto:" + email;
-				});
+				}).catch(err => window.location.href = "mailto:" + email);
 			}
+
 			function openWA(e) {
 				e.preventDefault();
-				
-				// 🚀 ANTI-SCRAPER: Break your number up into strings. 
-				// Change these to your actual number (Do not include the + or 0 at the start)
 				const countryCode = "44"; 
 				const part1 = "7837"; 
 				const part2 = "442271"; 
-				
-				// Reassemble and open the chat
 				const secureNumber = countryCode + part1 + part2;
 				window.open("https://wa.me/" + secureNumber, "_blank");
 			}
 		</script>
-
 		<script src="assets/js/jquery.min.js"></script>
 		<script src="assets/js/browser.min.js"></script>
 		<script src="assets/js/breakpoints.min.js"></script>
