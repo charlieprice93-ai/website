@@ -13,7 +13,7 @@
 			#batcave-grid {
 				position: fixed;
 				top: 0; left: 0;
-				width: 100vw; height: 100vh;
+				height: 100vh;
 				z-index: 1; /* Sits completely behind your white sidebar */
 				display: none; /* Hidden by default */
 				grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
@@ -21,13 +21,15 @@
 				gap: 0; padding: 0; margin: 0;
 				background: #111; overflow: hidden;
 			}
-			#batcave-grid article { width: 100%; height: 100%; position: relative; overflow: hidden; margin: 0; padding: 0; border: none; }
+			#batcave-grid article { width: 100%; height: 100%; position: relative; overflow: hidden; margin: 0; padding: 0; border: none; outline: none; }
 			.span-2 { grid-column: span 2; grid-row: span 2; }
-			#batcave-grid article .thumbnail { width: 100%; height: 100%; display: block; position: relative; margin: 0; cursor: pointer; }
+			
+			/* Renamed from .thumbnail to stop main.js from crashing */
+			#batcave-grid article .batcave-item { width: 100%; height: 100%; display: block; position: relative; margin: 0; cursor: pointer; border: none; outline: none; text-decoration: none; }
 			#batcave-grid img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.3s ease, transform 0.3s ease; }
 			#batcave-grid article:hover img { opacity: 0.7; transform: scale(1.05); }
 
-			/* Play buttons for videos in the batcave grid */
+			/* Correct Play buttons for videos in the batcave grid */
 			#batcave-grid .play-button {
 				position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
 				color: white; font-size: 3em; text-shadow: 0px 4px 15px rgba(0,0,0,0.8);
@@ -35,10 +37,10 @@
 			}
 			#batcave-grid article:hover .play-button { opacity: 1; }
 
-			/* 🚀 FIX: Protect the sidebar so the grid doesn't bleed through */
+			/* 🚀 FIX: Protect the sidebar so the grid CANNOT bleed through */
 			#main {
 				position: relative;
-				z-index: 10 !important;
+				z-index: 10000 !important; /* Huge z-index to sit above the fixed grid */
 				background: #ffffff !important; 
 			}
 
@@ -190,8 +192,17 @@
 			const gallery = document.getElementById("thumbnails");
 			const batcaveGrid = document.getElementById("batcave-grid");
 
+			// 🚀 DYNAMIC WIDTH CALCULATION: Matches grid width to left window to prevent bleeding
+			function syncBatcaveWidth() {
+				if(batcaveGrid && batcaveGrid.style.display === 'grid') {
+					const viewer = document.getElementById('viewer');
+					if (viewer) batcaveGrid.style.width = viewer.offsetWidth + 'px';
+					else batcaveGrid.style.width = '100vw'; // Fallback
+				}
+			}
+			window.addEventListener('resize', syncBatcaveWidth);
+
 			// 🚀 THE INTERACTION ROUTER
-			// This catches clicks on the Batcave wall and redirects them through the template natively
 			window.isRoutingClick = false;
 			function navigateFromOverview(e, folder, tabClass, filename) {
 				if (e) e.preventDefault();
@@ -207,12 +218,13 @@
 
 				// 3. Wait a tiny fraction of a second for the sidebar thumbnails to un-hide, then click the target
 				setTimeout(() => {
-					const targetLinks = document.querySelectorAll(`#thumbnails .${tabClass} a`);
+					// 🚀 Notice we look for standard .thumbnail here, because we are clicking the SIDEBAR items
+					const targetLinks = document.querySelectorAll(`#thumbnails .${tabClass} a.thumbnail`);
 					let wasClicked = false;
 					
 					targetLinks.forEach(link => {
 						if (link.getAttribute('href').endsWith(filename)) {
-							link.click(); // Fires the template's standard viewer!
+							link.click(); // Fires the template's standard viewer safely!
 							wasClicked = true;
 						}
 					});
@@ -221,7 +233,7 @@
 					if (!wasClicked && targetLinks.length > 0) targetLinks[0].click();
 					
 					window.isRoutingClick = false; // Reset
-				}, 350); 
+				}, 400); 
 			}
 
 			// 🚀 BUILD THE BATCAVE GRID
@@ -230,11 +242,13 @@
 				overviewImages.forEach(img => {
 					let spanClass = (img.aspect && img.aspect > 1.2) ? "span-2" : "";
 					let tabClass = 'tab-' + img.folder;
-					let icon = img.mediaId ? `<div class="play-button"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg></div>` : "";
+					
+					// 🚀 Corrected standard Play Button SVG
+					let icon = img.mediaId ? `<div class="play-button"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>` : "";
 					
 					batcaveHTML += `
 					<article class="${spanClass}">
-						<a class="thumbnail" href="#" onclick="navigateFromOverview(event, '${img.folder}', '${tabClass}', '${img.file}')">
+						<a class="batcave-item" href="#" onclick="navigateFromOverview(event, '${img.folder}', '${tabClass}', '${img.file}')">
 							<img src="images/${img.folder}/thumbs/${img.file}" alt="" loading="lazy" />
 							${icon}
 						</a>
@@ -418,33 +432,44 @@
 					const viewer = document.getElementById('viewer');
 
 					if (tabClass === 'tab-overview') {
-						// 🚀 TURN ON BATCAVE, TURN OFF TEMPLATE VIEWER AND THUMBNAILS
-						if(batcaveGrid) batcaveGrid.style.display = 'grid';
+						// 🚀 TURN ON BATCAVE, HIDE TEMPLATE THUMBNAILS
+						if(batcaveGrid) {
+							batcaveGrid.style.display = 'grid';
+							syncBatcaveWidth(); // Match left window width
+						}
+						
+						// Leave gallery display style empty so the template CSS controls it
 						if(gallery) gallery.style.display = 'none';
+						
+						// Fade out viewer
 						if (viewer) {
 							viewer.style.opacity = '0';
 							viewer.style.pointerEvents = 'none'; 
 						}
 					} else {
-						// 🚀 TURN OFF BATCAVE, RESTORE TEMPLATE
+						// 🚀 TURN OFF BATCAVE, SAFELY RESTORE TEMPLATE
 						if(batcaveGrid) batcaveGrid.style.display = 'none';
-						if(gallery) gallery.style.display = 'grid'; 
+						
+						// 🚀 VERY IMPORTANT: Set display to empty string so it relies on the template's CSS (grid)
+						if(gallery) gallery.style.display = ''; 
+						
+						// Restore the viewer fully so template can use it
 						if (viewer) {
-							viewer.style.opacity = '1';
-							viewer.style.pointerEvents = 'auto';
+							viewer.style.opacity = '';
+							viewer.style.pointerEvents = '';
 						}
 
 						// Standard hide/show logic for right sidebar
 						document.querySelectorAll('#thumbnails .portfolio-item').forEach(item => item.style.display = 'none');
 						document.querySelectorAll('#thumbnails .' + tabClass).forEach(item => item.style.display = 'block');
 
-						// Auto-click the first image ONLY if the user naturally clicked the menu (not if routing from batcave)
+						// Auto-click the first image ONLY if the user naturally clicked the menu
 						if (window.innerWidth > 980 && !window.isRoutingClick) {
 							const firstImg = document.querySelector('#thumbnails .' + tabClass + ' .thumbnail');
 							if (firstImg) firstImg.click();
 						}
 					}
-				}, 300);
+				}, 100);
 			}
 
 			// Auto-Load Overview on visit
