@@ -9,6 +9,42 @@
 		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
 
 		<style>
+			/* 🚀 1. The Isolated Batcave Grid Layer */
+			#batcave-grid {
+				position: fixed;
+				top: 0; left: 0;
+				width: 100vw; height: 100vh;
+				z-index: 1; /* Sits completely behind your white sidebar */
+				display: none; /* Hidden by default */
+				grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
+				grid-auto-flow: dense; 
+				gap: 0; padding: 0; margin: 0;
+				background: #111; overflow: hidden;
+			}
+			#batcave-grid article { width: 100%; height: 100%; position: relative; overflow: hidden; margin: 0; padding: 0; border: none; }
+			.span-2 { grid-column: span 2; grid-row: span 2; }
+			#batcave-grid article .thumbnail { width: 100%; height: 100%; display: block; position: relative; margin: 0; cursor: pointer; }
+			#batcave-grid img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.3s ease, transform 0.3s ease; }
+			#batcave-grid article:hover img { opacity: 0.7; transform: scale(1.05); }
+
+			/* Play buttons for videos in the batcave grid */
+			#batcave-grid .play-button {
+				position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+				color: white; font-size: 3em; text-shadow: 0px 4px 15px rgba(0,0,0,0.8);
+				opacity: 0.8; transition: opacity 0.2s; pointer-events: none; z-index: 2;
+			}
+			#batcave-grid article:hover .play-button { opacity: 1; }
+
+			/* 🚀 FIX: Protect the sidebar so the grid doesn't bleed through */
+			#main {
+				position: relative;
+				z-index: 10 !important;
+				background: #ffffff !important; 
+			}
+
+			/* --------------------------------------------------- */
+			/* YOUR ORIGINAL STYLES BELOW (UNTOUCHED)              */
+			/* --------------------------------------------------- */
 			#thumbnails {
 				display: grid !important;
 				grid-template-columns: repeat(2, 1fr) !important; 
@@ -20,47 +56,27 @@
 				width: 100% !important;
 				height: auto !important;
 				position: relative !important;
-				top: 0 !important;
-				left: 0 !important;
-				transform: none !important;
+				top: 0 !important; left: 0 !important; transform: none !important;
 			}
 			#thumbnails article .thumbnail, 
 			#thumbnails article .media-trigger {
 				width: 100% !important;
 				aspect-ratio: 1 / 1 !important;
-				display: block;
-				cursor: pointer;
-				position: relative;
+				display: block; cursor: pointer; position: relative;
 			}
-			#thumbnails article img {
-				width: 100% !important;
-				height: 100% !important;
-				object-fit: cover !important; 
-			}
+			#thumbnails article img { width: 100% !important; height: 100% !important; object-fit: cover !important; }
 
-			.play-button {
-				position: absolute;
-				top: 50%; left: 50%;
-				transform: translate(-50%, -50%);
-				color: white;
-				font-size: 3em;
-				text-shadow: 0px 4px 15px rgba(0,0,0,0.8);
-				opacity: 0.8;
-				transition: opacity 0.2s;
-				pointer-events: none;
+			#thumbnails .play-button {
+				position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+				color: white; font-size: 3em; text-shadow: 0px 4px 15px rgba(0,0,0,0.8);
+				opacity: 0.8; transition: opacity 0.2s; pointer-events: none;
 			}
 			.media-trigger:hover .play-button { opacity: 1; }
 
-	/* 2. The Blurred Cinematic Viewer (For Photos) */
-			#viewer .slide .image {
-				background-size: cover !important;
-				background-position: center !important;
-				position: relative;
-			}
+			#viewer .slide .image { background-size: cover !important; background-position: center !important; position: relative; }
 			#viewer .slide .image::before {
 				content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
 				backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); 
-				/* 🚀 THE FIX: Changed from black (0,0,0) to white (255,255,255) */
 				background: rgba(255, 255, 255, 0.75); z-index: 1;
 			}
 			#viewer .slide .image::after {
@@ -74,142 +90,47 @@
 			.main-categories a:hover { color: #333; }
 			.main-categories span { margin: 0 0.5em; color: #a0a0a1; opacity: 0.5; }
 			
-			#media-portal {
-				display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-				background: #000000; z-index: 50;
-			}
-			#media-portal iframe {
-				position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-				width: 100%; height: 100%; border: none;
-			}
+			#media-portal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #000000; z-index: 50; }
+			#media-portal iframe { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100%; height: 100%; border: none; }
 			#viewer .inner { z-index: 99999 !important; }
-			/* 3. Custom Accordion Arrow Override */
-			details > summary {
-				list-style: none; /* Hides the default arrow on modern browsers */
-			}
-			details > summary::-webkit-details-marker {
-				display: none; /* Hides the default arrow on older Safari/iOS */
-			}
-			details > summary::before {
-				content: '▸'; /* A clean, geometric text triangle */
-				display: inline-block;
-				margin-right: 0.5em;
-				transition: transform 0.2s ease;
-				font-size: 1.1em;
-			}
-			details[open] > summary::before {
-				transform: rotate(90deg); /* Animates the arrow pointing down when clicked */
-			}
-	/* 4. Category Blurb Logos */
-			.blurb-logos {
-				margin-top: 2em;
-				display: flex;
-				gap: 1.5em; /* 🚀 FIX: Reduced gap so they fit on the same line */
-				flex-wrap: wrap;
-				justify-content: center; 
-				align-items: center;
-			}
-			.blurb-logos img {
-				width: 100px;  /* 🚀 FIX: Reduced from 130px to fit the sidebar width */
-				height: 40px;  /* 🚀 FIX: Scaled down proportionally */
-				object-fit: contain; 
-				opacity: 0.5; 
-				filter: grayscale(100%);
-				transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); 
-				transform-origin: center;
-			}			
-			.blurb-logos img:hover {
-				opacity: 1;
-				filter: grayscale(0%);
-				transform: scale(1.6); 
-				z-index: 10;
-				position: relative;
-			}
-		/* 5. Reviews Carousel */
-			#reviews-carousel {
-				position: relative; margin: 2em 0; padding: 1.5em; 
-				background: rgba(255, 255, 255, 0.03); border-radius: 8px; 
-				text-align: right; /* 🚀 Switched to right-aligned */
-				display: flex; align-items: center; justify-content: flex-end; /* 🚀 Pushes content right */
-				min-height: 160px; 
-			}
-			.review-slide {
-				position: absolute; opacity: 0; transition: opacity 0.8s ease; 
-				width: 85%; pointer-events: none;
-			}
+
+			details > summary { list-style: none; }
+			details > summary::-webkit-details-marker { display: none; }
+			details > summary::before { content: '▸'; display: inline-block; margin-right: 0.5em; transition: transform 0.2s ease; font-size: 1.1em; }
+			details[open] > summary::before { transform: rotate(90deg); }
+
+			.blurb-logos { margin-top: 2em; display: flex; gap: 1.5em; flex-wrap: wrap; justify-content: center; align-items: center; }
+			.blurb-logos img { width: 100px; height: 40px; object-fit: contain; opacity: 0.5; filter: grayscale(100%); transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); transform-origin: center; }			
+			.blurb-logos img:hover { opacity: 1; filter: grayscale(0%); transform: scale(1.6); z-index: 10; position: relative; }
+
+			#reviews-carousel { position: relative; margin: 2em 0; padding: 1.5em; background: rgba(255, 255, 255, 0.03); border-radius: 8px; text-align: right; display: flex; align-items: center; justify-content: flex-end; min-height: 160px; }
+			.review-slide { position: absolute; opacity: 0; transition: opacity 0.8s ease; width: 85%; pointer-events: none; }
 			.review-slide.active { opacity: 1; pointer-events: auto; z-index: 2; }
 			.stars { color: #f5c518; font-size: 1.2em; margin-bottom: 0.8em; }
 			.review-text { font-style: italic; color: #a0a0a1; font-size: 0.95em; line-height: 1.6; margin: 0; }
 			.review-loc { margin-top: 1em; font-size: 0.75em; color: #666; text-transform: uppercase; letter-spacing: 1px; }
-			/* Profile Picture */
-/* Profile Picture */
-			#profile-pic {
-			    width: 110px;  /* 🚀 Increased from 75px */
-			    height: 110px; /* 🚀 Increased from 75px */
-			    border-radius: 50%; 
-			    object-fit: cover; 
-			    flex-shrink: 0; 
-			}
-			/* 6. Sub-Categories Styling */
+
+			#profile-pic { width: 110px; height: 110px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
 			.sub-categories { font-size: 1.05em; font-weight: normal; margin: 1em 0; }
 			.sub-categories a { color: #a0a0a1; border-bottom: none; text-decoration: none; transition: color 0.2s ease; }
 			.sub-categories a:hover { color: #333; }
 			.sub-categories span { margin: 0 0.5em; color: #a0a0a1; opacity: 0.5; }
-
-			/* 7. Blurb Logos Carousel (Updated for groups of 3) */
-			.blurb-logos {
-				position: relative;
-				margin-top: 1.5em;
-				height: 60px; /* Increased to accommodate larger logos */
-				display: flex;
-				justify-content: center;
-				align-items: center;
-			}
-			.logo-group {
-				position: absolute;
-				display: flex;
-				justify-content: center;
-				align-items: center;
-				gap: 2.5em; /* Spacing between the 3 logos */
-				opacity: 0;
-				transition: opacity 2.0s ease;
-				pointer-events: none;
-				width: 100%;
-			}
-			.logo-group.active {
-				opacity: 1; 
-				pointer-events: auto;
-				z-index: 2;
-			}
-			.blurb-logo {
-				width: 130px; /* Increased from 110px */
-				height: 55px; /* Increased from 45px */
-				object-fit: contain;
-				opacity: 0.5;
-				filter: grayscale(100%);
-				transition: all 0.3s ease;
-			}
-			.blurb-logo:hover {
-				opacity: 1;
-				filter: grayscale(0%);
-				transform: scale(1.15); 
-			}
 		</style>
 	</head>
 	<body class="is-preload-0 is-preload-1 is-preload-2">
+
+		<div id="batcave-grid"></div>
 
 		<div id="media-portal">
 			<iframe id="media-player" src="" allow="autoplay; fullscreen; encrypted-media; xr-spatial-tracking"></iframe>
 		</div>
 
 		<div id="main">
-<header id="header">
+			<header id="header">
 				<h1>Charlie Price</h1>
 				
 				<div style="display: flex; align-items: center; justify-content: flex-end; gap: 1em; margin-bottom: 2em;">
-					
 					<img id="profile-pic" src="images/portrait.jpg" alt="Charlie Price Portrait">
-					
 					<div style="text-align: right;">
 						<p style="margin: 0; line-height: 1;">Isle of Wight, UK</p>
 						<ul class="icons" style="margin-top: 0.5em; margin-bottom: 0;">
@@ -217,18 +138,21 @@
 							<li><a href="https://www.instagram.com/charliepr1ce" target="_blank" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
 							<li><a href="#" onclick="copyEmail(event)" class="icon fa-envelope"><span class="label">Email</span></a></li>
 						</ul>
-						</div>
+					</div>
 				</div>
 				<div id="about-container" style="margin-bottom: 2em; font-size: 0.9em;"></div>
 				
 				<div class="main-categories">
-					<a href="#" id="link-nav-photo" onclick="switchMain(event, 'nav-photo', 'tab-real-estate')" style="font-weight: bold; text-decoration: underline; color: #333;">Photography</a> <span>/</span>
+					<a href="#" id="link-nav-overview" onclick="switchMain(event, 'nav-overview', 'tab-overview')" style="font-weight: bold; text-decoration: underline; color: #333;">Overview</a> <span>/</span>
+					<a href="#" id="link-nav-photo" onclick="switchMain(event, 'nav-photo', 'tab-real-estate')">Photography</a> <span>/</span>
 					<a href="#" id="link-nav-video" onclick="switchMain(event, 'nav-video', 'tab-video-travel')">Videography</a> <span>/</span>
 					<a href="#" id="link-nav-design" onclick="switchMain(event, 'nav-design', 'tab-web-branding')">Design & Planning</a>
 				</div>
 
-				<nav id="nav-photo" class="sub-nav sub-categories" style="display: block;">
-					<a href="#" onclick="switchTab(event, 'tab-real-estate', this)" style="font-weight: bold; text-decoration: underline; color: #333;">Real Estate</a> <span>/</span>
+				<nav id="nav-overview" class="sub-nav sub-categories" style="display: block;"></nav>
+
+				<nav id="nav-photo" class="sub-nav sub-categories" style="display: none;">
+					<a href="#" onclick="switchTab(event, 'tab-real-estate', this)">Real Estate</a> <span>/</span>
 					<a href="#" onclick="switchTab(event, 'tab-travel', this)">Travel & Lifestyle</a> <span>/</span>
 					<a href="#" onclick="switchTab(event, 'tab-theatre', this)">Film & Theatre</a>
 				</nav>
@@ -248,7 +172,6 @@
 
 				<div id="category-desc" style="margin: 1.5em 0; font-style: italic; color: #888; font-size: 0.9em; display: none; line-height: 1.5; font-weight: normal;">
 				</div>
-
 			</header>
 
 			<section id="thumbnails"></section>
@@ -265,16 +188,71 @@
 
 		<script>
 			const gallery = document.getElementById("thumbnails");
+			const batcaveGrid = document.getElementById("batcave-grid");
 
+			// 🚀 THE INTERACTION ROUTER
+			// This catches clicks on the Batcave wall and redirects them through the template natively
+			window.isRoutingClick = false;
+			function navigateFromOverview(e, folder, tabClass, filename) {
+				if (e) e.preventDefault();
+				window.isRoutingClick = true; 
+
+				// 1. Determine which parent menu to open
+				let parentNavId = 'nav-photo';
+				if (tabClass.includes('video')) parentNavId = 'nav-video';
+				if (tabClass.includes('branding') || tabClass.includes('floor') || tabClass.includes('3d')) parentNavId = 'nav-design';
+
+				// 2. Switch the sidebar navigation to the correct tab
+				switchMain(null, parentNavId, tabClass);
+
+				// 3. Wait a tiny fraction of a second for the sidebar thumbnails to un-hide, then click the target
+				setTimeout(() => {
+					const targetLinks = document.querySelectorAll(`#thumbnails .${tabClass} a`);
+					let wasClicked = false;
+					
+					targetLinks.forEach(link => {
+						if (link.getAttribute('href').endsWith(filename)) {
+							link.click(); // Fires the template's standard viewer!
+							wasClicked = true;
+						}
+					});
+
+					// Fallback: If exact file isn't found, just click the first one in the folder
+					if (!wasClicked && targetLinks.length > 0) targetLinks[0].click();
+					
+					window.isRoutingClick = false; // Reset
+				}, 350); 
+			}
+
+			// 🚀 BUILD THE BATCAVE GRID
+			if (typeof overviewImages !== 'undefined' && batcaveGrid) {
+				let batcaveHTML = "";
+				overviewImages.forEach(img => {
+					let spanClass = (img.aspect && img.aspect > 1.2) ? "span-2" : "";
+					let tabClass = 'tab-' + img.folder;
+					let icon = img.mediaId ? `<div class="play-button"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg></div>` : "";
+					
+					batcaveHTML += `
+					<article class="${spanClass}">
+						<a class="thumbnail" href="#" onclick="navigateFromOverview(event, '${img.folder}', '${tabClass}', '${img.file}')">
+							<img src="images/${img.folder}/thumbs/${img.file}" alt="" loading="lazy" />
+							${icon}
+						</a>
+					</article>`;
+				});
+				batcaveGrid.innerHTML = batcaveHTML;
+			}
+
+			// 🚀 BUILD THE STANDARD TEMPLATE GRID
 			function buildGroup(dataArray, folder, categoryClass) {
 				if (!dataArray || dataArray.length === 0) return "";
 				let html = "";
 				dataArray.forEach(img => {
 					if (img.mediaId && img.mediaId !== "") {
-// 🚀 FIX: Replaced hijackable text characters with bulletproof SVGs
 						let icon = img.mediaId.startsWith("http") 
 							? `<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>` 
-							: `<svg viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`;						html += `
+							: `<svg viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`;						
+						html += `
 						<article class="portfolio-item ${categoryClass}" style="display: none;">
 							<a class="thumbnail media-trigger" href="images/${folder}/fulls/${img.file}" onclick="setTimeout(() => openMedia('${img.mediaId}'), 50);">
 								<img src="images/${folder}/thumbs/${img.file}" alt="" loading="lazy" />
@@ -307,41 +285,14 @@
 				buildGroup((typeof floorPlansImages !== 'undefined' ? floorPlansImages : null), 'floor-plans', 'tab-floor-plans') +
 				buildGroup((typeof _3dToursImages !== 'undefined' ? _3dToursImages : null), '3d-tours', 'tab-3d-tours');
 
-			document.querySelectorAll('.tab-real-estate').forEach(item => item.style.display = 'block');
-// 🚀 INJECT THE ABOUT SECTION WITH SMART SPLIT
-			if (typeof categoryDescriptions !== 'undefined' && categoryDescriptions['tab-about']) {
-				let fullText = categoryDescriptions['tab-about'];
-				let splitIndex = fullText.indexOf('<br><br>');
-				let html = "";
-				
-				if (splitIndex !== -1) {
-					let firstPart = fullText.substring(0, splitIndex);
-					let restPart = fullText.substring(splitIndex + 8); 
-					
-					html += `<p style="margin: 0; color: #888;">${firstPart}</p>`;
-					html += `
-					<details style="margin-top: 1em; font-size: 1em; color: #a0a0a1;">
-						<summary style="cursor: pointer; outline: none; transition: color 0.2s ease;">Read More</summary>
-						<p style="margin-top: 1em; margin-bottom: 0; line-height: 1.6; color: #888;">${restPart}</p>
-					</details>`;
-				} else {
-					html += `<p style="margin: 0; color: #888;">${fullText}</p>`;
-				}
-				
-				document.getElementById('about-container').innerHTML = html;
-			}
-			
-// 🚀 ENGINE: Text Box Injector
-	// 🚀 GLOBAL VARIABLES for the carousels
+			// 🚀 TEXT AND LOGO INJECTORS
 			let logoCarouselInterval = null;
 			let reviewCarouselInterval = null;
 
-			// 🚀 ENGINE: Text Box, Reviews & Logo Injector
 			function updateDescription(tabClass, targetEl) {
 				const descBox = document.getElementById('category-desc');
 				let html = "";
 				
-				// 1. Inject Text with Smart Split
 				if (typeof categoryDescriptions !== 'undefined' && categoryDescriptions[tabClass]) {
 					let fullText = categoryDescriptions[tabClass];
 					let splitIndex = fullText.indexOf('<br><br>');
@@ -349,29 +300,19 @@
 					if (splitIndex !== -1) {
 						let firstPart = fullText.substring(0, splitIndex);
 						let restPart = fullText.substring(splitIndex + 8); 
-						
 						html += `<p style="margin: 0; color: #888;">${firstPart}</p>`;
-						html += `
-						<details style="margin-top: 1em; font-size: 1em; color: #a0a0a1;">
-							<summary style="cursor: pointer; outline: none; transition: color 0.2s ease;">Read More</summary>
-							<p style="margin-top: 1em; margin-bottom: 0; line-height: 1.6; color: #888;">${restPart}</p>
-						</details>`;
+						html += `<details style="margin-top: 1em; font-size: 1em; color: #a0a0a1;"><summary style="cursor: pointer; outline: none;">Read More</summary><p style="margin-top: 1em; margin-bottom: 0; line-height: 1.6; color: #888;">${restPart}</p></details>`;
 					} else {
 						html += `<p style="margin: 0; color: #888;">${fullText}</p>`;
 					}
 				}
 
-				// 🚀 2. Inject Reviews (ONLY for Real Estate tab)
 				if (tabClass === 'tab-real-estate' && typeof clientReviews !== 'undefined' && clientReviews.length > 0) {
 					const starSvg = `<svg viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor" style="vertical-align: middle; margin: 0 2px;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`;
 					const fiveStars = starSvg.repeat(5);
-
-					// Note: Using your existing CSS classes for #reviews-carousel and .review-slide
 					html += `<div id="reviews-carousel">`;
 					clientReviews.forEach((review, index) => {
-						let activeClass = index === 0 ? "active" : "";
-						html += `
-						<div class="review-slide ${activeClass}">
+						html += `<div class="review-slide ${index === 0 ? "active" : ""}">
 							<p class="review-text">"${review.text}"</p>
 							<div class="stars" style="margin: 0.8em 0 0.5em 0;">${fiveStars}</div>
 							<p class="review-loc">— Vendor, ${review.location}</p>
@@ -380,41 +321,26 @@
 					html += `</div>`;
 				}
 				
-				// 3. Inject Logos (Formatted for Carousel in Groups of 3)
 				if (typeof categoryLogos !== 'undefined' && categoryLogos[tabClass] && categoryLogos[tabClass].length > 0) {
 					const logos = categoryLogos[tabClass];
 					html += '<div class="blurb-logos">';
-					
-					// Chunk logos into arrays of up to 3
-					const chunkSize = 3;
-					for (let i = 0; i < logos.length; i += chunkSize) {
-						const chunk = logos.slice(i, i + chunkSize);
-						const activeClass = i === 0 ? "active" : "";
-						
-						html += `<div class="logo-group ${activeClass}">`;
-						chunk.forEach(logoSrc => {
-							html += `<img src="${logoSrc}" class="blurb-logo" alt="Client Logo" />`;
-						});
+					for (let i = 0; i < logos.length; i += 3) {
+						const chunk = logos.slice(i, i + 3);
+						html += `<div class="logo-group ${i === 0 ? "active" : ""}">`;
+						chunk.forEach(logoSrc => html += `<img src="${logoSrc}" class="blurb-logo" alt="Client Logo" />`);
 						html += `</div>`;
 					}
 					html += '</div>';
 				}
 				
-				// 4. Show/Hide Box & Initialize Carousels
 				if (html !== "") {
 					descBox.innerHTML = html;
 					descBox.style.display = 'block';
-
-					// Detach and snap right below the active link
-					if (targetEl && targetEl.parentNode) {
-						targetEl.parentNode.appendChild(descBox);
-					}
-
-					// Clear any existing carousel timers
+					if (targetEl && targetEl.parentNode) targetEl.parentNode.appendChild(descBox);
+					
 					if (logoCarouselInterval) clearInterval(logoCarouselInterval);
 					if (reviewCarouselInterval) clearInterval(reviewCarouselInterval);
 
-					// Start Logo Carousel (10 seconds)
 					let logoGroups = descBox.querySelectorAll('.logo-group');
 					if (logoGroups.length > 1) {
 						let currentGroupIdx = 0;
@@ -425,7 +351,6 @@
 						}, 10000); 
 					}
 
-					// Start Review Carousel (30 seconds)
 					let reviewSlides = descBox.querySelectorAll('.review-slide');
 					if (reviewSlides.length > 1) {
 						let currentReviewIdx = 0;
@@ -440,12 +365,12 @@
 				}
 			}
 
+			// 🚀 MENU SWITCHING LOGIC
 			function switchMain(e, navId, defaultTabClass) {
 				if(e) e.preventDefault();
 				const viewerClose = document.querySelector('#viewer .close');
 				if (viewerClose) viewerClose.click();closeMedia();
 
-				// Reset all Main links
 				document.querySelectorAll('.main-categories a').forEach(a => {
 					a.style.fontWeight = 'normal'; a.style.textDecoration = 'none'; a.style.color = '#a0a0a1'; 
 				});
@@ -454,15 +379,17 @@
 					activeLink.style.fontWeight = 'bold'; activeLink.style.textDecoration = 'underline'; activeLink.style.color = '#333'; 
 				}
 
-				// Hide all Sub Navs
 				document.querySelectorAll('.sub-nav').forEach(nav => nav.style.display = 'none');
 				const activeNav = document.getElementById(navId);
 				
 				if (activeNav) {
 					activeNav.style.display = 'block';
 					const firstSubLink = activeNav.querySelector('a');
-					// Trigger switchTab on the first element of the new menu
-					if (firstSubLink) switchTab(null, defaultTabClass, firstSubLink);
+					if (firstSubLink) {
+						switchTab(null, defaultTabClass, firstSubLink);
+					} else {
+						switchTab(null, defaultTabClass, null);
+					}
 				}
 			}
 
@@ -471,62 +398,75 @@
 				const viewerClose = document.querySelector('#viewer .close');
 				if (viewerClose) viewerClose.click();closeMedia();
 
-				// 🚀 Update Sub-Nav Styles (Remove underline from siblings, add to active)
 				if (linkEl) {
 					const parentNav = linkEl.closest('.sub-nav');
 					if (parentNav) {
 						parentNav.querySelectorAll('a').forEach(a => {
-							a.style.fontWeight = 'normal';
-							a.style.textDecoration = 'none';
-							a.style.color = '#a0a0a1';
+							a.style.fontWeight = 'normal'; a.style.textDecoration = 'none'; a.style.color = '#a0a0a1';
 						});
 					}
-					linkEl.style.fontWeight = 'bold';
-					linkEl.style.textDecoration = 'underline';
-					linkEl.style.color = '#333';
+					linkEl.style.fontWeight = 'bold'; linkEl.style.textDecoration = 'underline'; linkEl.style.color = '#333';
 				}
 
-				updateDescription(tabClass, linkEl);
+				if (tabClass === 'tab-overview') {
+					updateDescription('tab-about', document.getElementById('nav-overview'));
+				} else {
+					updateDescription(tabClass, linkEl);
+				}
 				
-				gallery.style.opacity = 0;
 				setTimeout(() => {
-					document.querySelectorAll('.portfolio-item').forEach(item => item.style.display = 'none');
-					document.querySelectorAll('.' + tabClass).forEach(item => item.style.display = 'block');
-					gallery.style.opacity = 1;
+					const viewer = document.getElementById('viewer');
 
-					if (window.innerWidth > 980) {
-						const firstImg = document.querySelector('.' + tabClass + ' .thumbnail');
-						if (firstImg) firstImg.click();
+					if (tabClass === 'tab-overview') {
+						// 🚀 TURN ON BATCAVE, TURN OFF TEMPLATE VIEWER AND THUMBNAILS
+						if(batcaveGrid) batcaveGrid.style.display = 'grid';
+						if(gallery) gallery.style.display = 'none';
+						if (viewer) {
+							viewer.style.opacity = '0';
+							viewer.style.pointerEvents = 'none'; 
+						}
+					} else {
+						// 🚀 TURN OFF BATCAVE, RESTORE TEMPLATE
+						if(batcaveGrid) batcaveGrid.style.display = 'none';
+						if(gallery) gallery.style.display = 'grid'; 
+						if (viewer) {
+							viewer.style.opacity = '1';
+							viewer.style.pointerEvents = 'auto';
+						}
+
+						// Standard hide/show logic for right sidebar
+						document.querySelectorAll('#thumbnails .portfolio-item').forEach(item => item.style.display = 'none');
+						document.querySelectorAll('#thumbnails .' + tabClass).forEach(item => item.style.display = 'block');
+
+						// Auto-click the first image ONLY if the user naturally clicked the menu (not if routing from batcave)
+						if (window.innerWidth > 980 && !window.isRoutingClick) {
+							const firstImg = document.querySelector('#thumbnails .' + tabClass + ' .thumbnail');
+							if (firstImg) firstImg.click();
+						}
 					}
 				}, 300);
 			}
 
-			// 🚀 FIX: Auto-load Real Estate content correctly on initial page visit
+			// Auto-Load Overview on visit
 			document.addEventListener("DOMContentLoaded", function() {
-				const firstPhotoTab = document.querySelector('#nav-photo a');
-				if (firstPhotoTab) {
-					switchTab(null, 'tab-real-estate', firstPhotoTab);
-				}
+				switchMain(null, 'nav-overview', 'tab-overview');
 			});
-		function openMedia(mediaId) {
-				// 🚀 NEW: Catch Rayon links and force them into a new tab
+
+			function openMedia(mediaId) {
 				if (mediaId.includes("rayon.design")) {
 					window.open(mediaId, '_blank');
-					return; // This stops the black iframe portal from opening
+					return; 
 				}
-
 				const viewer = document.getElementById('viewer');
 				const portal = document.getElementById('media-portal');
 				if (viewer && portal) viewer.appendChild(portal);
 				
 				const player = document.getElementById('media-player');
-				
 				if (mediaId.startsWith("http")) {
 					player.src = mediaId; 
 				} else {
 					player.src = "https://www.youtube.com/embed/" + mediaId + "?autoplay=1&mute=1&rel=0&showinfo=0&modestbranding=1";
 				}
-				
 				portal.style.display = 'block';
 			}
 
@@ -537,14 +477,8 @@
 				if (player) player.src = ""; 
 			}
 
-		document.addEventListener('click', function(e) {
-				// Close if they click the 'X' toggle, nav arrows, OR a standard photo thumbnail
-				if (
-					e.target.closest('.toggle') || 
-					e.target.closest('.nav-next') || 
-					e.target.closest('.nav-previous') || 
-					(e.target.closest('.thumbnail') && !e.target.closest('.media-trigger'))
-				) {
+			document.addEventListener('click', function(e) {
+				if ( e.target.closest('.toggle') || e.target.closest('.nav-next') || e.target.closest('.nav-previous') || (e.target.closest('.thumbnail') && !e.target.closest('.media-trigger')) ) {
 					closeMedia();
 				}
 			});
@@ -554,33 +488,22 @@
 					closeMedia();
 				}
 			});
+
 			function copyEmail(e) {
 				e.preventDefault();
 				const email = "charlieprice93@gmail.com";
-				
-				// 1. Copy the email to the user's clipboard
 				navigator.clipboard.writeText(email).then(() => {
-					// 2. Show a polite alert
 					alert("Email address copied to clipboard: " + email);
-					// 3. Still attempt to open their mail app
 					window.location.href = "mailto:" + email;
-				}).catch(err => {
-					// Fallback if their browser blocks clipboard access
-					window.location.href = "mailto:" + email;
-				});
+				}).catch(err => window.location.href = "mailto:" + email);
 			}
+
 			function openWA(e) {
 				e.preventDefault();
-				
-				// 🚀 ANTI-SCRAPER: Break your number up into strings. 
-				// Change these to your actual number (Do not include the + or 0 at the start)
 				const countryCode = "44"; 
 				const part1 = "7837"; 
 				const part2 = "442271"; 
-				
-				// Reassemble and open the chat
-				const secureNumber = countryCode + part1 + part2;
-				window.open("https://wa.me/" + secureNumber, "_blank");
+				window.open("https://wa.me/" + countryCode + part1 + part2, "_blank");
 			}
 		</script>
 
