@@ -3,6 +3,7 @@ import subprocess
 from PIL import Image
 import re
 import json
+import random # 🚀 NEW: Required for our Home Page shuffle
 
 FOLDERS = [
     "real-estate", "travel", "theatre", 
@@ -33,6 +34,9 @@ js_content += "};\n\n"
 
 category_logos = {} 
 
+# 🚀 NEW: Our global pool for the Home Page
+all_portfolio_images = []
+
 def get_avg_color(img_path):
     try:
         with Image.open(img_path) as img:
@@ -43,7 +47,6 @@ def get_avg_color(img_path):
 def color_distance(c1, c2):
     return sum((a - b) ** 2 for a, b in zip(c1, c2))
 
-# 🚀 NEW: Helper to calculate Logo Aspect Ratio (Width / Height)
 def get_aspect_ratio(img_path):
     try:
         with Image.open(img_path) as img:
@@ -119,15 +122,23 @@ for folder in FOLDERS:
             else:
                 subprocess.run(['sips', '-Z', '600', '-s', 'formatOptions', '70', new_full_path, '--out', thumb_path], capture_output=True)
         
-        # 🚀 NEW: Record aspect ratio for logos
         if is_blurb:
             aspect = get_aspect_ratio(thumb_path)
             blurb_logos.append({"path": f"images/{folder}/thumbs/{new_filename}", "aspect": aspect})
         else:
             avg_color = get_avg_color(thumb_path)
             images_data.append({"file": new_filename, "title": clean_title, "color": avg_color, "mediaId": media_id})
+            
+            # 🚀 NEW: Add every standard image to our global Home Page pool
+            all_portfolio_images.append({
+                "file": new_filename, 
+                "folder": folder, # Need this to build the image path later
+                "title": clean_title, 
+                "color": avg_color, 
+                "mediaId": media_id,
+                "originTab": f"tab-{folder}" # Need this to trigger the correct sidebar menu
+            })
         
-    # 🚀 NEW: Smart Size Sorter (Alternates Wide -> Narrow -> Wide)
     if blurb_logos:
         blurb_logos.sort(key=lambda x: x["aspect"], reverse=True)
         arranged_logos = []
@@ -176,6 +187,44 @@ for folder in FOLDERS:
         js_content += f'  {{ file: "{img["file"]}", title: "{img["title"]}", mediaId: "{img["mediaId"]}" }},\n'
     js_content += "];\n\n"
 
+# 🚀 NEW: BUILD THE HOME PAGE GRID ARRAY
+TOTAL_HOME_IMAGES = 64 # 16 displayed + 48 in reserve for the "twinkle" effect
+
+# Grab a random selection, ensuring we don't ask for more images than you actually have
+sample_size = min(TOTAL_HOME_IMAGES, len(all_portfolio_images))
+home_raw_selection = random.sample(all_portfolio_images, sample_size)
+
+arranged_home_images = []
+if home_raw_selection:
+    arranged_home_images.append(home_raw_selection.pop(0))
+    # Run the Home Grid through your existing color-distance logic!
+    while home_raw_selection:
+        idx = len(arranged_home_images)
+        best_img = None
+        best_score = -1
+        
+        for img in home_raw_selection:
+            c_color = img["color"]
+            dist_prev = color_distance(arranged_home_images[idx - 1]["color"], c_color)
+            if idx >= 2:
+                dist_above = color_distance(arranged_home_images[idx - 2]["color"], c_color)
+                score = min(dist_prev, dist_above)
+            else:
+                score = dist_prev
+                
+            if score > best_score:
+                best_score = score
+                best_img = img
+                
+        arranged_home_images.append(best_img)
+        home_raw_selection.remove(best_img)
+
+# Output the new array to data.js
+js_content += "const homeImages = [\n"
+for img in arranged_home_images:
+    js_content += f'  {{ file: "{img["file"]}", folder: "{img["folder"]}", title: "{img["title"]}", mediaId: "{img["mediaId"]}", originTab: "{img["originTab"]}" }},\n'
+js_content += "];\n\n"
+
 js_content += "const categoryLogos = {\n"
 for tab_class, logos in category_logos.items():
     js_content += f'  "{tab_class}": {json.dumps(logos)},\n'
@@ -184,4 +233,4 @@ js_content += "};\n\n"
 with open("data.js", "w") as f:
     f.write(js_content)
 
-print("✅ Success! Images, Videos, Text Descriptions, Logos, and Interactive Tours processed!")
+print("✅ Success! Images, Videos, Text Descriptions, Logos, Interactive Tours, AND Home Grid processed!")

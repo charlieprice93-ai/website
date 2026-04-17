@@ -194,6 +194,55 @@
 				filter: grayscale(0%);
 				transform: scale(1.15); 
 			}
+			/* 🚀 HOME PAGE GRID OVERLAY */
+#home-grid-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%; 
+    height: 100%;
+    z-index: 45; /* Sits exactly over the Lens viewer, but safely under your #main sidebar */
+    background: #ffffff; /* Or #000000 depending on your site's dark/light mode */
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: 25vh; /* 4 rows exactly fill a 100vh screen */
+    overflow-y: auto;
+    overflow-x: hidden;
+    transition: opacity 0.8s ease, visibility 0.8s ease;
+}
+
+/* Hide it completely when not active so it doesn't block clicks */
+#home-grid-overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* Individual Grid Cells */
+.home-grid-cell {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 1;
+    transition: opacity 1.5s ease-in-out; /* The slow, smooth fade */
+    cursor: pointer;
+}
+
+/* The state added via JS when an image is rotating out */
+.home-grid-cell.fade-out {
+    opacity: 0;
+}
+
+/* Responsive Grid formatting for smaller screens */
+@media screen and (max-width: 1280px) {
+    #home-grid-overlay { grid-template-columns: repeat(3, 1fr); grid-auto-rows: 33.33vh; }
+}
+@media screen and (max-width: 980px) {
+    #home-grid-overlay { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 40vh; }
+}
+@media screen and (max-width: 736px) {
+    #home-grid-overlay { grid-template-columns: repeat(1, 1fr); grid-auto-rows: 45vh; }
+}
 		</style>
 	</head>
 	<body class="is-preload-0 is-preload-1 is-preload-2">
@@ -501,13 +550,7 @@
 				}, 300);
 			}
 
-			// 🚀 FIX: Auto-load Real Estate content correctly on initial page visit
-			document.addEventListener("DOMContentLoaded", function() {
-				const firstPhotoTab = document.querySelector('#nav-photo a');
-				if (firstPhotoTab) {
-					switchTab(null, 'tab-real-estate', firstPhotoTab);
-				}
-			});
+			
 		function openMedia(mediaId) {
 				// 🚀 NEW: Catch Rayon links and force them into a new tab
 				if (mediaId.includes("rayon.design")) {
@@ -582,6 +625,118 @@
 				const secureNumber = countryCode + part1 + part2;
 				window.open("https://wa.me/" + secureNumber, "_blank");
 			}
+			// 🚀 HOME PAGE ENGINE
+document.addEventListener("DOMContentLoaded", function() {
+    // 1. Create the overlay safely
+    const overlay = document.createElement('div');
+    overlay.id = 'home-grid-overlay';
+    document.body.appendChild(overlay);
+
+    // 2. State management
+    const displayCount = 16; 
+    let displayedImages = homeImages.slice(0, displayCount);
+    let reserveImages = homeImages.slice(displayCount);
+
+    // 3. Build the initial grid
+    displayedImages.forEach((imgData, index) => {
+        let img = document.createElement('img');
+        // Use thumbnails to keep the grid lighting-fast!
+        img.src = `images/${imgData.folder}/thumbs/${imgData.file}`; 
+        img.className = 'home-grid-cell';
+        img.dataset.index = index;
+        
+        // When clicked, route to the image
+        img.onclick = () => routeToMedia(displayedImages[index]);
+        
+        overlay.appendChild(img);
+    });
+
+    // 4. The Twinkle Effect (Runs every 3 seconds)
+    setInterval(() => {
+        // Pause the twinkle if the user isn't on the Home page
+        if (reserveImages.length === 0 || overlay.classList.contains('hidden')) return;
+
+        // Pick a random cell
+        let cellIndex = Math.floor(Math.random() * displayCount);
+        let imgElement = overlay.children[cellIndex];
+        
+        // Step A: Fade it out
+        imgElement.classList.add('fade-out');
+        
+        // Step B: Wait for the fade to finish, then swap data
+        setTimeout(() => {
+            let oldData = displayedImages[cellIndex];
+            let newData = reserveImages.shift();
+            reserveImages.push(oldData); // Put old image at the back of the queue
+            displayedImages[cellIndex] = newData; // Update state
+            
+            // Swap the image source and click target
+            imgElement.src = `images/${newData.folder}/thumbs/${newData.file}`;
+            imgElement.onclick = () => routeToMedia(newData);
+            
+            // Step C: Fade it back in
+            imgElement.classList.remove('fade-out');
+        }, 1500); // 1.5 seconds matches our CSS transition speed
+    }, 3000); 
+
+    // 5. The Routing Function (The Ghost User)
+    function routeToMedia(imgData) {
+        // Fade out our custom grid
+        overlay.classList.add('hidden');
+
+        // Find the specific sub-category tab link
+        const tabLink = document.querySelector(`a[onclick*="${imgData.originTab}"]`);
+        
+        if (tabLink) {
+            // First, find and click the parent category (Photo, Video, etc.)
+            const parentNav = tabLink.closest('nav');
+            if (parentNav) {
+                const mainLink = document.getElementById('link-' + parentNav.id);
+                if (mainLink) mainLink.click();
+            }
+            // Then click the sub-category
+            tabLink.click();
+        }
+
+        // Wait a tiny bit for your existing switchTab animation to finish, then click the thumbnail
+        setTimeout(() => {
+            const thumbnails = document.querySelectorAll(`.${imgData.originTab} .thumbnail img`);
+            for (let thumb of thumbnails) {
+                if (thumb.src.includes(imgData.file)) {
+                    thumb.parentElement.click(); 
+                    break;
+                }
+            }
+        }, 350); 
+    }
+
+    // 6. Hook up the H1 Home Button
+    const h1 = document.querySelector('#header h1');
+    if (h1) {
+        h1.style.cursor = 'pointer';
+        h1.title = "Return to Home Grid";
+        h1.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            // Bring our grid back
+            overlay.classList.remove('hidden');
+            
+            // Ensure any fullscreen media portals are closed
+            closeMedia();
+            const viewerClose = document.querySelector('#viewer .close');
+            if (viewerClose) viewerClose.click();
+
+            // Deselect the sidebar links to make it look "reset"
+            document.querySelectorAll('.main-categories a, .sub-categories a').forEach(a => {
+                a.style.fontWeight = 'normal'; 
+                a.style.textDecoration = 'none'; 
+                a.style.color = '#a0a0a1'; 
+            });
+            document.querySelectorAll('.sub-nav').forEach(nav => nav.style.display = 'none');
+            document.getElementById('category-desc').style.display = 'none';
+        });
+    }
+});
 		</script>
 
 		<script src="assets/js/jquery.min.js"></script>
