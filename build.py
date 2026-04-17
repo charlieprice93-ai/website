@@ -127,18 +127,31 @@ for folder in FOLDERS:
             blurb_logos.append({"path": f"images/{folder}/thumbs/{new_filename}", "aspect": aspect})
         else:
             avg_color = get_avg_color(thumb_path)
+            
+            # 🚀 NEW: Calculate the orientation for the locked grid
+            orientation = "square"
+            try:
+                with Image.open(thumb_path) as img:
+                    w, h = img.size
+                    if w > h * 1.15: # 15% wider than tall = landscape
+                        orientation = "landscape"
+                    elif h > w * 1.15: # 15% taller than wide = portrait
+                        orientation = "portrait"
+            except Exception:
+                pass
+
             images_data.append({"file": new_filename, "title": clean_title, "color": avg_color, "mediaId": media_id})
             
-            # 🚀 NEW: Add every standard image to our global Home Page pool
+            # Add to global pool WITH the orientation tag
             all_portfolio_images.append({
                 "file": new_filename, 
-                "folder": folder, # Need this to build the image path later
+                "folder": folder, 
                 "title": clean_title, 
                 "color": avg_color, 
                 "mediaId": media_id,
-                "originTab": f"tab-{folder}" # Need this to trigger the correct sidebar menu
-            })
-        
+                "originTab": f"tab-{folder}",
+                "orientation": orientation # 🚀 NEW
+            })        
     if blurb_logos:
         blurb_logos.sort(key=lambda x: x["aspect"], reverse=True)
         arranged_logos = []
@@ -222,9 +235,8 @@ if home_raw_selection:
 # Output the new array to data.js
 js_content += "const homeImages = [\n"
 for img in arranged_home_images:
-    js_content += f'  {{ file: "{img["file"]}", folder: "{img["folder"]}", title: "{img["title"]}", mediaId: "{img["mediaId"]}", originTab: "{img["originTab"]}" }},\n'
+    js_content += f'  {{ file: "{img["file"]}", folder: "{img["folder"]}", title: "{img["title"]}", mediaId: "{img["mediaId"]}", originTab: "{img["originTab"]}", orientation: "{img["orientation"]}" }},\n'
 js_content += "];\n\n"
-
 js_content += "const categoryLogos = {\n"
 for tab_class, logos in category_logos.items():
     js_content += f'  "{tab_class}": {json.dumps(logos)},\n'

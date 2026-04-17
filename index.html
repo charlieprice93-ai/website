@@ -194,70 +194,63 @@
 				filter: grayscale(0%);
 				transform: scale(1.15); 
 			}
-			/* 🚀 HOME PAGE MASONRY GRID (FLOATING IN VIEWER) */
-#home-masonry-grid {
+/* 🚀 HOME PAGE LOCKED GRID (V3) */
+#home-locked-grid {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 85%; /* Creates the floating 'picture frame' look */
+    width: 85%;
     max-height: 85vh;
-    z-index: 45; /* Sits safely above the background image */
+    z-index: 45;
     
-    /* The Magic Masonry Formula */
-    column-count: 4;
-    column-gap: 15px;
+    /* The Solid Board that blocks background bleed */
+    background: #ffffff; /* Change to #000000 if your site is dark mode */
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1); /* Subtle shadow lifts it off the background */
+    
+    /* The Tetris Packing System */
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: 18vh; /* Fixed height for rows ensures vertical locking */
+    gap: 15px;
+    grid-auto-flow: dense; /* Magically fills empty spaces */
     
     overflow-y: auto;
-    overflow-x: hidden;
+    scrollbar-width: none;
     transition: opacity 0.8s ease, visibility 0.8s ease;
-    
-    /* Hide the scrollbar for a cleaner floating look, but keep functionality */
-    scrollbar-width: none; 
 }
 
-#home-masonry-grid::-webkit-scrollbar { 
-    display: none; 
-}
+#home-locked-grid::-webkit-scrollbar { display: none; }
+#home-locked-grid.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
 
-#home-masonry-grid.hidden {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-}
+/* The Specific Slot Sizes */
+.slot-landscape { grid-column: span 2; grid-row: span 1; }
+.slot-portrait { grid-column: span 1; grid-row: span 2; }
+.slot-square { grid-column: span 1; grid-row: span 1; }
 
-/* Individual Masonry Items */
+/* The Images inside the slots */
 .home-grid-item {
     width: 100%;
-    height: auto; /* Natural aspect ratio creates the puzzle/masonry effect! */
-    margin-bottom: 15px;
-    display: block;
+    height: 100%;
+    object-fit: cover; /* Perfectly fills the fixed slot */
+    border-radius: 4px;
     opacity: 1;
-    border-radius: 4px; /* Optional: adds a tiny, polished curve to the images */
-    transition: opacity 1.5s ease-in-out, transform 0.3s ease;
+    transition: opacity 1.5s ease-in-out;
     cursor: pointer;
 }
+.home-grid-item:hover { opacity: 0.85; }
+.home-grid-item.fade-out { opacity: 0; }
 
-.home-grid-item:hover {
-    transform: scale(1.02); /* Slight pop on hover */
-}
-
-/* State for the twinkle rotation */
-.home-grid-item.fade-out {
-    opacity: 0;
-}
-
-/* Responsive Grid formatting for smaller screens */
+/* Responsive adjustments */
 @media screen and (max-width: 1280px) {
-    #home-masonry-grid { column-count: 3; width: 90%; }
-}
-@media screen and (max-width: 980px) {
-    #home-masonry-grid { column-count: 2; width: 95%; max-height: 90vh; }
+    #home-locked-grid { grid-template-columns: repeat(3, 1fr); }
 }
 @media screen and (max-width: 736px) {
-    #home-masonry-grid { column-count: 1; width: 100%; max-height: 100vh; border-radius: 0; }
-}
-		</style>
+    #home-locked-grid { grid-template-columns: repeat(2, 1fr); width: 95%; max-height: 95vh; padding: 10px; }
+    .slot-landscape { grid-column: span 2; } /* Keep landscapes wide */
+}		</style>
 	</head>
 	<body class="is-preload-0 is-preload-1 is-preload-2">
 
@@ -639,57 +632,90 @@
 				const secureNumber = countryCode + part1 + part2;
 				window.open("https://wa.me/" + secureNumber, "_blank");
 			}
-// 🚀 HOME PAGE ENGINE V2 (Masonry & Floating)
+// 🚀 HOME PAGE ENGINE V3 (Locked Grid & Smart Sorting)
 document.addEventListener("DOMContentLoaded", function() {
     
-    // 1. Create the floating masonry grid INSIDE the viewer
     const viewer = document.getElementById('viewer');
     const gridContainer = document.createElement('div');
-    gridContainer.id = 'home-masonry-grid';
+    gridContainer.id = 'home-locked-grid';
     viewer.appendChild(gridContainer); 
 
-    // 2. State management
-    const displayCount = 16; 
-    let displayedImages = homeImages.slice(0, displayCount);
-    let reserveImages = homeImages.slice(displayCount);
-
-    // 3. Build the initial grid
-    displayedImages.forEach((imgData, index) => {
-        let img = document.createElement('img');
-        img.src = `images/${imgData.folder}/thumbs/${imgData.file}`; 
-        img.className = 'home-grid-item';
-        img.dataset.index = index;
-        
-        img.onclick = () => routeToMedia(displayedImages[index]);
-        gridContainer.appendChild(img);
+    // 1. Sort images into aspect ratio buckets
+    const buckets = { landscape: [], portrait: [], square: [] };
+    homeImages.forEach(img => {
+        if (buckets[img.orientation]) {
+            buckets[img.orientation].push(img);
+        } else {
+            buckets['landscape'].push(img); // fallback
+        }
     });
 
-    // 4. The Twinkle Effect 
+    // 2. Define the Rigid Layout Map (16 slots designed to look like a puzzle)
+    // You can edit this array to change the grid structure!
+    const layoutBlueprint = [
+        'landscape', 'portrait', 'square',
+        'square', 'landscape',
+        'portrait', 'square', 'landscape',
+        'landscape', 'square', 'square',
+        'square', 'portrait', 'landscape'
+    ];
+
+    const activeSlots = []; // Keep track of what's currently displayed
+
+    // 3. Build the Grid
+    layoutBlueprint.forEach((type, index) => {
+        // Create the fixed box container
+        let box = document.createElement('div');
+        box.className = `slot-${type}`;
+        
+        // Grab an image from the correct bucket
+        if (buckets[type].length > 0) {
+            let imgData = buckets[type].shift(); // Remove from reserve
+            
+            let img = document.createElement('img');
+            img.src = `images/${imgData.folder}/thumbs/${imgData.file}`;
+            img.className = 'home-grid-item';
+            img.onclick = () => routeToMedia(imgData);
+            
+            box.appendChild(img);
+            gridContainer.appendChild(box);
+            
+            // Save state for the twinkle effect
+            activeSlots.push({ domImage: img, currentData: imgData, type: type });
+        }
+    });
+
+    // 4. The Smart Twinkle Effect
     setInterval(() => {
-        if (reserveImages.length === 0 || gridContainer.classList.contains('hidden')) return;
+        if (gridContainer.classList.contains('hidden')) return;
 
-        let cellIndex = Math.floor(Math.random() * displayCount);
-        let imgElement = gridContainer.children[cellIndex];
+        // Pick a random active slot
+        let slotIndex = Math.floor(Math.random() * activeSlots.length);
+        let slot = activeSlots[slotIndex];
         
-        imgElement.classList.add('fade-out');
-        
-        setTimeout(() => {
-            let oldData = displayedImages[cellIndex];
-            let newData = reserveImages.shift();
-            reserveImages.push(oldData); 
-            displayedImages[cellIndex] = newData; 
+        // Check if we have reserve images of THIS SPECIFIC type
+        if (buckets[slot.type].length > 0) {
             
-            imgElement.src = `images/${newData.folder}/thumbs/${newData.file}`;
-            imgElement.onclick = () => routeToMedia(newData);
+            slot.domImage.classList.add('fade-out');
             
-            imgElement.classList.remove('fade-out');
-        }, 1500); 
-    }, 3000); 
+            setTimeout(() => {
+                let oldData = slot.currentData;
+                let newData = buckets[slot.type].shift(); // Get fresh matching image
+                
+                buckets[slot.type].push(oldData); // Put old image back at the end of the reserve line
+                slot.currentData = newData; // Update state
+                
+                slot.domImage.src = `images/${newData.folder}/thumbs/${newData.file}`;
+                slot.domImage.onclick = () => routeToMedia(newData);
+                
+                slot.domImage.classList.remove('fade-out');
+            }, 1500); 
+        }
+    }, 2500); 
 
-    // 5. The Routing Function (Ghost Click)
+    // 5. The Routing Function
     function routeToMedia(imgData) {
         gridContainer.classList.add('hidden'); 
-
         const tabLink = document.querySelector(`a[onclick*="${imgData.originTab}"]`);
         if (tabLink) {
             const parentNav = tabLink.closest('nav');
@@ -699,49 +725,37 @@ document.addEventListener("DOMContentLoaded", function() {
             }
             tabLink.click();
         }
-
         setTimeout(() => {
             const thumbnails = document.querySelectorAll(`.${imgData.originTab} .thumbnail img`);
             for (let thumb of thumbnails) {
                 if (thumb.src.includes(imgData.file)) {
-                    thumb.parentElement.click(); 
-                    break;
+                    thumb.parentElement.click(); break;
                 }
             }
         }, 350); 
     }
 
-    // 6. Sidebar Interceptor: Hide the grid when ANY sidebar link is clicked
+    // 6. Sidebar Interceptor
     const sidebarLinks = document.querySelectorAll('#header a[onclick*="switchMain"], #header a[onclick*="switchTab"]');
     sidebarLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            gridContainer.classList.add('hidden');
-        });
+        link.addEventListener('click', () => { gridContainer.classList.add('hidden'); });
     });
 
-    // 7. Master Reset Function (The "Clean State")
+    // 7. Master Reset
     function resetToHome() {
-        // Fade grid in
         gridContainer.classList.remove('hidden');
-        
-        // Ensure any fullscreen media is closed
         closeMedia();
         const viewerClose = document.querySelector('#viewer .close');
         if (viewerClose) viewerClose.click();
 
-        // Strip bold/underline styles from all links
         document.querySelectorAll('.main-categories a, .sub-categories a').forEach(a => {
-            a.style.fontWeight = 'normal'; 
-            a.style.textDecoration = 'none'; 
-            a.style.color = '#a0a0a1'; 
+            a.style.fontWeight = 'normal'; a.style.textDecoration = 'none'; a.style.color = '#a0a0a1'; 
         });
         
-        // Hide sub-navigation and blurbs
         document.querySelectorAll('.sub-nav').forEach(nav => nav.style.display = 'none');
         const descBox = document.getElementById('category-desc');
         if (descBox) descBox.style.display = 'none';
 
-        // Hide the right-hand sidebar thumbnails smoothly
         const gallery = document.getElementById("thumbnails");
         if (gallery) {
             gallery.style.opacity = 0;
@@ -751,23 +765,16 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    // 8. Hook up the H1 Home Button
+    // 8. Hook up H1
     const h1 = document.querySelector('#header h1');
     if (h1) {
         h1.style.cursor = 'pointer';
         h1.title = "Return to Home Grid";
-        h1.addEventListener('click', (e) => {
-            e.preventDefault();
-            resetToHome();
-        });
+        h1.addEventListener('click', (e) => { e.preventDefault(); resetToHome(); });
     }
 
-    // 9. Initial Load: Run the reset to ensure a perfect clean state
-    setTimeout(() => {
-        resetToHome();
-    }, 100);
-
-});		</script>
+    setTimeout(() => { resetToHome(); }, 100);
+}); </script>
 
 		<script src="assets/js/jquery.min.js"></script>
 		<script src="assets/js/browser.min.js"></script>
