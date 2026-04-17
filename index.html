@@ -194,54 +194,68 @@
 				filter: grayscale(0%);
 				transform: scale(1.15); 
 			}
-			/* 🚀 HOME PAGE GRID OVERLAY */
-#home-grid-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%; 
-    height: 100%;
-    z-index: 45; /* Sits exactly over the Lens viewer, but safely under your #main sidebar */
-    background: #ffffff; /* Or #000000 depending on your site's dark/light mode */
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-auto-rows: 25vh; /* 4 rows exactly fill a 100vh screen */
+			/* 🚀 HOME PAGE MASONRY GRID (FLOATING IN VIEWER) */
+#home-masonry-grid {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 85%; /* Creates the floating 'picture frame' look */
+    max-height: 85vh;
+    z-index: 45; /* Sits safely above the background image */
+    
+    /* The Magic Masonry Formula */
+    column-count: 4;
+    column-gap: 15px;
+    
     overflow-y: auto;
     overflow-x: hidden;
     transition: opacity 0.8s ease, visibility 0.8s ease;
+    
+    /* Hide the scrollbar for a cleaner floating look, but keep functionality */
+    scrollbar-width: none; 
 }
 
-/* Hide it completely when not active so it doesn't block clicks */
-#home-grid-overlay.hidden {
+#home-masonry-grid::-webkit-scrollbar { 
+    display: none; 
+}
+
+#home-masonry-grid.hidden {
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
 }
 
-/* Individual Grid Cells */
-.home-grid-cell {
+/* Individual Masonry Items */
+.home-grid-item {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
+    height: auto; /* Natural aspect ratio creates the puzzle/masonry effect! */
+    margin-bottom: 15px;
+    display: block;
     opacity: 1;
-    transition: opacity 1.5s ease-in-out; /* The slow, smooth fade */
+    border-radius: 4px; /* Optional: adds a tiny, polished curve to the images */
+    transition: opacity 1.5s ease-in-out, transform 0.3s ease;
     cursor: pointer;
 }
 
-/* The state added via JS when an image is rotating out */
-.home-grid-cell.fade-out {
+.home-grid-item:hover {
+    transform: scale(1.02); /* Slight pop on hover */
+}
+
+/* State for the twinkle rotation */
+.home-grid-item.fade-out {
     opacity: 0;
 }
 
 /* Responsive Grid formatting for smaller screens */
 @media screen and (max-width: 1280px) {
-    #home-grid-overlay { grid-template-columns: repeat(3, 1fr); grid-auto-rows: 33.33vh; }
+    #home-masonry-grid { column-count: 3; width: 90%; }
 }
 @media screen and (max-width: 980px) {
-    #home-grid-overlay { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 40vh; }
+    #home-masonry-grid { column-count: 2; width: 95%; max-height: 90vh; }
 }
 @media screen and (max-width: 736px) {
-    #home-grid-overlay { grid-template-columns: repeat(1, 1fr); grid-auto-rows: 45vh; }
+    #home-masonry-grid { column-count: 1; width: 100%; max-height: 100vh; border-radius: 0; }
 }
 		</style>
 	</head>
@@ -625,12 +639,14 @@
 				const secureNumber = countryCode + part1 + part2;
 				window.open("https://wa.me/" + secureNumber, "_blank");
 			}
-			// 🚀 HOME PAGE ENGINE
+// 🚀 HOME PAGE ENGINE V2 (Masonry & Floating)
 document.addEventListener("DOMContentLoaded", function() {
-    // 1. Create the overlay safely
-    const overlay = document.createElement('div');
-    overlay.id = 'home-grid-overlay';
-    document.body.appendChild(overlay);
+    
+    // 1. Create the floating masonry grid INSIDE the viewer
+    const viewer = document.getElementById('viewer');
+    const gridContainer = document.createElement('div');
+    gridContainer.id = 'home-masonry-grid';
+    viewer.appendChild(gridContainer); 
 
     // 2. State management
     const displayCount = 16; 
@@ -640,65 +656,50 @@ document.addEventListener("DOMContentLoaded", function() {
     // 3. Build the initial grid
     displayedImages.forEach((imgData, index) => {
         let img = document.createElement('img');
-        // Use thumbnails to keep the grid lighting-fast!
         img.src = `images/${imgData.folder}/thumbs/${imgData.file}`; 
-        img.className = 'home-grid-cell';
+        img.className = 'home-grid-item';
         img.dataset.index = index;
         
-        // When clicked, route to the image
         img.onclick = () => routeToMedia(displayedImages[index]);
-        
-        overlay.appendChild(img);
+        gridContainer.appendChild(img);
     });
 
-    // 4. The Twinkle Effect (Runs every 3 seconds)
+    // 4. The Twinkle Effect 
     setInterval(() => {
-        // Pause the twinkle if the user isn't on the Home page
-        if (reserveImages.length === 0 || overlay.classList.contains('hidden')) return;
+        if (reserveImages.length === 0 || gridContainer.classList.contains('hidden')) return;
 
-        // Pick a random cell
         let cellIndex = Math.floor(Math.random() * displayCount);
-        let imgElement = overlay.children[cellIndex];
+        let imgElement = gridContainer.children[cellIndex];
         
-        // Step A: Fade it out
         imgElement.classList.add('fade-out');
         
-        // Step B: Wait for the fade to finish, then swap data
         setTimeout(() => {
             let oldData = displayedImages[cellIndex];
             let newData = reserveImages.shift();
-            reserveImages.push(oldData); // Put old image at the back of the queue
-            displayedImages[cellIndex] = newData; // Update state
+            reserveImages.push(oldData); 
+            displayedImages[cellIndex] = newData; 
             
-            // Swap the image source and click target
             imgElement.src = `images/${newData.folder}/thumbs/${newData.file}`;
             imgElement.onclick = () => routeToMedia(newData);
             
-            // Step C: Fade it back in
             imgElement.classList.remove('fade-out');
-        }, 1500); // 1.5 seconds matches our CSS transition speed
+        }, 1500); 
     }, 3000); 
 
-    // 5. The Routing Function (The Ghost User)
+    // 5. The Routing Function (Ghost Click)
     function routeToMedia(imgData) {
-        // Fade out our custom grid
-        overlay.classList.add('hidden');
+        gridContainer.classList.add('hidden'); 
 
-        // Find the specific sub-category tab link
         const tabLink = document.querySelector(`a[onclick*="${imgData.originTab}"]`);
-        
         if (tabLink) {
-            // First, find and click the parent category (Photo, Video, etc.)
             const parentNav = tabLink.closest('nav');
             if (parentNav) {
                 const mainLink = document.getElementById('link-' + parentNav.id);
                 if (mainLink) mainLink.click();
             }
-            // Then click the sub-category
             tabLink.click();
         }
 
-        // Wait a tiny bit for your existing switchTab animation to finish, then click the thumbnail
         setTimeout(() => {
             const thumbnails = document.querySelectorAll(`.${imgData.originTab} .thumbnail img`);
             for (let thumb of thumbnails) {
@@ -710,34 +711,63 @@ document.addEventListener("DOMContentLoaded", function() {
         }, 350); 
     }
 
-    // 6. Hook up the H1 Home Button
+    // 6. Sidebar Interceptor: Hide the grid when ANY sidebar link is clicked
+    const sidebarLinks = document.querySelectorAll('#header a[onclick*="switchMain"], #header a[onclick*="switchTab"]');
+    sidebarLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            gridContainer.classList.add('hidden');
+        });
+    });
+
+    // 7. Master Reset Function (The "Clean State")
+    function resetToHome() {
+        // Fade grid in
+        gridContainer.classList.remove('hidden');
+        
+        // Ensure any fullscreen media is closed
+        closeMedia();
+        const viewerClose = document.querySelector('#viewer .close');
+        if (viewerClose) viewerClose.click();
+
+        // Strip bold/underline styles from all links
+        document.querySelectorAll('.main-categories a, .sub-categories a').forEach(a => {
+            a.style.fontWeight = 'normal'; 
+            a.style.textDecoration = 'none'; 
+            a.style.color = '#a0a0a1'; 
+        });
+        
+        // Hide sub-navigation and blurbs
+        document.querySelectorAll('.sub-nav').forEach(nav => nav.style.display = 'none');
+        const descBox = document.getElementById('category-desc');
+        if (descBox) descBox.style.display = 'none';
+
+        // Hide the right-hand sidebar thumbnails smoothly
+        const gallery = document.getElementById("thumbnails");
+        if (gallery) {
+            gallery.style.opacity = 0;
+            setTimeout(() => {
+                document.querySelectorAll('.portfolio-item').forEach(item => item.style.display = 'none');
+            }, 300);
+        }
+    }
+
+    // 8. Hook up the H1 Home Button
     const h1 = document.querySelector('#header h1');
     if (h1) {
         h1.style.cursor = 'pointer';
         h1.title = "Return to Home Grid";
         h1.addEventListener('click', (e) => {
             e.preventDefault();
-            
-            // Bring our grid back
-            overlay.classList.remove('hidden');
-            
-            // Ensure any fullscreen media portals are closed
-            closeMedia();
-            const viewerClose = document.querySelector('#viewer .close');
-            if (viewerClose) viewerClose.click();
-
-            // Deselect the sidebar links to make it look "reset"
-            document.querySelectorAll('.main-categories a, .sub-categories a').forEach(a => {
-                a.style.fontWeight = 'normal'; 
-                a.style.textDecoration = 'none'; 
-                a.style.color = '#a0a0a1'; 
-            });
-            document.querySelectorAll('.sub-nav').forEach(nav => nav.style.display = 'none');
-            document.getElementById('category-desc').style.display = 'none';
+            resetToHome();
         });
     }
-});
-		</script>
+
+    // 9. Initial Load: Run the reset to ensure a perfect clean state
+    setTimeout(() => {
+        resetToHome();
+    }, 100);
+
+});		</script>
 
 		<script src="assets/js/jquery.min.js"></script>
 		<script src="assets/js/browser.min.js"></script>
