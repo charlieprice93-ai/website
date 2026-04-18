@@ -194,76 +194,63 @@
 				filter: grayscale(0%);
 				transform: scale(1.15); 
 			}
-/* 🚀 HOME PAGE JUSTIFIED FLEX GRID (V5) */
-#home-justified-grid {
+/* 🚀 HOME PAGE MOSAIC HERO BOARD (V6) */
+#home-mosaic-board {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     width: 85%;
-    max-height: 85vh;
+    height: 85vh; /* Fixed height kills the scrollbar */
     z-index: 45;
     
-    /* The Solid Board */
-    background: #ffffff; /* Use #111111 if your site is dark mode */
-    padding: 15px;
+    background: #ffffff; 
+    padding: 12px;
     border-radius: 8px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
     
-    /* The Justified Engine */
-    display: flex;
-    flex-wrap: wrap;
+    /* The Explicit 4x5 Grid */
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(5, 1fr);
     gap: 12px;
-    align-content: flex-start; /* Keeps rows packed to the top */
     
-    overflow-y: auto;
-    scrollbar-width: none;
+    overflow: hidden; /* No scrolling allowed */
     transition: opacity 0.8s ease, visibility 0.8s ease;
 }
 
-#home-justified-grid::-webkit-scrollbar { display: none; }
-#home-justified-grid.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+#home-mosaic-board.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
 
-/* 🚀 The Ghost Element: Stops the bottom row from stretching massively if it only has 1 or 2 images */
-#home-justified-grid::after { content: ""; flex-grow: 100; height: 0; }
+/* The Spans */
+.slot-landscape { grid-column: span 2; grid-row: span 1; }
+.slot-portrait { grid-column: span 1; grid-row: span 2; }
+.slot-square { grid-column: span 1; grid-row: span 1; }
 
-/* The Flex Slots */
-.home-grid-slot {
-    height: 26vh; /* The mathematical anchor height for all rows */
-    flex-grow: 1; /* The magic property: stretches width to fill the row perfectly flush */
-    position: relative;
-    overflow: hidden;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-/* Base proportions (Flexbox uses these as the starting math before making them flush) */
-.home-grid-slot.landscape { flex-basis: 36vh; } /* Approx 5:4 */
-.home-grid-slot.portrait { flex-basis: 20vh; }  /* Approx 4:5 */
-.home-grid-slot.square { flex-basis: 26vh; }    /* 1:1 */
-
+/* The Images */
 .home-grid-item {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Beautifully fills its flex-stretched box */
+    object-fit: cover; 
+    border-radius: 4px;
+    cursor: pointer;
     transition: opacity 1.5s ease-in-out, transform 0.3s ease;
 }
-.home-grid-slot:hover .home-grid-item { transform: scale(1.02); opacity: 0.9; }
+
+.home-grid-item:hover { transform: scale(1.02); opacity: 0.9; z-index: 2; position: relative; }
 .home-grid-item.fade-out { opacity: 0; }
 
-/* Responsive adjustments */
+/* Responsive Adjustments */
 @media screen and (max-width: 980px) {
-    .home-grid-slot { height: 20vh; } /* Make rows shorter on tablets so more fit */
+    #home-mosaic-board { width: 92%; height: 80vh; gap: 8px; padding: 8px; }
 }
 @media screen and (max-width: 736px) {
-    #home-justified-grid { width: 95%; max-height: 95vh; padding: 10px; }
-    .home-grid-slot { height: 18vh; }
+    #home-mosaic-board { width: 95%; height: 90vh; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(6, 1fr); }
+    .slot-landscape { grid-column: span 2; } 
 }
 
 /* 🚀 BACKGROUND BLEED FIX */
 body.is-home-mode #viewer .slide { opacity: 0 !important; }
-body.is-home-mode #viewer { background-color: #f0f0f0; transition: background-color 0.8s ease; }		
-</style>
+body.is-home-mode #viewer { background-color: #f0f0f0; transition: background-color 0.8s ease; }</style>
 	</head>
 	<body class="is-preload-0 is-preload-1 is-preload-2">
 
@@ -645,15 +632,15 @@ body.is-home-mode #viewer { background-color: #f0f0f0; transition: background-co
 				const secureNumber = countryCode + part1 + part2;
 				window.open("https://wa.me/" + secureNumber, "_blank");
 			}
-// 🚀 HOME PAGE ENGINE V5 (Justified Flex Layout & Clean Background)
+// 🚀 HOME PAGE ENGINE V6 (2D Mosaic Packer)
 document.addEventListener("DOMContentLoaded", function() {
     
     const viewer = document.getElementById('viewer');
     const gridContainer = document.createElement('div');
-    gridContainer.id = 'home-justified-grid';
+    gridContainer.id = 'home-mosaic-board';
     viewer.appendChild(gridContainer); 
 
-    // 1. Sort images into aspect ratio buckets
+    // 1. Sort images
     const buckets = { landscape: [], portrait: [], square: [] };
     homeImages.forEach(img => {
         if (buckets[img.orientation]) buckets[img.orientation].push(img);
@@ -662,31 +649,58 @@ document.addEventListener("DOMContentLoaded", function() {
 
     const activeSlots = [];
     
-    // 2. Build the initial grid (Load roughly 24 images to ensure a full board)
-    let initialLoadCount = 24; 
-    let allAvailable = [...buckets.landscape, ...buckets.portrait, ...buckets.square].sort(() => 0.5 - Math.random());
-    
-    for (let i = 0; i < Math.min(initialLoadCount, allAvailable.length); i++) {
-        let typeToPick = allAvailable[i].orientation || 'landscape';
-        
-        // Grab from the correct bucket if available
-        if (buckets[typeToPick].length > 0) {
-            let imgData = buckets[typeToPick].shift();
+    // 2. The 2D Packing Algorithm
+    const isMobile = window.innerWidth <= 736;
+    const cols = isMobile ? 2 : 4;
+    const rows = isMobile ? 6 : 5;
+    const board = Array(rows).fill().map(() => Array(cols).fill(0));
+
+    for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+            if (board[r][c] !== 0) continue; // Cell already occupied by a span
+
+            // Check what fits geometrically
+            let canFitLandscape = (c + 1 < cols) && (board[r][c+1] === 0);
+            let canFitPortrait = (r + 1 < rows) && (board[r+1][c] === 0);
+
+            // Match geometry with available inventory
+            let choices = [];
+            if (canFitLandscape && buckets.landscape.length > 0) choices.push('landscape');
+            if (canFitPortrait && buckets.portrait.length > 0) choices.push('portrait');
+            if (buckets.square.length > 0) choices.push('square');
+
+            // Failsafe: If we ran out of exact matches, force a square to plug the hole
+            if (choices.length === 0) {
+                choices.push('square');
+                if (buckets.square.length === 0) {
+                    if (buckets.landscape.length > 0) buckets.square.push(buckets.landscape.shift());
+                    else if (buckets.portrait.length > 0) buckets.square.push(buckets.portrait.shift());
+                }
+            }
+
+            // Pick shape and grab image
+            let type = choices[Math.floor(Math.random() * choices.length)];
+            let imgData = buckets[type].shift();
+
+            // Mark the board as occupied
+            board[r][c] = 1;
+            let cssClass = 'slot-square';
+            if (type === 'landscape') { board[r][c+1] = 1; cssClass = 'slot-landscape'; }
+            if (type === 'portrait') { board[r+1][c] = 1; cssClass = 'slot-portrait'; }
+
+            // Build DOM
+            let box = document.createElement('div');
+            box.className = cssClass;
             
-            // The wrapper controls the Flexbox math
-            let wrapper = document.createElement('div');
-            wrapper.className = `home-grid-slot ${typeToPick}`;
-            
-            // The image sits perfectly inside
             let img = document.createElement('img');
             img.src = `images/${imgData.folder}/fulls/${imgData.file}`;
             img.className = 'home-grid-item';
             img.onclick = () => routeToMedia(imgData);
             
-            wrapper.appendChild(img);
-            gridContainer.appendChild(wrapper);
+            box.appendChild(img);
+            gridContainer.appendChild(box);
             
-            activeSlots.push({ domImage: img, currentData: imgData, bucket: typeToPick });
+            activeSlots.push({ domImage: img, currentData: imgData, bucket: type });
         }
     }
 
@@ -697,7 +711,6 @@ document.addEventListener("DOMContentLoaded", function() {
         let slotIndex = Math.floor(Math.random() * activeSlots.length);
         let slot = activeSlots[slotIndex];
         
-        // Only swap if we have an image of the EXACT SAME SHAPE in reserve
         if (buckets[slot.bucket].length > 0) {
             slot.domImage.classList.add('fade-out');
             
@@ -705,7 +718,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 let oldData = slot.currentData;
                 let newData = buckets[slot.bucket].shift(); 
                 
-                buckets[slot.bucket].push(oldData); // Recycle
+                buckets[slot.bucket].push(oldData); 
                 slot.currentData = newData; 
                 
                 slot.domImage.src = `images/${newData.folder}/fulls/${newData.file}`;
@@ -716,10 +729,10 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }, 2500); 
 
-    // 4. The Routing Function
+    // 4. Routing
     function routeToMedia(imgData) {
         gridContainer.classList.add('hidden'); 
-        document.body.classList.remove('is-home-mode'); // 🚀 Remove background block
+        document.body.classList.remove('is-home-mode'); 
         
         const tabLink = document.querySelector(`a[onclick*="${imgData.originTab}"]`);
         if (tabLink) {
@@ -740,19 +753,18 @@ document.addEventListener("DOMContentLoaded", function() {
         }, 350); 
     }
 
-    // 5. Sidebar Interceptor
-    const sidebarLinks = document.querySelectorAll('#header a[onclick*="switchMain"], #header a[onclick*="switchTab"]');
-    sidebarLinks.forEach(link => {
+    // 5. Interceptor
+    document.querySelectorAll('#header a[onclick*="switchMain"], #header a[onclick*="switchTab"]').forEach(link => {
         link.addEventListener('click', () => { 
             gridContainer.classList.add('hidden'); 
-            document.body.classList.remove('is-home-mode'); // 🚀 Remove background block
+            document.body.classList.remove('is-home-mode'); 
         });
     });
 
-    // 6. Master Reset (The Home State)
+    // 6. Reset (The Home State)
     function resetToHome() {
         gridContainer.classList.remove('hidden');
-        document.body.classList.add('is-home-mode'); // 🚀 Apply background block
+        document.body.classList.add('is-home-mode'); 
         
         closeMedia();
         const viewerClose = document.querySelector('#viewer .close');
@@ -783,10 +795,8 @@ document.addEventListener("DOMContentLoaded", function() {
         h1.addEventListener('click', (e) => { e.preventDefault(); resetToHome(); });
     }
 
-    // Ensure clean state on boot
     setTimeout(() => { resetToHome(); }, 100);
-}); 
-</script>
+});</script>
 
 		<script src="assets/js/jquery.min.js"></script>
 		<script src="assets/js/browser.min.js"></script>
