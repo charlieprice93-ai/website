@@ -632,7 +632,7 @@
 				const secureNumber = countryCode + part1 + part2;
 				window.open("https://wa.me/" + secureNumber, "_blank");
 			}
-// 🚀 HOME PAGE ENGINE V3 (Locked Grid & Smart Sorting)
+// 🚀 HOME PAGE ENGINE V4 (Dynamic Math & High-Res)
 document.addEventListener("DOMContentLoaded", function() {
     
     const viewer = document.getElementById('viewer');
@@ -646,66 +646,102 @@ document.addEventListener("DOMContentLoaded", function() {
         if (buckets[img.orientation]) {
             buckets[img.orientation].push(img);
         } else {
-            buckets['landscape'].push(img); // fallback
+            buckets['landscape'].push(img);
         }
     });
 
-    // 2. Define the Rigid Layout Map (16 slots designed to look like a puzzle)
-    // You can edit this array to change the grid structure!
-    const layoutBlueprint = [
-        'landscape', 'portrait', 'square',
-        'square', 'landscape',
-        'portrait', 'square', 'landscape',
-        'landscape', 'square', 'square',
-        'square', 'portrait', 'landscape'
-    ];
+    const activeSlots = [];
+    
+    // 2. The Dynamic Math Engine (Builds perfect rows)
+    let colCount = 0;
+    const targetColumns = 16; // 4 rows of 4 columns = 16 units total
 
-    const activeSlots = []; // Keep track of what's currently displayed
+    while (colCount < targetColumns) {
+        let neededColumns = 4 - (colCount % 4); // How many columns left in the current row?
+        let typeToPick = null;
+        let assignedClass = null;
 
-    // 3. Build the Grid
-    layoutBlueprint.forEach((type, index) => {
-        // Create the fixed box container
-        let box = document.createElement('div');
-        box.className = `slot-${type}`;
+        if (neededColumns >= 2) {
+            // We have space for anything (Landscape, Portrait, or Square)
+            let choices = [];
+            if (buckets.landscape.length > 0) choices.push('landscape');
+            if (buckets.portrait.length > 0) choices.push('portrait');
+            if (buckets.square.length > 0) choices.push('square');
+
+            if (choices.length === 0) break; // We are completely out of images
+            
+            typeToPick = choices[Math.floor(Math.random() * choices.length)];
+            assignedClass = typeToPick;
+        } else {
+            // We only have 1 column left. MUST use Portrait or Square.
+            let choices = [];
+            if (buckets.portrait.length > 0) choices.push('portrait');
+            if (buckets.square.length > 0) choices.push('square');
+
+            if (choices.length > 0) {
+                typeToPick = choices[Math.floor(Math.random() * choices.length)];
+                assignedClass = typeToPick;
+            } else {
+                // FALLBACK: We only have Landscapes left, but only 1 column of space.
+                // We force a Landscape to sit in a Square slot so it doesn't break the row math.
+                typeToPick = 'landscape';
+                assignedClass = 'square'; 
+            }
+        }
+
+        // 3. Build the DOM Element
+        let imgData = buckets[typeToPick].shift(); // Remove from reserve
         
-        // Grab an image from the correct bucket
-        if (buckets[type].length > 0) {
-            let imgData = buckets[type].shift(); // Remove from reserve
-            
-            let img = document.createElement('img');
-            img.src = `images/${imgData.folder}/thumbs/${imgData.file}`;
-            img.className = 'home-grid-item';
-            img.onclick = () => routeToMedia(imgData);
-            
-            box.appendChild(img);
-            gridContainer.appendChild(box);
-            
-            // Save state for the twinkle effect
-            activeSlots.push({ domImage: img, currentData: imgData, type: type });
-        }
-    });
+        let box = document.createElement('div');
+        box.className = `slot-${assignedClass}`;
+        
+        let img = document.createElement('img');
+        // 🚀 HIGH-RES UPDATE: Switched 'thumbs' to 'fulls'
+        img.src = `images/${imgData.folder}/fulls/${imgData.file}`;
+        img.className = 'home-grid-item';
+        img.onclick = () => routeToMedia(imgData);
+        
+        box.appendChild(img);
+        gridContainer.appendChild(box);
+        
+        // Save the slot's identity for the twinkle effect
+        activeSlots.push({ 
+            domImage: img, 
+            currentData: imgData, 
+            originalBucket: typeToPick, 
+            assignedClass: assignedClass 
+        });
+        
+        // Add to our column math (Landscapes take 2, others take 1)
+        colCount += (assignedClass === 'landscape' ? 2 : 1);
+    }
 
     // 4. The Smart Twinkle Effect
     setInterval(() => {
         if (gridContainer.classList.contains('hidden')) return;
 
-        // Pick a random active slot
         let slotIndex = Math.floor(Math.random() * activeSlots.length);
         let slot = activeSlots[slotIndex];
         
-        // Check if we have reserve images of THIS SPECIFIC type
-        if (buckets[slot.type].length > 0) {
-            
+        // Always swap with an image that matches the slot's VISUAL shape
+        let targetBucket = slot.assignedClass; 
+        
+        if (buckets[targetBucket].length > 0) {
             slot.domImage.classList.add('fade-out');
             
             setTimeout(() => {
                 let oldData = slot.currentData;
-                let newData = buckets[slot.type].shift(); // Get fresh matching image
+                let newData = buckets[targetBucket].shift(); 
                 
-                buckets[slot.type].push(oldData); // Put old image back at the end of the reserve line
-                slot.currentData = newData; // Update state
+                // Put old image back into its original bucket
+                buckets[slot.originalBucket].push(oldData); 
                 
-                slot.domImage.src = `images/${newData.folder}/thumbs/${newData.file}`;
+                // Update slot state
+                slot.currentData = newData; 
+                slot.originalBucket = targetBucket; 
+                
+                // 🚀 HIGH-RES UPDATE
+                slot.domImage.src = `images/${newData.folder}/fulls/${newData.file}`;
                 slot.domImage.onclick = () => routeToMedia(newData);
                 
                 slot.domImage.classList.remove('fade-out');
