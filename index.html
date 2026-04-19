@@ -194,64 +194,73 @@
 				filter: grayscale(0%);
 				transform: scale(1.15); 
 			}
-/* 🚀 HOME PAGE MOSAIC HERO BOARD (V6) */
+/* 🚀 HOME PAGE HIGH-DENSITY MOSAIC (V7) */
 #home-mosaic-board {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     width: 85%;
-    height: 85vh; /* Fixed height kills the scrollbar */
+    height: 85vh; 
     z-index: 45;
     
-    background: #ffffff; 
-    padding: 12px;
+    background: #ffffff; /* Use #111111 for dark mode */
+    padding: 10px;
     border-radius: 8px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    box-sizing: border-box; /* Stops padding from pushing the board out of bounds */
     
-    /* The Explicit 4x5 Grid */
+    /* The 12x10 Micro-Grid */
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(5, 1fr);
-    gap: 12px;
+    grid-template-columns: repeat(12, 1fr);
+    grid-template-rows: repeat(10, 1fr);
+    gap: 8px; /* Tighter gap for a busy mosaic */
     
-    overflow: hidden; /* No scrolling allowed */
+    overflow: hidden; 
     transition: opacity 0.8s ease, visibility 0.8s ease;
 }
 
 #home-mosaic-board.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
 
-/* The Spans */
-.slot-landscape { grid-column: span 2; grid-row: span 1; }
-.slot-portrait { grid-column: span 1; grid-row: span 2; }
-.slot-square { grid-column: span 1; grid-row: span 1; }
+/* 🚀 THE OVERFLOW FIX: Force slots to obey the 85vh board */
+.home-grid-slot {
+    min-height: 0; 
+    min-width: 0;
+    position: relative;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+/* Perfect Photographic Spans */
+.slot-landscape { grid-column: span 3; grid-row: span 2; } /* 3:2 Ratio */
+.slot-portrait { grid-column: span 2; grid-row: span 3; }  /* 2:3 Ratio */
+.slot-square { grid-column: span 2; grid-row: span 2; }    /* 1:1 Ratio */
+.slot-filler { grid-column: span 1; grid-row: span 1; }    /* Tiny 1x1 plug for leftover holes */
 
 /* The Images */
 .home-grid-item {
     width: 100%;
     height: 100%;
     object-fit: cover; 
-    border-radius: 4px;
     cursor: pointer;
     transition: opacity 1.5s ease-in-out, transform 0.3s ease;
 }
 
-.home-grid-item:hover { transform: scale(1.02); opacity: 0.9; z-index: 2; position: relative; }
+.home-grid-slot:hover .home-grid-item { transform: scale(1.05); opacity: 0.85; }
 .home-grid-item.fade-out { opacity: 0; }
 
-/* Responsive Adjustments */
+/* Responsive Adjustments for Mobile */
 @media screen and (max-width: 980px) {
-    #home-mosaic-board { width: 92%; height: 80vh; gap: 8px; padding: 8px; }
+    #home-mosaic-board { width: 95%; height: 80vh; gap: 6px; padding: 6px; }
 }
 @media screen and (max-width: 736px) {
-    #home-mosaic-board { width: 95%; height: 90vh; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(6, 1fr); }
-    .slot-landscape { grid-column: span 2; } 
+    /* Compress to a 6x16 grid for tall, skinny phone screens */
+    #home-mosaic-board { grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(16, 1fr); height: 90vh; }
 }
 
-/* 🚀 BACKGROUND BLEED FIX */
+/* BACKGROUND BLEED FIX */
 body.is-home-mode #viewer .slide { opacity: 0 !important; }
-body.is-home-mode #viewer { background-color: #f0f0f0; transition: background-color 0.8s ease; }</style>
-	</head>
+body.is-home-mode #viewer { background-color: #f0f0f0; transition: background-color 0.8s ease; } </style>	</head>
 	<body class="is-preload-0 is-preload-1 is-preload-2">
 
 		<div id="media-portal">
@@ -632,7 +641,7 @@ body.is-home-mode #viewer { background-color: #f0f0f0; transition: background-co
 				const secureNumber = countryCode + part1 + part2;
 				window.open("https://wa.me/" + secureNumber, "_blank");
 			}
-// 🚀 HOME PAGE ENGINE V6 (2D Mosaic Packer)
+// 🚀 HOME PAGE ENGINE V7 (High-Density Geometry Packer)
 document.addEventListener("DOMContentLoaded", function() {
     
     const viewer = document.getElementById('viewer');
@@ -649,48 +658,65 @@ document.addEventListener("DOMContentLoaded", function() {
 
     const activeSlots = [];
     
-    // 2. The 2D Packing Algorithm
+    // 2. The High-Density 2D Packing Algorithm
     const isMobile = window.innerWidth <= 736;
-    const cols = isMobile ? 2 : 4;
-    const rows = isMobile ? 6 : 5;
+    const cols = isMobile ? 6 : 12;
+    const rows = isMobile ? 16 : 10;
     const board = Array(rows).fill().map(() => Array(cols).fill(0));
 
+    // Helper: Checks if a shape can fit without hitting boundaries or overlapping
+    function canFit(r, c, w, h) {
+        if (r + h > rows || c + w > cols) return false;
+        for (let i = r; i < r + h; i++) {
+            for (let j = c; j < c + w; j++) {
+                if (board[i][j] !== 0) return false;
+            }
+        }
+        return true;
+    }
+
+    // Helper: Claims the space on the board
+    function markBoard(r, c, w, h) {
+        for (let i = r; i < r + h; i++) {
+            for (let j = c; j < c + w; j++) {
+                board[i][j] = 1;
+            }
+        }
+    }
+
+    // 3. Scan the board and plug in shapes
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
-            if (board[r][c] !== 0) continue; // Cell already occupied by a span
+            if (board[r][c] !== 0) continue; // Skip occupied spaces
 
-            // Check what fits geometrically
-            let canFitLandscape = (c + 1 < cols) && (board[r][c+1] === 0);
-            let canFitPortrait = (r + 1 < rows) && (board[r+1][c] === 0);
+            let options = [];
+            
+            // Check geometric fit AND inventory availability
+            if (canFit(r, c, 3, 2) && buckets.landscape.length > 0) options.push({type: 'landscape', w: 3, h: 2, css: 'slot-landscape'});
+            if (canFit(r, c, 2, 3) && buckets.portrait.length > 0) options.push({type: 'portrait', w: 2, h: 3, css: 'slot-portrait'});
+            if (canFit(r, c, 2, 2) && buckets.square.length > 0) options.push({type: 'square', w: 2, h: 2, css: 'slot-square'});
 
-            // Match geometry with available inventory
-            let choices = [];
-            if (canFitLandscape && buckets.landscape.length > 0) choices.push('landscape');
-            if (canFitPortrait && buckets.portrait.length > 0) choices.push('portrait');
-            if (buckets.square.length > 0) choices.push('square');
-
-            // Failsafe: If we ran out of exact matches, force a square to plug the hole
-            if (choices.length === 0) {
-                choices.push('square');
+            let selection;
+            if (options.length > 0) {
+                // Pick randomly from whatever perfectly fits
+                selection = options[Math.floor(Math.random() * options.length)];
+            } else {
+                // Failsafe: Only tiny 1x1 gaps left. Plug them so we don't have white holes.
+                let fbType = 'square';
                 if (buckets.square.length === 0) {
-                    if (buckets.landscape.length > 0) buckets.square.push(buckets.landscape.shift());
-                    else if (buckets.portrait.length > 0) buckets.square.push(buckets.portrait.shift());
+                    if (buckets.landscape.length > 0) fbType = 'landscape';
+                    else if (buckets.portrait.length > 0) fbType = 'portrait';
                 }
+                selection = {type: fbType, w: 1, h: 1, css: 'slot-filler'};
             }
 
-            // Pick shape and grab image
-            let type = choices[Math.floor(Math.random() * choices.length)];
-            let imgData = buckets[type].shift();
-
-            // Mark the board as occupied
-            board[r][c] = 1;
-            let cssClass = 'slot-square';
-            if (type === 'landscape') { board[r][c+1] = 1; cssClass = 'slot-landscape'; }
-            if (type === 'portrait') { board[r+1][c] = 1; cssClass = 'slot-portrait'; }
+            // Claim the territory and grab the image
+            markBoard(r, c, selection.w, selection.h);
+            let imgData = buckets[selection.type].shift();
 
             // Build DOM
             let box = document.createElement('div');
-            box.className = cssClass;
+            box.className = `home-grid-slot ${selection.css}`;
             
             let img = document.createElement('img');
             img.src = `images/${imgData.folder}/fulls/${imgData.file}`;
@@ -700,11 +726,11 @@ document.addEventListener("DOMContentLoaded", function() {
             box.appendChild(img);
             gridContainer.appendChild(box);
             
-            activeSlots.push({ domImage: img, currentData: imgData, bucket: type });
+            activeSlots.push({ domImage: img, currentData: imgData, bucket: selection.type });
         }
     }
 
-    // 3. The Smart Twinkle Effect
+    // 4. The Smart Twinkle Effect
     setInterval(() => {
         if (gridContainer.classList.contains('hidden')) return;
 
@@ -729,7 +755,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }, 2500); 
 
-    // 4. Routing
+    // 5. Routing
     function routeToMedia(imgData) {
         gridContainer.classList.add('hidden'); 
         document.body.classList.remove('is-home-mode'); 
@@ -753,7 +779,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }, 350); 
     }
 
-    // 5. Interceptor
+    // 6. Interceptor
     document.querySelectorAll('#header a[onclick*="switchMain"], #header a[onclick*="switchTab"]').forEach(link => {
         link.addEventListener('click', () => { 
             gridContainer.classList.add('hidden'); 
@@ -761,7 +787,7 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 
-    // 6. Reset (The Home State)
+    // 7. Reset (The Home State)
     function resetToHome() {
         gridContainer.classList.remove('hidden');
         document.body.classList.add('is-home-mode'); 
@@ -787,7 +813,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    // 7. Hook up H1
+    // 8. Hook up H1
     const h1 = document.querySelector('#header h1');
     if (h1) {
         h1.style.cursor = 'pointer';
