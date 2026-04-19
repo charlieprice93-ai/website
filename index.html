@@ -194,74 +194,71 @@
 				filter: grayscale(0%);
 				transform: scale(1.15); 
 			}
-/* 🚀 HOME PAGE HIGH-DENSITY MOSAIC (V7) */
+/* 🚀 HOME PAGE MASONRY MOSAIC (V8 - Purist, Ratios, Autoplay) */
 #home-mosaic-board {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 85%;
-    height: 85vh; 
-    z-index: 45;
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 85%; height: 85vh; z-index: 45;
+    background: #ffffff; padding: 10px; border-radius: 8px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2); box-sizing: border-box;
     
-    background: #ffffff; /* Use #111111 for dark mode */
-    padding: 10px;
-    border-radius: 8px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-    box-sizing: border-box; /* Stops padding from pushing the board out of bounds */
-    
-    /* The 12x10 Micro-Grid */
-    display: grid;
-    grid-template-columns: repeat(12, 1fr);
-    grid-template-rows: repeat(10, 1fr);
-    gap: 8px; /* Tighter gap for a busy mosaic */
-    
-    overflow: hidden; 
+    /* The Native Masonry Engine */
+    column-count: 5;
+    column-gap: 10px;
+    overflow: hidden; /* Slices the jagged bottom off for a locked wall */
     transition: opacity 0.8s ease, visibility 0.8s ease;
 }
-
 #home-mosaic-board.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
 
-/* 🚀 THE OVERFLOW FIX: Force slots to obey the 85vh board */
 .home-grid-slot {
-    min-height: 0; 
-    min-width: 0;
+    width: 100%;
+    margin-bottom: 10px;
+    display: inline-block; /* Crucial for masonry flow */
     position: relative;
     border-radius: 4px;
     overflow: hidden;
+    cursor: pointer;
+    background: #000; /* Black behind loading videos */
 }
 
-/* Perfect Photographic Spans */
-.slot-landscape { grid-column: span 3; grid-row: span 2; } /* 3:2 Ratio */
-.slot-portrait { grid-column: span 2; grid-row: span 3; }  /* 2:3 Ratio */
-.slot-square { grid-column: span 2; grid-row: span 2; }    /* 1:1 Ratio */
-.slot-filler { grid-column: span 1; grid-row: span 1; }    /* Tiny 1x1 plug for leftover holes */
+/* 🚀 EXACT NATIVE PHOTOGRAPHY RATIOS */
+.slot-portrait { aspect-ratio: 4 / 5; } /* Instagram Ratio */
+.slot-landscape { aspect-ratio: 3 / 2; } /* Standard Camera Ratio */
+.slot-square { aspect-ratio: 1 / 1; }
 
-/* The Images */
-.home-grid-item {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; 
-    cursor: pointer;
+.home-grid-item, .home-grid-video {
+    width: 100%; height: 100%; position: absolute; top: 0; left: 0;
     transition: opacity 1.5s ease-in-out, transform 0.3s ease;
 }
+.home-grid-item { object-fit: cover; }
 
-.home-grid-slot:hover .home-grid-item { transform: scale(1.05); opacity: 0.85; }
-.home-grid-item.fade-out { opacity: 0; }
+/* 🚀 Auto-Play Video Formatting */
+.home-grid-video { 
+    pointer-events: none; /* Let clicks pass to the slot to open full screen */
+    border: none; 
+    transform: scale(1.35); /* Base zoom to cover 16:9 into landscape */
+}
+/* Aggressive zoom to make 16:9 video fill a tall 4:5 portrait box */
+.slot-portrait .home-grid-video { transform: scale(2.2); } 
+.slot-square .home-grid-video { transform: scale(1.8); }
 
-/* Responsive Adjustments for Mobile */
-@media screen and (max-width: 980px) {
-    #home-mosaic-board { width: 95%; height: 80vh; gap: 6px; padding: 6px; }
-}
-@media screen and (max-width: 736px) {
-    /* Compress to a 6x16 grid for tall, skinny phone screens */
-    #home-mosaic-board { grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(16, 1fr); height: 90vh; }
-}
+.home-grid-slot:hover .home-grid-item, .home-grid-slot:hover .home-grid-video { opacity: 0.85; }
+.home-grid-slot:hover .home-grid-item { transform: scale(1.05); }
+
+/* Keep video zoomed when hovered, just add the 5% pop */
+.slot-landscape:hover .home-grid-video { transform: scale(1.4); }
+.slot-portrait:hover .home-grid-video { transform: scale(2.25); }
+.slot-square:hover .home-grid-video { transform: scale(1.85); }
+
+.fade-out { opacity: 0 !important; }
+
+@media screen and (max-width: 980px) { #home-mosaic-board { column-count: 4; } }
+@media screen and (max-width: 736px) { #home-mosaic-board { column-count: 2; height: 90vh; } }
 
 /* BACKGROUND BLEED FIX */
 body.is-home-mode #viewer .slide { opacity: 0 !important; }
-body.is-home-mode #viewer { background-color: #f0f0f0; transition: background-color 0.8s ease; } </style>	</head>
-	<body class="is-preload-0 is-preload-1 is-preload-2">
+body.is-home-mode #viewer { background-color: #f0f0f0; transition: background-color 0.8s ease; } 
+</style>	
+</head><body class="is-preload-0 is-preload-1 is-preload-2">
 
 		<div id="media-portal">
 			<iframe id="media-player" src="" allow="autoplay; fullscreen; encrypted-media; xr-spatial-tracking"></iframe>
@@ -641,7 +638,7 @@ body.is-home-mode #viewer { background-color: #f0f0f0; transition: background-co
 				const secureNumber = countryCode + part1 + part2;
 				window.open("https://wa.me/" + secureNumber, "_blank");
 			}
-// 🚀 HOME PAGE ENGINE V7 (High-Density Geometry Packer)
+// 🚀 HOME PAGE ENGINE V8 (Masonry & Autoplay Video Limit)
 document.addEventListener("DOMContentLoaded", function() {
     
     const viewer = document.getElementById('viewer');
@@ -649,7 +646,6 @@ document.addEventListener("DOMContentLoaded", function() {
     gridContainer.id = 'home-mosaic-board';
     viewer.appendChild(gridContainer); 
 
-    // 1. Sort images
     const buckets = { landscape: [], portrait: [], square: [] };
     homeImages.forEach(img => {
         if (buckets[img.orientation]) buckets[img.orientation].push(img);
@@ -657,80 +653,46 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     const activeSlots = [];
+    let activeVideoCount = 0;
+    const MAX_VIDEOS = 3; // The browser crash-prevention limit
     
-    // 2. The High-Density 2D Packing Algorithm
-    const isMobile = window.innerWidth <= 736;
-    const cols = isMobile ? 6 : 12;
-    const rows = isMobile ? 16 : 10;
-    const board = Array(rows).fill().map(() => Array(cols).fill(0));
-
-    // Helper: Checks if a shape can fit without hitting boundaries or overlapping
-    function canFit(r, c, w, h) {
-        if (r + h > rows || c + w > cols) return false;
-        for (let i = r; i < r + h; i++) {
-            for (let j = c; j < c + w; j++) {
-                if (board[i][j] !== 0) return false;
-            }
-        }
-        return true;
-    }
-
-    // Helper: Claims the space on the board
-    function markBoard(r, c, w, h) {
-        for (let i = r; i < r + h; i++) {
-            for (let j = c; j < c + w; j++) {
-                board[i][j] = 1;
-            }
-        }
-    }
-
-    // 3. Scan the board and plug in shapes
-    for (let r = 0; r < rows; r++) {
-        for (let c = 0; c < cols; c++) {
-            if (board[r][c] !== 0) continue; // Skip occupied spaces
-
-            let options = [];
+    // Load enough images to overfill the 85vh container (creating the sliced-edge illusion)
+    const loadCount = window.innerWidth <= 736 ? 12 : 25; 
+    let allAvailable = [...buckets.landscape, ...buckets.portrait, ...buckets.square].sort(() => 0.5 - Math.random());
+    
+    for (let i = 0; i < Math.min(loadCount, allAvailable.length); i++) {
+        let typeToPick = allAvailable[i].orientation || 'landscape';
+        
+        if (buckets[typeToPick].length > 0) {
+            let imgData = buckets[typeToPick].shift();
             
-            // Check geometric fit AND inventory availability
-            if (canFit(r, c, 3, 2) && buckets.landscape.length > 0) options.push({type: 'landscape', w: 3, h: 2, css: 'slot-landscape'});
-            if (canFit(r, c, 2, 3) && buckets.portrait.length > 0) options.push({type: 'portrait', w: 2, h: 3, css: 'slot-portrait'});
-            if (canFit(r, c, 2, 2) && buckets.square.length > 0) options.push({type: 'square', w: 2, h: 2, css: 'slot-square'});
-
-            let selection;
-            if (options.length > 0) {
-                // Pick randomly from whatever perfectly fits
-                selection = options[Math.floor(Math.random() * options.length)];
-            } else {
-                // Failsafe: Only tiny 1x1 gaps left. Plug them so we don't have white holes.
-                let fbType = 'square';
-                if (buckets.square.length === 0) {
-                    if (buckets.landscape.length > 0) fbType = 'landscape';
-                    else if (buckets.portrait.length > 0) fbType = 'portrait';
-                }
-                selection = {type: fbType, w: 1, h: 1, css: 'slot-filler'};
-            }
-
-            // Claim the territory and grab the image
-            markBoard(r, c, selection.w, selection.h);
-            let imgData = buckets[selection.type].shift();
-
-            // Build DOM
             let box = document.createElement('div');
-            box.className = `home-grid-slot ${selection.css}`;
+            box.className = `home-grid-slot slot-${typeToPick}`;
+            box.onclick = () => routeToMedia(imgData);
             
-            let img = document.createElement('img');
-            img.src = `images/${imgData.folder}/fulls/${imgData.file}`;
-            img.className = 'home-grid-item';
-            img.onclick = () => routeToMedia(imgData);
+            let isPlayingVideo = false;
+            let mediaElement;
+
+            // Decide to render Video or Image
+            if (imgData.isVideo && imgData.mediaId && activeVideoCount < MAX_VIDEOS) {
+                mediaElement = document.createElement('iframe');
+                mediaElement.src = `https://www.youtube.com/embed/${imgData.mediaId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${imgData.mediaId}&playsinline=1&modestbranding=1`;
+                mediaElement.className = 'home-grid-video';
+                activeVideoCount++;
+                isPlayingVideo = true;
+            } else {
+                mediaElement = document.createElement('img');
+                mediaElement.src = `images/${imgData.folder}/fulls/${imgData.file}`;
+                mediaElement.className = 'home-grid-item';
+            }
             
-            box.appendChild(img);
+            box.appendChild(mediaElement);
             gridContainer.appendChild(box);
-            
-            activeSlots.push({ domImage: img, currentData: imgData, bucket: selection.type });
+            activeSlots.push({ box: box, domElement: mediaElement, currentData: imgData, bucket: typeToPick, isPlayingVideo: isPlayingVideo });
         }
     }
 
-    // 4. The Smart Twinkle Effect
+    // The Twinkle Effect with Video Management
     setInterval(() => {
         if (gridContainer.classList.contains('hidden')) return;
 
@@ -738,24 +700,47 @@ document.addEventListener("DOMContentLoaded", function() {
         let slot = activeSlots[slotIndex];
         
         if (buckets[slot.bucket].length > 0) {
-            slot.domImage.classList.add('fade-out');
+            slot.domElement.classList.add('fade-out');
             
             setTimeout(() => {
                 let oldData = slot.currentData;
                 let newData = buckets[slot.bucket].shift(); 
-                
                 buckets[slot.bucket].push(oldData); 
                 slot.currentData = newData; 
                 
-                slot.domImage.src = `images/${newData.folder}/fulls/${newData.file}`;
-                slot.domImage.onclick = () => routeToMedia(newData);
+                // Cleanup old video count
+                if (slot.isPlayingVideo) {
+                    activeVideoCount--;
+                    slot.isPlayingVideo = false;
+                }
                 
-                slot.domImage.classList.remove('fade-out');
+                slot.domElement.remove(); // Remove old img/iframe
+                
+                let newElement;
+                if (newData.isVideo && newData.mediaId && activeVideoCount < MAX_VIDEOS) {
+                    newElement = document.createElement('iframe');
+                    newElement.src = `https://www.youtube.com/embed/${newData.mediaId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${newData.mediaId}&playsinline=1&modestbranding=1`;
+                    newElement.className = 'home-grid-video fade-out';
+                    activeVideoCount++;
+                    slot.isPlayingVideo = true;
+                } else {
+                    newElement = document.createElement('img');
+                    newElement.src = `images/${newData.folder}/fulls/${newData.file}`;
+                    newElement.className = 'home-grid-item fade-out';
+                }
+                
+                slot.box.appendChild(newElement);
+                slot.domElement = newElement;
+                slot.box.onclick = () => routeToMedia(newData);
+                
+                // Force browser reflow to run the fade transition
+                void newElement.offsetWidth;
+                newElement.classList.remove('fade-out');
+                
             }, 1500); 
         }
     }, 2500); 
 
-    // 5. Routing
     function routeToMedia(imgData) {
         gridContainer.classList.add('hidden'); 
         document.body.classList.remove('is-home-mode'); 
@@ -779,7 +764,6 @@ document.addEventListener("DOMContentLoaded", function() {
         }, 350); 
     }
 
-    // 6. Interceptor
     document.querySelectorAll('#header a[onclick*="switchMain"], #header a[onclick*="switchTab"]').forEach(link => {
         link.addEventListener('click', () => { 
             gridContainer.classList.add('hidden'); 
@@ -787,7 +771,6 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 
-    // 7. Reset (The Home State)
     function resetToHome() {
         gridContainer.classList.remove('hidden');
         document.body.classList.add('is-home-mode'); 
@@ -813,11 +796,9 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    // 8. Hook up H1
     const h1 = document.querySelector('#header h1');
     if (h1) {
-        h1.style.cursor = 'pointer';
-        h1.title = "Return to Home Grid";
+        h1.style.cursor = 'pointer'; h1.title = "Return to Home Grid";
         h1.addEventListener('click', (e) => { e.preventDefault(); resetToHome(); });
     }
 

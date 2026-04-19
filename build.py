@@ -201,16 +201,18 @@ for folder in FOLDERS:
     js_content += "];\n\n"
 
 # 🚀 NEW: BUILD THE HOME PAGE GRID ARRAY
-TOTAL_HOME_IMAGES = 64 # 16 displayed + 48 in reserve for the "twinkle" effect
+TOTAL_HOME_IMAGES = 64 
 
-# Grab a random selection, ensuring we don't ask for more images than you actually have
-sample_size = min(TOTAL_HOME_IMAGES, len(all_portfolio_images))
-home_raw_selection = random.sample(all_portfolio_images, sample_size)
+# 🚀 PURIST ROUTE: Only allow aesthetic photo/video folders
+purist_folders = ["real-estate", "travel", "theatre", "video-travel", "video-music", "video-shorts", "video-theatre"]
+pure_portfolio = [img for img in all_portfolio_images if img["folder"] in purist_folders]
+
+sample_size = min(TOTAL_HOME_IMAGES, len(pure_portfolio))
+home_raw_selection = random.sample(pure_portfolio, sample_size)
 
 arranged_home_images = []
 if home_raw_selection:
     arranged_home_images.append(home_raw_selection.pop(0))
-    # Run the Home Grid through your existing color-distance logic!
     while home_raw_selection:
         idx = len(arranged_home_images)
         best_img = None
@@ -235,13 +237,10 @@ if home_raw_selection:
 # Output the new array to data.js
 js_content += "const homeImages = [\n"
 for img in arranged_home_images:
-    js_content += f'  {{ file: "{img["file"]}", folder: "{img["folder"]}", title: "{img["title"]}", mediaId: "{img["mediaId"]}", originTab: "{img["originTab"]}", orientation: "{img["orientation"]}" }},\n'
+    # 🚀 NEW: Added the isVideo tag to power the auto-play engine
+    is_video = "true" if "video" in img["folder"].lower() else "false"
+    js_content += f'  {{ file: "{img["file"]}", folder: "{img["folder"]}", title: "{img["title"]}", mediaId: "{img["mediaId"]}", originTab: "{img["originTab"]}", orientation: "{img["orientation"]}", isVideo: {is_video} }},\n'
 js_content += "];\n\n"
-js_content += "const categoryLogos = {\n"
-for tab_class, logos in category_logos.items():
-    js_content += f'  "{tab_class}": {json.dumps(logos)},\n'
-js_content += "};\n\n"
-
 with open("data.js", "w") as f:
     f.write(js_content)
 
