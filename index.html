@@ -194,36 +194,32 @@
 				filter: grayscale(0%);
 				transform: scale(1.15); 
 			}
-/* 🚀 HOME PAGE MASONRY MOSAIC (V8 - Purist, Ratios, Autoplay) */
-#home-mosaic-board {
+/* 🚀 HOME PAGE PERFECT TETRIS BOARD (V9 - Purist, Ratios, Autoplay) */
+#home-mosaic-wrapper {
     position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    width: 85%; height: 85vh; z-index: 45;
-    background: #ffffff; padding: 10px; border-radius: 8px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.2); box-sizing: border-box;
-    
-    /* The Native Masonry Engine */
-    column-count: 5;
-    column-gap: 10px;
-    overflow: hidden; /* Slices the jagged bottom off for a locked wall */
+    width: 85vw; height: 85vh; z-index: 45;
+    background: #ffffff; border-radius: 8px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2); 
+    overflow: hidden; /* This cleanly slices off the bottom of the puzzle */
     transition: opacity 0.8s ease, visibility 0.8s ease;
 }
-#home-mosaic-board.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+#home-mosaic-wrapper.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
 
-.home-grid-slot {
-    width: 100%;
-    margin-bottom: 10px;
-    display: inline-block; /* Crucial for masonry flow */
-    position: relative;
-    border-radius: 4px;
-    overflow: hidden;
-    cursor: pointer;
-    background: #000; /* Black behind loading videos */
+#home-tetris-board {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    /* Magic Math: Calculates row height to exactly match column width, creating perfect squares */
+    grid-auto-rows: calc((85vw - 108px) / 12); 
+    gap: 8px; padding: 10px; width: 100%;
+    grid-auto-flow: dense; /* The native Tetris packer */
 }
 
-/* 🚀 EXACT NATIVE PHOTOGRAPHY RATIOS */
-.slot-portrait { aspect-ratio: 4 / 5; } /* Instagram Ratio */
-.slot-landscape { aspect-ratio: 3 / 2; } /* Standard Camera Ratio */
-.slot-square { aspect-ratio: 1 / 1; }
+/* 🚀 EXACT PHOTOGRAPHIC TETRIS SPANS */
+.slot-landscape { grid-column: span 4; grid-row: span 3; } /* 4:3 Ratio */
+.slot-portrait { grid-column: span 3; grid-row: span 4; }  /* 3:4 Ratio (Instagram style) */
+.slot-square { grid-column: span 3; grid-row: span 3; }    /* 1:1 Ratio */
+
+.home-grid-slot { position: relative; overflow: hidden; border-radius: 4px; cursor: pointer; background: #000; }
 
 .home-grid-item, .home-grid-video {
     width: 100%; height: 100%; position: absolute; top: 0; left: 0;
@@ -231,33 +227,40 @@
 }
 .home-grid-item { object-fit: cover; }
 
-/* 🚀 Auto-Play Video Formatting */
-.home-grid-video { 
-    pointer-events: none; /* Let clicks pass to the slot to open full screen */
-    border: none; 
-    transform: scale(1.35); /* Base zoom to cover 16:9 into landscape */
-}
-/* Aggressive zoom to make 16:9 video fill a tall 4:5 portrait box */
+/* 🚀 Auto-Play Video Formatting (Zoomed to hide 16:9 black bars) */
+.home-grid-video { pointer-events: none; border: none; transform: scale(1.4); }
 .slot-portrait .home-grid-video { transform: scale(2.2); } 
 .slot-square .home-grid-video { transform: scale(1.8); }
 
 .home-grid-slot:hover .home-grid-item, .home-grid-slot:hover .home-grid-video { opacity: 0.85; }
 .home-grid-slot:hover .home-grid-item { transform: scale(1.05); }
-
-/* Keep video zoomed when hovered, just add the 5% pop */
-.slot-landscape:hover .home-grid-video { transform: scale(1.4); }
+.slot-landscape:hover .home-grid-video { transform: scale(1.45); }
 .slot-portrait:hover .home-grid-video { transform: scale(2.25); }
 .slot-square:hover .home-grid-video { transform: scale(1.85); }
 
+.grid-play-btn {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 45px; height: 45px; fill: white; filter: drop-shadow(0px 4px 15px rgba(0,0,0,0.7));
+    opacity: 0.8; pointer-events: none; transition: 0.3s ease; z-index: 10;
+}
+.home-grid-slot:hover .grid-play-btn { opacity: 1; transform: translate(-50%, -50%) scale(1.15); }
 .fade-out { opacity: 0 !important; }
 
-@media screen and (max-width: 980px) { #home-mosaic-board { column-count: 4; } }
-@media screen and (max-width: 736px) { #home-mosaic-board { column-count: 2; height: 90vh; } }
+@media screen and (max-width: 980px) { 
+    #home-mosaic-wrapper { width: 95vw; }
+    #home-tetris-board { grid-auto-rows: calc((95vw - 108px) / 12); } 
+}
+@media screen and (max-width: 736px) { 
+    #home-mosaic-wrapper { height: 90vh; }
+    #home-tetris-board { grid-template-columns: repeat(6, 1fr); grid-auto-rows: calc((95vw - 60px) / 6); } 
+    .slot-landscape { grid-column: span 6; grid-row: span 4; }
+    .slot-portrait { grid-column: span 3; grid-row: span 4; }
+    .slot-square { grid-column: span 3; grid-row: span 3; }
+}
 
 /* BACKGROUND BLEED FIX */
 body.is-home-mode #viewer .slide { opacity: 0 !important; }
-body.is-home-mode #viewer { background-color: #f0f0f0; transition: background-color 0.8s ease; } 
-</style>	
+body.is-home-mode #viewer { background-color: #f0f0f0; transition: background-color 0.8s ease; }</style>	
 </head><body class="is-preload-0 is-preload-1 is-preload-2">
 
 		<div id="media-portal">
@@ -638,13 +641,18 @@ body.is-home-mode #viewer { background-color: #f0f0f0; transition: background-co
 				const secureNumber = countryCode + part1 + part2;
 				window.open("https://wa.me/" + secureNumber, "_blank");
 			}
-// 🚀 HOME PAGE ENGINE V8 (Masonry & Autoplay Video Limit)
+// 🚀 HOME PAGE ENGINE V9 (Tetris Packer & Video Autoplay)
 document.addEventListener("DOMContentLoaded", function() {
     
     const viewer = document.getElementById('viewer');
+    const wrapper = document.createElement('div');
+    wrapper.id = 'home-mosaic-wrapper';
+    
     const gridContainer = document.createElement('div');
-    gridContainer.id = 'home-mosaic-board';
-    viewer.appendChild(gridContainer); 
+    gridContainer.id = 'home-tetris-board';
+    
+    wrapper.appendChild(gridContainer);
+    viewer.appendChild(wrapper); 
 
     const buckets = { landscape: [], portrait: [], square: [] };
     homeImages.forEach(img => {
@@ -654,10 +662,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
     const activeSlots = [];
     let activeVideoCount = 0;
-    const MAX_VIDEOS = 3; // The browser crash-prevention limit
+    const MAX_VIDEOS = 3; 
     
-    // Load enough images to overfill the 85vh container (creating the sliced-edge illusion)
-    const loadCount = window.innerWidth <= 736 ? 12 : 25; 
+    // Generate ~35 items to ensure the grid overflows out the bottom of the wrapper
+    const loadCount = window.innerWidth <= 736 ? 16 : 35; 
     let allAvailable = [...buckets.landscape, ...buckets.portrait, ...buckets.square].sort(() => 0.5 - Math.random());
     
     for (let i = 0; i < Math.min(loadCount, allAvailable.length); i++) {
@@ -673,8 +681,7 @@ document.addEventListener("DOMContentLoaded", function() {
             let isPlayingVideo = false;
             let mediaElement;
 
-            // Decide to render Video or Image
-            if (imgData.isVideo && imgData.mediaId && activeVideoCount < MAX_VIDEOS) {
+            if (imgData.isVideo === true && imgData.mediaId && activeVideoCount < MAX_VIDEOS) {
                 mediaElement = document.createElement('iframe');
                 mediaElement.src = `https://www.youtube.com/embed/${imgData.mediaId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${imgData.mediaId}&playsinline=1&modestbranding=1`;
                 mediaElement.className = 'home-grid-video';
@@ -687,14 +694,21 @@ document.addEventListener("DOMContentLoaded", function() {
             }
             
             box.appendChild(mediaElement);
+            
+            if (imgData.isVideo === true) {
+                let playSvg = document.createElement('div');
+                playSvg.innerHTML = `<svg class="grid-play-btn" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
+                box.appendChild(playSvg.firstChild);
+            }
+
             gridContainer.appendChild(box);
             activeSlots.push({ box: box, domElement: mediaElement, currentData: imgData, bucket: typeToPick, isPlayingVideo: isPlayingVideo });
         }
     }
 
-    // The Twinkle Effect with Video Management
+    // The Twinkle Effect
     setInterval(() => {
-        if (gridContainer.classList.contains('hidden')) return;
+        if (wrapper.classList.contains('hidden')) return;
 
         let slotIndex = Math.floor(Math.random() * activeSlots.length);
         let slot = activeSlots[slotIndex];
@@ -708,16 +722,15 @@ document.addEventListener("DOMContentLoaded", function() {
                 buckets[slot.bucket].push(oldData); 
                 slot.currentData = newData; 
                 
-                // Cleanup old video count
                 if (slot.isPlayingVideo) {
                     activeVideoCount--;
                     slot.isPlayingVideo = false;
                 }
                 
-                slot.domElement.remove(); // Remove old img/iframe
+                slot.domElement.remove(); 
                 
                 let newElement;
-                if (newData.isVideo && newData.mediaId && activeVideoCount < MAX_VIDEOS) {
+                if (newData.isVideo === true && newData.mediaId && activeVideoCount < MAX_VIDEOS) {
                     newElement = document.createElement('iframe');
                     newElement.src = `https://www.youtube.com/embed/${newData.mediaId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${newData.mediaId}&playsinline=1&modestbranding=1`;
                     newElement.className = 'home-grid-video fade-out';
@@ -729,11 +742,19 @@ document.addEventListener("DOMContentLoaded", function() {
                     newElement.className = 'home-grid-item fade-out';
                 }
                 
+                let existingPlayBtn = slot.box.querySelector('.grid-play-btn');
+                if (newData.isVideo === true && !existingPlayBtn) {
+                    let playSvg = document.createElement('div');
+                    playSvg.innerHTML = `<svg class="grid-play-btn" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
+                    slot.box.appendChild(playSvg.firstChild);
+                } else if (newData.isVideo !== true && existingPlayBtn) {
+                    existingPlayBtn.remove();
+                }
+
                 slot.box.appendChild(newElement);
                 slot.domElement = newElement;
                 slot.box.onclick = () => routeToMedia(newData);
                 
-                // Force browser reflow to run the fade transition
                 void newElement.offsetWidth;
                 newElement.classList.remove('fade-out');
                 
@@ -742,7 +763,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }, 2500); 
 
     function routeToMedia(imgData) {
-        gridContainer.classList.add('hidden'); 
+        wrapper.classList.add('hidden'); 
         document.body.classList.remove('is-home-mode'); 
         
         const tabLink = document.querySelector(`a[onclick*="${imgData.originTab}"]`);
@@ -766,13 +787,13 @@ document.addEventListener("DOMContentLoaded", function() {
 
     document.querySelectorAll('#header a[onclick*="switchMain"], #header a[onclick*="switchTab"]').forEach(link => {
         link.addEventListener('click', () => { 
-            gridContainer.classList.add('hidden'); 
+            wrapper.classList.add('hidden'); 
             document.body.classList.remove('is-home-mode'); 
         });
     });
 
     function resetToHome() {
-        gridContainer.classList.remove('hidden');
+        wrapper.classList.remove('hidden');
         document.body.classList.add('is-home-mode'); 
         
         closeMedia();
