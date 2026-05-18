@@ -7,7 +7,7 @@ import random # 🚀 NEW: Required for our Home Page shuffle
 
 FOLDERS = [
     "real-estate", "travel", "theatre", 
-    "video-travel", "video-music", "video-shorts", "video-theatre",
+    "video-travel", "video-music", "video-shorts", "video-theatre", "video-real-estate",
     "web-branding", "floor-plans", "3d-tours"
 ]
 
@@ -204,9 +204,8 @@ for folder in FOLDERS:
 TOTAL_HOME_IMAGES = 64 
 
 # 🚀 PURIST ROUTE: Only allow aesthetic photo/video folders
-purist_folders = ["real-estate", "travel", "theatre", "video-travel", "video-music", "video-shorts", "video-theatre"]
+purist_folders = ["real-estate", "travel", "theatre", "video-travel", "video-music", "video-shorts", "video-theatre", "video-real-estate"]
 pure_portfolio = [img for img in all_portfolio_images if img["folder"] in purist_folders]
-
 sample_size = min(TOTAL_HOME_IMAGES, len(pure_portfolio))
 home_raw_selection = random.sample(pure_portfolio, sample_size)
 

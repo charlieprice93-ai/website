@@ -308,13 +308,13 @@ body.is-home-mode #viewer { background-color: #f0f0f0; transition: background-co
 					<a href="#" onclick="switchTab(event, 'tab-theatre', this)">Film & Theatre</a>
 				</nav>
 
-				<nav id="nav-video" class="sub-nav sub-categories" style="display: none;">
-					<a href="#" onclick="switchTab(event, 'tab-video-travel', this)">Travel & Tourism</a> <span>/</span>
-					<a href="#" onclick="switchTab(event, 'tab-video-music', this)">Music Videos</a> <span>/</span>
-					<a href="#" onclick="switchTab(event, 'tab-video-shorts', this)">Short Films</a> <span>/</span>
-					<a href="#" onclick="switchTab(event, 'tab-video-theatre', this)">Theatre</a>
-				</nav>
-
+<nav id="nav-video" class="sub-nav sub-categories" style="display: none;">
+    <a href="#" onclick="switchTab(event, 'tab-video-real-estate', this)">Real Estate</a> <span>/</span>
+    <a href="#" onclick="switchTab(event, 'tab-video-travel', this)">Travel & Tourism</a> <span>/</span>
+    <a href="#" onclick="switchTab(event, 'tab-video-music', this)">Music Videos</a> <span>/</span>
+    <a href="#" onclick="switchTab(event, 'tab-video-shorts', this)">Short Films</a> <span>/</span>
+    <a href="#" onclick="switchTab(event, 'tab-video-theatre', this)">Theatre</a>
+</nav>
 				<nav id="nav-design" class="sub-nav sub-categories" style="display: none;">
 					<a href="#" onclick="switchTab(event, 'tab-web-branding', this)">Web & Branding</a> <span>/</span>
 					<a href="#" onclick="switchTab(event, 'tab-floor-plans', this)">Floor Plans</a> <span>/</span>
@@ -370,7 +370,7 @@ body.is-home-mode #viewer { background-color: #f0f0f0; transition: background-co
 				return html;
 			}
 
-			gallery.innerHTML = 
+gallery.innerHTML = 
 				buildGroup((typeof realEstateImages !== 'undefined' ? realEstateImages : null), 'real-estate', 'tab-real-estate') +
 				buildGroup((typeof travelImages !== 'undefined' ? travelImages : null), 'travel', 'tab-travel') +
 				buildGroup((typeof theatreImages !== 'undefined' ? theatreImages : null), 'theatre', 'tab-theatre') +
@@ -378,10 +378,10 @@ body.is-home-mode #viewer { background-color: #f0f0f0; transition: background-co
 				buildGroup((typeof videoMusicImages !== 'undefined' ? videoMusicImages : null), 'video-music', 'tab-video-music') +
 				buildGroup((typeof videoShortsImages !== 'undefined' ? videoShortsImages : null), 'video-shorts', 'tab-video-shorts') +
 				buildGroup((typeof videoTheatreImages !== 'undefined' ? videoTheatreImages : null), 'video-theatre', 'tab-video-theatre') +
+				buildGroup((typeof videoRealEstateImages !== 'undefined' ? videoRealEstateImages : null), 'video-real-estate', 'tab-video-real-estate') +
 				buildGroup((typeof webBrandingImages !== 'undefined' ? webBrandingImages : null), 'web-branding', 'tab-web-branding') +
 				buildGroup((typeof floorPlansImages !== 'undefined' ? floorPlansImages : null), 'floor-plans', 'tab-floor-plans') +
 				buildGroup((typeof _3dToursImages !== 'undefined' ? _3dToursImages : null), '3d-tours', 'tab-3d-tours');
-
 			document.querySelectorAll('.tab-real-estate').forEach(item => item.style.display = 'block');
 // 🚀 INJECT THE ABOUT SECTION WITH SMART SPLIT
 			if (typeof categoryDescriptions !== 'undefined' && categoryDescriptions['tab-about']) {
@@ -569,12 +569,14 @@ body.is-home-mode #viewer { background-color: #f0f0f0; transition: background-co
 					document.querySelectorAll('.' + tabClass).forEach(item => item.style.display = 'block');
 					gallery.style.opacity = 1;
 
-					if (window.innerWidth > 980) {
-						const firstImg = document.querySelector('.' + tabClass + ' .thumbnail');
-						if (firstImg) firstImg.click();
+				if (window.innerWidth > 980) {
+						// 🚀 NEW: Randomise the first item shown in the viewer
+						const allThumbnails = document.querySelectorAll('.' + tabClass + ' .thumbnail');
+						if (allThumbnails && allThumbnails.length > 0) {
+							const randomThumb = allThumbnails[Math.floor(Math.random() * allThumbnails.length)];
+							randomThumb.click();
+						}
 					}
-				}, 300);
-			}
 
 			
 		function openMedia(mediaId) {
