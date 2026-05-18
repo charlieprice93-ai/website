@@ -194,33 +194,41 @@
 				filter: grayscale(0%);
 				transform: scale(1.15); 
 			}
-/* 🚀 HOME PAGE MICRO-TETRIS BOARD (V10 - Pure Density & Ratios) */
+/* 🚀 HOME PAGE EXTREME SCALE TETRIS (V11) */
 #home-mosaic-wrapper {
     position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
     width: 85vw; height: 85vh; z-index: 45;
     background: #ffffff; border-radius: 8px;
     box-shadow: 0 10px 40px rgba(0,0,0,0.2); 
-    overflow: hidden; /* Cleanly slices off the jagged bottom */
+    overflow: hidden; /* Slices off the jagged bottom */
     transition: opacity 0.8s ease, visibility 0.8s ease;
-    container-type: inline-size; /* 🚀 The Magic Fix for perfect squares */
 }
 #home-mosaic-wrapper.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
 
 #home-tetris-board {
     display: grid;
-    /* 24 Columns gives us the tight, busy density */
     grid-template-columns: repeat(24, 1fr);
-    /* Mathematically forces rows to be perfect squares based on the 24 columns */
-    grid-auto-rows: calc((100cqw - (23 * 8px)) / 24); 
+    /* 🚀 Universally supported math to force perfect squares */
+    grid-auto-rows: calc((85vw - (23 * 8px)) / 24); 
     gap: 8px; padding: 10px; width: 100%;
-    grid-auto-flow: dense; /* The organic puzzle packer */
+    grid-auto-flow: dense; 
 }
 
-/* 🚀 EXACT PHOTOGRAPHIC SPANS */
-.slot-landscape { grid-column: span 4; grid-row: span 3; } /* 4:3 Ratio */
-.slot-portrait { grid-column: span 3; grid-row: span 4; }  /* 3:4 Ratio (Instagram) */
-.slot-square { grid-column: span 3; grid-row: span 3; }    /* 1:1 Ratio */
-.slot-square-lg { grid-column: span 4; grid-row: span 4; } /* 1:1 Large */
+/* 🚀 EXTREME SCALE SPANS (All maintain perfect photo ratios) */
+/* Landscapes (3:2) */
+.slot-landscape-lg { grid-column: span 12; grid-row: span 8; }
+.slot-landscape-md { grid-column: span 6; grid-row: span 4; }
+.slot-landscape-sm { grid-column: span 3; grid-row: span 2; }
+
+/* Portraits (2:3) */
+.slot-portrait-lg { grid-column: span 8; grid-row: span 12; }
+.slot-portrait-md { grid-column: span 4; grid-row: span 6; }
+.slot-portrait-sm { grid-column: span 2; grid-row: span 3; }
+
+/* Squares (1:1) */
+.slot-square-lg { grid-column: span 8; grid-row: span 8; }
+.slot-square-md { grid-column: span 4; grid-row: span 4; }
+.slot-square-sm { grid-column: span 2; grid-row: span 2; }
 
 .home-grid-slot { position: relative; overflow: hidden; border-radius: 4px; cursor: pointer; background: #000; }
 
@@ -230,16 +238,13 @@
 }
 .home-grid-item { object-fit: cover; }
 
-/* 🚀 Auto-Play Video Formatting (Zoomed to hide 16:9 black bars) */
+/* Auto-Play Video Formatting */
 .home-grid-video { pointer-events: none; border: none; transform: scale(1.4); }
-.slot-portrait .home-grid-video { transform: scale(1.8); } 
-.slot-square .home-grid-video, .slot-square-lg .home-grid-video { transform: scale(1.6); }
+.slot-portrait-lg .home-grid-video, .slot-portrait-md .home-grid-video, .slot-portrait-sm .home-grid-video { transform: scale(1.8); } 
+.slot-square-lg .home-grid-video, .slot-square-md .home-grid-video, .slot-square-sm .home-grid-video { transform: scale(1.6); }
 
 .home-grid-slot:hover .home-grid-item, .home-grid-slot:hover .home-grid-video { opacity: 0.85; }
 .home-grid-slot:hover .home-grid-item { transform: scale(1.05); }
-.slot-landscape:hover .home-grid-video { transform: scale(1.45); }
-.slot-portrait:hover .home-grid-video { transform: scale(1.85); }
-.slot-square:hover .home-grid-video, .slot-square-lg:hover .home-grid-video { transform: scale(1.65); }
 
 .grid-play-btn {
     position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -249,23 +254,23 @@
 .home-grid-slot:hover .grid-play-btn { opacity: 1; transform: translate(-50%, -50%) scale(1.15); }
 .fade-out { opacity: 0 !important; }
 
-/* Responsive adjustments for Tablets and Phones */
+/* Responsive adjustments */
 @media screen and (max-width: 980px) { 
     #home-mosaic-wrapper { width: 95vw; }
+    #home-tetris-board { grid-auto-rows: calc((95vw - (23 * 8px)) / 24); }
 }
 @media screen and (max-width: 736px) { 
     #home-mosaic-wrapper { height: 90vh; }
-    /* Drop to 12 columns on phones so images don't get microscopic */
-    #home-tetris-board { grid-template-columns: repeat(12, 1fr); grid-auto-rows: calc((100cqw - (11 * 8px)) / 12); } 
-    .slot-landscape { grid-column: span 6; grid-row: span 4; } /* Adjusted spans for 12-col mobile */
-    .slot-portrait { grid-column: span 4; grid-row: span 5; }
-    .slot-square { grid-column: span 4; grid-row: span 4; }
-    .slot-square-lg { grid-column: span 6; grid-row: span 6; }
+    #home-tetris-board { grid-template-columns: repeat(12, 1fr); grid-auto-rows: calc((95vw - (11 * 8px)) / 12); } 
+    /* Force mobile sizes to prevent screen overflow */
+    .slot-landscape-lg, .slot-landscape-md { grid-column: span 6; grid-row: span 4; }
+    .slot-portrait-lg, .slot-portrait-md { grid-column: span 4; grid-row: span 6; }
+    .slot-square-lg, .slot-square-md { grid-column: span 4; grid-row: span 4; }
 }
+
 /* BACKGROUND BLEED FIX */
 body.is-home-mode #viewer .slide { opacity: 0 !important; }
-body.is-home-mode #viewer { background-color: #f0f0f0; transition: background-color 0.8s ease; }
-</style>
+body.is-home-mode #viewer { background-color: #f0f0f0; transition: background-color 0.8s ease; }</style>
 </head>
 <body class="is-preload-0 is-preload-1 is-preload-2">
 
@@ -647,7 +652,7 @@ body.is-home-mode #viewer { background-color: #f0f0f0; transition: background-co
 				const secureNumber = countryCode + part1 + part2;
 				window.open("https://wa.me/" + secureNumber, "_blank");
 			}
-// 🚀 HOME PAGE ENGINE V10 (Micro-Tetris Packer & Video Autoplay)
+// 🚀 HOME PAGE ENGINE V11 (Extreme Scale Tetris)
 document.addEventListener("DOMContentLoaded", function() {
     
     const viewer = document.getElementById('viewer');
@@ -670,8 +675,8 @@ document.addEventListener("DOMContentLoaded", function() {
     let activeVideoCount = 0;
     const MAX_VIDEOS = 3; 
     
-    // Generate ~45 items to ensure the grid overflows heavily out the bottom
-    const loadCount = window.innerWidth <= 736 ? 20 : 45; 
+    // Generate ~60 items to ensure the grid overflows past the bottom
+    const loadCount = window.innerWidth <= 736 ? 20 : 60; 
     let allAvailable = [...buckets.landscape, ...buckets.portrait, ...buckets.square].sort(() => 0.5 - Math.random());
     
     for (let i = 0; i < Math.min(loadCount, allAvailable.length); i++) {
@@ -680,9 +685,13 @@ document.addEventListener("DOMContentLoaded", function() {
         if (buckets[typeToPick].length > 0) {
             let imgData = buckets[typeToPick].shift();
             
-            // Randomly mix in some slightly larger squares to break up uniformity
-            let cssType = typeToPick;
-            if (cssType === 'square' && Math.random() > 0.5) cssType = 'square-lg';
+            // 🚀 The Weighted Scale Randomizer
+            let scale = 'sm'; // Default to micro size
+            let roll = Math.random();
+            if (roll > 0.90) scale = 'lg';      // 10% chance for a massive Hero image
+            else if (roll > 0.50) scale = 'md'; // 40% chance for a medium image
+            
+            let cssType = `${typeToPick}-${scale}`;
             
             let box = document.createElement('div');
             box.className = `home-grid-slot slot-${cssType}`;
@@ -712,7 +721,7 @@ document.addEventListener("DOMContentLoaded", function() {
             }
 
             gridContainer.appendChild(box);
-            activeSlots.push({ box: box, domElement: mediaElement, currentData: imgData, bucket: typeToPick, isPlayingVideo: isPlayingVideo });
+            activeSlots.push({ box: box, domElement: mediaElement, currentData: imgData, bucket: typeToPick, scale: scale, isPlayingVideo: isPlayingVideo });
         }
     }
 
