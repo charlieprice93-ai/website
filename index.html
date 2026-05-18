@@ -642,7 +642,7 @@
 				window.open("https://wa.me/" + secureNumber, "_blank");
 			}
 
-			// 🚀 HOME PAGE ENGINE V11 (Extreme Scale Tetris)
+// 🚀 HOME PAGE ENGINE V11 (Extreme Scale Tetris)
 			document.addEventListener("DOMContentLoaded", function() {
 			    
 			    const viewer = document.getElementById('viewer');
@@ -665,7 +665,7 @@
 
 			    const activeSlots = [];
 			    let activeVideoCount = 0;
-			    const MAX_VIDEOS = 3; 
+			    const MAX_VIDEOS = 3; // 🚀 Limits auto-play to 3 to prevent lag
 			    
 			    // Generate ~60 items to ensure the grid overflows past the bottom
 			    const loadCount = window.innerWidth <= 736 ? 20 : 60; 
@@ -692,7 +692,8 @@
 			            let isPlayingVideo = false;
 			            let mediaElement;
 
-			            if (imgData.isVideo === "true" && imgData.mediaId && activeVideoCount < MAX_VIDEOS) {
+						// 🚀 FIX: Removed quotes around true
+			            if (imgData.isVideo === true && imgData.mediaId && activeVideoCount < MAX_VIDEOS) {
 			                mediaElement = document.createElement('iframe');
 			                mediaElement.src = `https://www.youtube.com/embed/${imgData.mediaId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${imgData.mediaId}&playsinline=1&modestbranding=1`;
 			                mediaElement.className = 'home-grid-video';
@@ -706,7 +707,8 @@
 			            
 			            box.appendChild(mediaElement);
 			            
-			            if (imgData.isVideo === "true") {
+						// 🚀 FIX: Removed quotes around true
+			            if (imgData.isVideo === true) {
 			                let playSvg = document.createElement('div');
 			                playSvg.innerHTML = `<svg class="grid-play-btn" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
 			                box.appendChild(playSvg.firstChild);
@@ -741,7 +743,8 @@
 			                slot.domElement.remove(); 
 			                
 			                let newElement;
-			                if (newData.isVideo === "true" && newData.mediaId && activeVideoCount < MAX_VIDEOS) {
+							// 🚀 FIX: Removed quotes around true
+			                if (newData.isVideo === true && newData.mediaId && activeVideoCount < MAX_VIDEOS) {
 			                    newElement = document.createElement('iframe');
 			                    newElement.src = `https://www.youtube.com/embed/${newData.mediaId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${newData.mediaId}&playsinline=1&modestbranding=1`;
 			                    newElement.className = 'home-grid-video fade-out';
@@ -754,11 +757,12 @@
 			                }
 			                
 			                let existingPlayBtn = slot.box.querySelector('.grid-play-btn');
-			                if (newData.isVideo === "true" && !existingPlayBtn) {
+							// 🚀 FIX: Removed quotes around true
+			                if (newData.isVideo === true && !existingPlayBtn) {
 			                    let playSvg = document.createElement('div');
 			                    playSvg.innerHTML = `<svg class="grid-play-btn" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
 			                    slot.box.appendChild(playSvg.firstChild);
-			                } else if (newData.isVideo !== "true" && existingPlayBtn) {
+			                } else if (newData.isVideo !== true && existingPlayBtn) {
 			                    existingPlayBtn.remove();
 			                }
 
@@ -835,8 +839,7 @@
 			    }
 
 			    setTimeout(() => { resetToHome(); }, 100);
-			});
-		</script>
+			});		</script>
 
 		<script src="assets/js/jquery.min.js"></script>
 		<script src="assets/js/browser.min.js"></script>
