@@ -642,7 +642,7 @@
 				window.open("https://wa.me/" + secureNumber, "_blank");
 			}
 
-// 🚀 HOME PAGE ENGINE V11 (Extreme Scale Tetris)
+// 🚀 HOME PAGE ENGINE V12 (Dynamic Shuffle & Video Director)
 			document.addEventListener("DOMContentLoaded", function() {
 			    
 			    const viewer = document.getElementById('viewer');
@@ -655,21 +655,35 @@
 			    wrapper.appendChild(gridContainer);
 			    viewer.appendChild(wrapper); 
 
+			    // 🚀 FIX 1: The Fisher-Yates Shuffle ensures a completely new board every refresh
+			    function shuffleArray(array) {
+			        let curId = array.length;
+			        while (0 !== curId) {
+			            let randId = Math.floor(Math.random() * curId);
+			            curId -= 1;
+			            let tmp = array[curId];
+			            array[curId] = array[randId];
+			            array[randId] = tmp;
+			        }
+			        return array;
+			    }
+
 			    const buckets = { landscape: [], portrait: [], square: [] };
 			    if (typeof homeImages !== 'undefined') {
-				    homeImages.forEach(img => {
-				        if (buckets[img.orientation]) buckets[img.orientation].push(img);
-				        else buckets['landscape'].push(img);
-				    });
-				}
+			        // Deep copy and shuffle the raw array before sorting
+			        let randomizedHome = shuffleArray([...homeImages]); 
+			        randomizedHome.forEach(img => {
+			            if (buckets[img.orientation]) buckets[img.orientation].push(img);
+			            else buckets['landscape'].push(img);
+			        });
+			    }
 
 			    const activeSlots = [];
 			    let activeVideoCount = 0;
-			    const MAX_VIDEOS = 3; // 🚀 Limits auto-play to 3 to prevent lag
+			    const MAX_VIDEOS = 3; 
 			    
-			    // Generate ~60 items to ensure the grid overflows past the bottom
 			    const loadCount = window.innerWidth <= 736 ? 20 : 60; 
-			    let allAvailable = [...buckets.landscape, ...buckets.portrait, ...buckets.square].sort(() => 0.5 - Math.random());
+			    let allAvailable = shuffleArray([...buckets.landscape, ...buckets.portrait, ...buckets.square]);
 			    
 			    for (let i = 0; i < Math.min(loadCount, allAvailable.length); i++) {
 			        let typeToPick = allAvailable[i].orientation || 'landscape';
@@ -677,7 +691,6 @@
 			        if (buckets[typeToPick].length > 0) {
 			            let imgData = buckets[typeToPick].shift();
 			            
-			            // 🚀 The Weighted Scale Randomizer
 			            let scale = 'sm'; 
 			            let roll = Math.random();
 			            if (roll > 0.90) scale = 'lg';      
@@ -691,9 +704,9 @@
 			            
 			            let isPlayingVideo = false;
 			            let mediaElement;
+			            let isVideoData = (imgData.isVideo === true || imgData.isVideo === "true");
 
-						// 🚀 FIX: Removed quotes around true
-			            if (imgData.isVideo === true && imgData.mediaId && activeVideoCount < MAX_VIDEOS) {
+			            if (isVideoData && imgData.mediaId && activeVideoCount < MAX_VIDEOS) {
 			                mediaElement = document.createElement('iframe');
 			                mediaElement.src = `https://www.youtube.com/embed/${imgData.mediaId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${imgData.mediaId}&playsinline=1&modestbranding=1`;
 			                mediaElement.className = 'home-grid-video';
@@ -707,8 +720,7 @@
 			            
 			            box.appendChild(mediaElement);
 			            
-						// 🚀 FIX: Removed quotes around true
-			            if (imgData.isVideo === true) {
+			            if (isVideoData) {
 			                let playSvg = document.createElement('div');
 			                playSvg.innerHTML = `<svg class="grid-play-btn" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
 			                box.appendChild(playSvg.firstChild);
@@ -719,7 +731,52 @@
 			        }
 			    }
 
-			    // The Twinkle Effect
+			    // 🚀 FIX 2: The "Video Director" (Cycles playing videos)
+			    setInterval(() => {
+			        if (wrapper.classList.contains('hidden')) return;
+
+			        let playingSlots = activeSlots.filter(s => s.isPlayingVideo);
+			        let pausedVideoSlots = activeSlots.filter(s => (s.currentData.isVideo === true || s.currentData.isVideo === "true") && !s.isPlayingVideo);
+
+			        if (playingSlots.length > 0 && pausedVideoSlots.length > 0) {
+			            // Pick one playing video to pause
+			            let slotToPause = playingSlots[Math.floor(Math.random() * playingSlots.length)];
+			            // Pick one paused video to play
+			            let slotToPlay = pausedVideoSlots[Math.floor(Math.random() * pausedVideoSlots.length)];
+
+			            // Fade them out
+			            slotToPause.domElement.classList.add('fade-out');
+			            slotToPlay.domElement.classList.add('fade-out');
+
+			            setTimeout(() => {
+			                // Downgrade playing iframe to static image
+			                let newImg = document.createElement('img');
+			                newImg.src = `images/${slotToPause.currentData.folder}/fulls/${slotToPause.currentData.file}`;
+			                newImg.className = 'home-grid-item fade-out';
+			                slotToPause.box.appendChild(newImg);
+			                slotToPause.domElement.remove();
+			                slotToPause.domElement = newImg;
+			                slotToPause.isPlayingVideo = false;
+			                
+			                // Upgrade static image to playing iframe
+			                let newIframe = document.createElement('iframe');
+			                newIframe.src = `https://www.youtube.com/embed/${slotToPlay.currentData.mediaId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${slotToPlay.currentData.mediaId}&playsinline=1&modestbranding=1`;
+			                newIframe.className = 'home-grid-video fade-out';
+			                slotToPlay.box.appendChild(newIframe);
+			                slotToPlay.domElement.remove();
+			                slotToPlay.domElement = newIframe;
+			                slotToPlay.isPlayingVideo = true;
+			                
+			                // Trigger smooth fade-in
+			                void newImg.offsetWidth;
+			                void newIframe.offsetWidth;
+			                newImg.classList.remove('fade-out');
+			                newIframe.classList.remove('fade-out');
+			            }, 800); // Waits for the fade to complete before swapping code
+			        }
+			    }, 10000); // Cycles a video every 10 seconds
+
+			    // 🚀 THE TWINKLE EFFECT (Random Image Swaps)
 			    setInterval(() => {
 			        if (wrapper.classList.contains('hidden')) return;
 
@@ -743,8 +800,9 @@
 			                slot.domElement.remove(); 
 			                
 			                let newElement;
-							// 🚀 FIX: Removed quotes around true
-			                if (newData.isVideo === true && newData.mediaId && activeVideoCount < MAX_VIDEOS) {
+			                let isNewVideoData = (newData.isVideo === true || newData.isVideo === "true");
+
+			                if (isNewVideoData && newData.mediaId && activeVideoCount < MAX_VIDEOS) {
 			                    newElement = document.createElement('iframe');
 			                    newElement.src = `https://www.youtube.com/embed/${newData.mediaId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${newData.mediaId}&playsinline=1&modestbranding=1`;
 			                    newElement.className = 'home-grid-video fade-out';
@@ -757,12 +815,11 @@
 			                }
 			                
 			                let existingPlayBtn = slot.box.querySelector('.grid-play-btn');
-							// 🚀 FIX: Removed quotes around true
-			                if (newData.isVideo === true && !existingPlayBtn) {
+			                if (isNewVideoData && !existingPlayBtn) {
 			                    let playSvg = document.createElement('div');
 			                    playSvg.innerHTML = `<svg class="grid-play-btn" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
 			                    slot.box.appendChild(playSvg.firstChild);
-			                } else if (newData.isVideo !== true && existingPlayBtn) {
+			                } else if (!isNewVideoData && existingPlayBtn) {
 			                    existingPlayBtn.remove();
 			                }
 
@@ -777,6 +834,7 @@
 			        }
 			    }, 2500); 
 
+			    // 🚀 ROUTING & NAVIGATION
 			    function routeToMedia(imgData) {
 			        wrapper.classList.add('hidden'); 
 			        document.body.classList.remove('is-home-mode'); 
@@ -839,7 +897,7 @@
 			    }
 
 			    setTimeout(() => { resetToHome(); }, 100);
-			});		</script>
+			});</script>
 
 		<script src="assets/js/jquery.min.js"></script>
 		<script src="assets/js/browser.min.js"></script>
