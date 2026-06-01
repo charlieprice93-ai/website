@@ -198,17 +198,14 @@
 				transform: scale(1.15); 
 			}
 
-			/* 🚀 HOME PAGE EXTREME SCALE TETRIS (V11) */
-			#home-mosaic-wrapper {
-			    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-			    width: 85vw; height: 85vh; z-index: 45;
-			    background: #ffffff; border-radius: 8px;
-			    box-shadow: 0 10px 40px rgba(0,0,0,0.2); 
-			    overflow: hidden;
-			    transition: opacity 0.8s ease, visibility 0.8s ease;
-			}
-			#home-mosaic-wrapper.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-
+/* 🚀 HOME PAGE EXTREME SCALE TETRIS (V13) */
+#home-mosaic-wrapper {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 85vw; z-index: 45;
+    /* Removed background, height, and overflow to create organic jagged edges */
+    transition: opacity 0.8s ease, visibility 0.8s ease;
+}
+#home-mosaic-wrapper.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
 			#home-tetris-board {
 			    display: grid;
 			    grid-template-columns: repeat(24, 1fr);
@@ -271,10 +268,15 @@
 			    .slot-square-lg, .slot-square-md { grid-column: span 4; grid-row: span 4; }
 			}
 
-			/* BACKGROUND BLEED FIX */
-			body.is-home-mode #viewer .slide { opacity: 0 !important; }
-			body.is-home-mode #viewer { background-color: #f0f0f0; transition: background-color 0.8s ease; }
-		</style>
+/* BACKGROUND BLEED FIX */
+body.is-home-mode #viewer .slide { opacity: 0 !important; }
+body.is-home-mode #viewer { background-color: #f0f0f0; transition: background-color 0.8s ease; }
+
+/* 🚀 REMOVE ARROWS ON HOME GRID */
+body.is-home-mode #viewer .inner .nav-next,
+body.is-home-mode #viewer .inner .nav-previous {
+    display: none !important;
+}		</style>
 	</head>
 	<body class="is-preload-0 is-preload-1 is-preload-2">
 
@@ -642,262 +644,326 @@
 				window.open("https://wa.me/" + secureNumber, "_blank");
 			}
 
-// 🚀 HOME PAGE ENGINE V12 (Dynamic Shuffle & Video Director)
-			document.addEventListener("DOMContentLoaded", function() {
-			    
-			    const viewer = document.getElementById('viewer');
-			    const wrapper = document.createElement('div');
-			    wrapper.id = 'home-mosaic-wrapper';
-			    
-			    const gridContainer = document.createElement('div');
-			    gridContainer.id = 'home-tetris-board';
-			    
-			    wrapper.appendChild(gridContainer);
-			    viewer.appendChild(wrapper); 
+// 🚀 HOME PAGE ENGINE V13 (Cooldown, Adjacency & Video Director)
+document.addEventListener("DOMContentLoaded", function() {
+    
+    const viewer = document.getElementById('viewer');
+    const wrapper = document.createElement('div');
+    wrapper.id = 'home-mosaic-wrapper';
+    
+    const gridContainer = document.createElement('div');
+    gridContainer.id = 'home-tetris-board';
+    
+    wrapper.appendChild(gridContainer);
+    viewer.appendChild(wrapper); 
 
-			    // 🚀 FIX 1: The Fisher-Yates Shuffle ensures a completely new board every refresh
-			    function shuffleArray(array) {
-			        let curId = array.length;
-			        while (0 !== curId) {
-			            let randId = Math.floor(Math.random() * curId);
-			            curId -= 1;
-			            let tmp = array[curId];
-			            array[curId] = array[randId];
-			            array[randId] = tmp;
-			        }
-			        return array;
-			    }
+    function shuffleArray(array) {
+        let curId = array.length;
+        while (0 !== curId) {
+            let randId = Math.floor(Math.random() * curId);
+            curId -= 1;
+            let tmp = array[curId];
+            array[curId] = array[randId];
+            array[randId] = tmp;
+        }
+        return array;
+    }
 
-			    const buckets = { landscape: [], portrait: [], square: [] };
-			    if (typeof homeImages !== 'undefined') {
-			        // Deep copy and shuffle the raw array before sorting
-			        let randomizedHome = shuffleArray([...homeImages]); 
-			        randomizedHome.forEach(img => {
-			            if (buckets[img.orientation]) buckets[img.orientation].push(img);
-			            else buckets['landscape'].push(img);
-			        });
-			    }
+    // 🚀 NEW: Calculates if two elements are physically touching on the screen
+    function isAdjacent(el1, el2) {
+        const r1 = el1.getBoundingClientRect();
+        const r2 = el2.getBoundingClientRect();
+        const margin = 12; // 8px CSS gap + 4px safety buffer
+        return !(
+            r1.right + margin < r2.left ||
+            r1.left > r2.right + margin ||
+            r1.bottom + margin < r2.top ||
+            r1.top > r2.bottom + margin
+        );
+    }
 
-			    const activeSlots = [];
-			    let activeVideoCount = 0;
-			    const MAX_VIDEOS = 3; 
-			    
-			    const loadCount = window.innerWidth <= 736 ? 20 : 60; 
-			    let allAvailable = shuffleArray([...buckets.landscape, ...buckets.portrait, ...buckets.square]);
-			    
-			    for (let i = 0; i < Math.min(loadCount, allAvailable.length); i++) {
-			        let typeToPick = allAvailable[i].orientation || 'landscape';
-			        
-			        if (buckets[typeToPick].length > 0) {
-			            let imgData = buckets[typeToPick].shift();
-			            
-			            let scale = 'sm'; 
-			            let roll = Math.random();
-			            if (roll > 0.90) scale = 'lg';      
-			            else if (roll > 0.50) scale = 'md'; 
-			            
-			            let cssType = `${typeToPick}-${scale}`;
-			            
-			            let box = document.createElement('div');
-			            box.className = `home-grid-slot slot-${cssType}`;
-			            box.onclick = () => routeToMedia(imgData);
-			            
-			            let isPlayingVideo = false;
-			            let mediaElement;
-			            let isVideoData = (imgData.isVideo === true || imgData.isVideo === "true");
+    const buckets = { landscape: [], portrait: [], square: [] };
+    if (typeof homeImages !== 'undefined') {
+        let randomizedHome = shuffleArray([...homeImages]); 
+        randomizedHome.forEach(img => {
+            if (buckets[img.orientation]) buckets[img.orientation].push(img);
+            else buckets['landscape'].push(img);
+        });
+    }
 
-			            if (isVideoData && imgData.mediaId && activeVideoCount < MAX_VIDEOS) {
-			                mediaElement = document.createElement('iframe');
-			                mediaElement.src = `https://www.youtube.com/embed/${imgData.mediaId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${imgData.mediaId}&playsinline=1&modestbranding=1`;
-			                mediaElement.className = 'home-grid-video';
-			                activeVideoCount++;
-			                isPlayingVideo = true;
-			            } else {
-			                mediaElement = document.createElement('img');
-			                mediaElement.src = `images/${imgData.folder}/fulls/${imgData.file}`;
-			                mediaElement.className = 'home-grid-item';
-			            }
-			            
-			            box.appendChild(mediaElement);
-			            
-			            if (isVideoData) {
-			                let playSvg = document.createElement('div');
-			                playSvg.innerHTML = `<svg class="grid-play-btn" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
-			                box.appendChild(playSvg.firstChild);
-			            }
+    const activeSlots = [];
+    let activeVideoCount = 0;
+    const MAX_VIDEOS = 3; 
+    
+    const loadCount = window.innerWidth <= 736 ? 20 : 60; 
+    let allAvailable = shuffleArray([...buckets.landscape, ...buckets.portrait, ...buckets.square]);
+    
+    for (let i = 0; i < Math.min(loadCount, allAvailable.length); i++) {
+        let typeToPick = allAvailable[i].orientation || 'landscape';
+        
+        if (buckets[typeToPick].length > 0) {
+            let imgData = buckets[typeToPick].shift();
+            
+            let scale = 'sm'; 
+            let roll = Math.random();
+            if (roll > 0.90) scale = 'lg';      
+            else if (roll > 0.50) scale = 'md'; 
+            
+            let cssType = `${typeToPick}-${scale}`;
+            
+            let box = document.createElement('div');
+            box.className = `home-grid-slot slot-${cssType}`;
+            box.onclick = () => routeToMedia(imgData);
+            
+            let isVideoData = (imgData.isVideo === true || imgData.isVideo === "true");
 
-			            gridContainer.appendChild(box);
-			            activeSlots.push({ box: box, domElement: mediaElement, currentData: imgData, bucket: typeToPick, scale: scale, isPlayingVideo: isPlayingVideo });
-			        }
-			    }
+            // 🚀 We load everything as an image initially to allow the browser to position the grid
+            let mediaElement = document.createElement('img');
+            mediaElement.src = `images/${imgData.folder}/fulls/${imgData.file}`;
+            mediaElement.className = 'home-grid-item';
+            box.appendChild(mediaElement);
+            
+            if (isVideoData) {
+                let playSvg = document.createElement('div');
+                playSvg.innerHTML = `<svg class="grid-play-btn" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
+                box.appendChild(playSvg.firstChild);
+            }
 
-			    // 🚀 FIX 2: The "Video Director" (Cycles playing videos)
-			    setInterval(() => {
-			        if (wrapper.classList.contains('hidden')) return;
+            gridContainer.appendChild(box);
+            activeSlots.push({ box: box, domElement: mediaElement, currentData: imgData, bucket: typeToPick, scale: scale, isPlayingVideo: false });
+        }
+    }
 
-			        let playingSlots = activeSlots.filter(s => s.isPlayingVideo);
-			        let pausedVideoSlots = activeSlots.filter(s => (s.currentData.isVideo === true || s.currentData.isVideo === "true") && !s.isPlayingVideo);
+    // 🚀 NEW: Start videos 1 second after load, checking for adjacency
+    setTimeout(() => {
+        let available = activeSlots.filter(s => (s.currentData.isVideo === true || s.currentData.isVideo === "true"));
+        let playing = [];
+        
+        while(playing.length < MAX_VIDEOS && available.length > 0) {
+            let validCandidates = available.filter(candidate => {
+                for (let p of playing) {
+                    if (isAdjacent(candidate.box, p.box)) return false;
+                }
+                return true;
+            });
+            
+            if(validCandidates.length === 0) break; // Grid layout forces videos too close, cap it early
+            
+            let chosen = validCandidates[Math.floor(Math.random() * validCandidates.length)];
+            
+            let newIframe = document.createElement('iframe');
+            newIframe.src = `https://www.youtube.com/embed/${chosen.currentData.mediaId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${chosen.currentData.mediaId}&playsinline=1&modestbranding=1`;
+            newIframe.className = 'home-grid-video fade-out';
+            chosen.box.appendChild(newIframe);
+            chosen.domElement.remove();
+            chosen.domElement = newIframe;
+            chosen.isPlayingVideo = true;
+            activeVideoCount++;
+            
+            void newIframe.offsetWidth;
+            newIframe.classList.remove('fade-out');
+            
+            playing.push(chosen);
+            available = available.filter(s => s !== chosen);
+        }
+    }, 1000);
 
-			        if (playingSlots.length > 0 && pausedVideoSlots.length > 0) {
-			            // Pick one playing video to pause
-			            let slotToPause = playingSlots[Math.floor(Math.random() * playingSlots.length)];
-			            // Pick one paused video to play
-			            let slotToPlay = pausedVideoSlots[Math.floor(Math.random() * pausedVideoSlots.length)];
+    // 🚀 NEW: The 10 Minute Cooldown Queue
+    const cooldownQueue = [];
+    const COOLDOWN_MINUTES = 10;
 
-			            // Fade them out
-			            slotToPause.domElement.classList.add('fade-out');
-			            slotToPlay.domElement.classList.add('fade-out');
+    setInterval(() => {
+        const now = Date.now();
+        for (let i = cooldownQueue.length - 1; i >= 0; i--) {
+            if (now - cooldownQueue[i].time >= COOLDOWN_MINUTES * 60 * 1000) {
+                let released = cooldownQueue.splice(i, 1)[0].item;
+                if(buckets[released.orientation]) buckets[released.orientation].push(released);
+            }
+        }
+    }, 10000);
 
-			            setTimeout(() => {
-			                // Downgrade playing iframe to static image
-			                let newImg = document.createElement('img');
-			                newImg.src = `images/${slotToPause.currentData.folder}/fulls/${slotToPause.currentData.file}`;
-			                newImg.className = 'home-grid-item fade-out';
-			                slotToPause.box.appendChild(newImg);
-			                slotToPause.domElement.remove();
-			                slotToPause.domElement = newImg;
-			                slotToPause.isPlayingVideo = false;
-			                
-			                // Upgrade static image to playing iframe
-			                let newIframe = document.createElement('iframe');
-			                newIframe.src = `https://www.youtube.com/embed/${slotToPlay.currentData.mediaId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${slotToPlay.currentData.mediaId}&playsinline=1&modestbranding=1`;
-			                newIframe.className = 'home-grid-video fade-out';
-			                slotToPlay.box.appendChild(newIframe);
-			                slotToPlay.domElement.remove();
-			                slotToPlay.domElement = newIframe;
-			                slotToPlay.isPlayingVideo = true;
-			                
-			                // Trigger smooth fade-in
-			                void newImg.offsetWidth;
-			                void newIframe.offsetWidth;
-			                newImg.classList.remove('fade-out');
-			                newIframe.classList.remove('fade-out');
-			            }, 800); // Waits for the fade to complete before swapping code
-			        }
-			    }, 10000); // Cycles a video every 10 seconds
+    // 🚀 The "Video Director" (Cycles playing videos & obeys adjacency)
+    setInterval(() => {
+        if (wrapper.classList.contains('hidden')) return;
 
-			    // 🚀 THE TWINKLE EFFECT (Random Image Swaps)
-			    setInterval(() => {
-			        if (wrapper.classList.contains('hidden')) return;
+        let playingSlots = activeSlots.filter(s => s.isPlayingVideo);
+        let pausedVideoSlots = activeSlots.filter(s => (s.currentData.isVideo === true || s.currentData.isVideo === "true") && !s.isPlayingVideo);
 
-			        let slotIndex = Math.floor(Math.random() * activeSlots.length);
-			        let slot = activeSlots[slotIndex];
-			        
-			        if (buckets[slot.bucket].length > 0) {
-			            slot.domElement.classList.add('fade-out');
-			            
-			            setTimeout(() => {
-			                let oldData = slot.currentData;
-			                let newData = buckets[slot.bucket].shift(); 
-			                buckets[slot.bucket].push(oldData); 
-			                slot.currentData = newData; 
-			                
-			                if (slot.isPlayingVideo) {
-			                    activeVideoCount--;
-			                    slot.isPlayingVideo = false;
-			                }
-			                
-			                slot.domElement.remove(); 
-			                
-			                let newElement;
-			                let isNewVideoData = (newData.isVideo === true || newData.isVideo === "true");
+        if (playingSlots.length > 0 && pausedVideoSlots.length > 0) {
+            let slotToPause = playingSlots[Math.floor(Math.random() * playingSlots.length)];
+            
+            let validCandidates = pausedVideoSlots.filter(candidate => {
+                for (let pSlot of playingSlots) {
+                    if (pSlot === slotToPause) continue; 
+                    if (isAdjacent(candidate.box, pSlot.box)) return false;
+                }
+                return true;
+            });
+            
+            if (validCandidates.length > 0) {
+                let slotToPlay = validCandidates[Math.floor(Math.random() * validCandidates.length)];
 
-			                if (isNewVideoData && newData.mediaId && activeVideoCount < MAX_VIDEOS) {
-			                    newElement = document.createElement('iframe');
-			                    newElement.src = `https://www.youtube.com/embed/${newData.mediaId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${newData.mediaId}&playsinline=1&modestbranding=1`;
-			                    newElement.className = 'home-grid-video fade-out';
-			                    activeVideoCount++;
-			                    slot.isPlayingVideo = true;
-			                } else {
-			                    newElement = document.createElement('img');
-			                    newElement.src = `images/${newData.folder}/fulls/${newData.file}`;
-			                    newElement.className = 'home-grid-item fade-out';
-			                }
-			                
-			                let existingPlayBtn = slot.box.querySelector('.grid-play-btn');
-			                if (isNewVideoData && !existingPlayBtn) {
-			                    let playSvg = document.createElement('div');
-			                    playSvg.innerHTML = `<svg class="grid-play-btn" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
-			                    slot.box.appendChild(playSvg.firstChild);
-			                } else if (!isNewVideoData && existingPlayBtn) {
-			                    existingPlayBtn.remove();
-			                }
+                slotToPause.domElement.classList.add('fade-out');
+                slotToPlay.domElement.classList.add('fade-out');
 
-			                slot.box.appendChild(newElement);
-			                slot.domElement = newElement;
-			                slot.box.onclick = () => routeToMedia(newData);
-			                
-			                void newElement.offsetWidth;
-			                newElement.classList.remove('fade-out');
-			                
-			            }, 1500); 
-			        }
-			    }, 2500); 
+                setTimeout(() => {
+                    let newImg = document.createElement('img');
+                    newImg.src = `images/${slotToPause.currentData.folder}/fulls/${slotToPause.currentData.file}`;
+                    newImg.className = 'home-grid-item fade-out';
+                    slotToPause.box.appendChild(newImg);
+                    slotToPause.domElement.remove();
+                    slotToPause.domElement = newImg;
+                    slotToPause.isPlayingVideo = false;
+                    
+                    let newIframe = document.createElement('iframe');
+                    newIframe.src = `https://www.youtube.com/embed/${slotToPlay.currentData.mediaId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${slotToPlay.currentData.mediaId}&playsinline=1&modestbranding=1`;
+                    newIframe.className = 'home-grid-video fade-out';
+                    slotToPlay.box.appendChild(newIframe);
+                    slotToPlay.domElement.remove();
+                    slotToPlay.domElement = newIframe;
+                    slotToPlay.isPlayingVideo = true;
+                    
+                    void newImg.offsetWidth;
+                    void newIframe.offsetWidth;
+                    newImg.classList.remove('fade-out');
+                    newIframe.classList.remove('fade-out');
+                }, 800); 
+            }
+        }
+    }, 10000); 
 
-			    // 🚀 ROUTING & NAVIGATION
-			    function routeToMedia(imgData) {
-			        wrapper.classList.add('hidden'); 
-			        document.body.classList.remove('is-home-mode'); 
-			        
-			        const tabLink = document.querySelector(`a[onclick*="${imgData.originTab}"]`);
-			        if (tabLink) {
-			            const parentNav = tabLink.closest('nav');
-			            if (parentNav) {
-			                const mainLink = document.getElementById('link-' + parentNav.id);
-			                if (mainLink) mainLink.click();
-			            }
-			            tabLink.click();
-			        }
-			        setTimeout(() => {
-			            const thumbnails = document.querySelectorAll(`.${imgData.originTab} .thumbnail img`);
-			            for (let thumb of thumbnails) {
-			                if (thumb.src.includes(imgData.file)) {
-			                    thumb.parentElement.click(); break;
-			                }
-			            }
-			        }, 350); 
-			    }
+    // 🚀 THE TWINKLE EFFECT (With Cooldown & Adjacency logic)
+    setInterval(() => {
+        if (wrapper.classList.contains('hidden')) return;
 
-			    document.querySelectorAll('#header a[onclick*="switchMain"], #header a[onclick*="switchTab"]').forEach(link => {
-			        link.addEventListener('click', () => { 
-			            wrapper.classList.add('hidden'); 
-			            document.body.classList.remove('is-home-mode'); 
-			        });
-			    });
+        let slotIndex = Math.floor(Math.random() * activeSlots.length);
+        let slot = activeSlots[slotIndex];
+        
+        if (buckets[slot.bucket].length > 0) {
+            slot.domElement.classList.add('fade-out');
+            
+            setTimeout(() => {
+                let oldData = slot.currentData;
+                let newData = buckets[slot.bucket].shift(); 
+                
+                // Push old data to the waiting room instead of active buckets
+                cooldownQueue.push({ item: oldData, time: Date.now() }); 
+                slot.currentData = newData; 
+                
+                if (slot.isPlayingVideo) {
+                    activeVideoCount--;
+                    slot.isPlayingVideo = false;
+                }
+                
+                slot.domElement.remove(); 
+                
+                let newElement;
+                let isNewVideoData = (newData.isVideo === true || newData.isVideo === "true");
+                let canPlayVideo = false;
 
-			    function resetToHome() {
-			        wrapper.classList.remove('hidden');
-			        document.body.classList.add('is-home-mode'); 
-			        
-			        closeMedia();
-			        const viewerClose = document.querySelector('#viewer .close');
-			        if (viewerClose) viewerClose.click();
+                // Ensure a twinkled-in video doesn't violate the adjacency rule
+                if (isNewVideoData && newData.mediaId && activeVideoCount < MAX_VIDEOS) {
+                    let playing = activeSlots.filter(s => s.isPlayingVideo);
+                    let hasAdjacent = playing.some(p => isAdjacent(slot.box, p.box));
+                    if (!hasAdjacent) canPlayVideo = true;
+                }
 
-			        document.querySelectorAll('.main-categories a, .sub-categories a').forEach(a => {
-			            a.style.fontWeight = 'normal'; a.style.textDecoration = 'none'; a.style.color = '#a0a0a1'; 
-			        });
-			        
-			        document.querySelectorAll('.sub-nav').forEach(nav => nav.style.display = 'none');
-			        const descBox = document.getElementById('category-desc');
-			        if (descBox) descBox.style.display = 'none';
+                if (canPlayVideo) {
+                    newElement = document.createElement('iframe');
+                    newElement.src = `https://www.youtube.com/embed/${newData.mediaId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${newData.mediaId}&playsinline=1&modestbranding=1`;
+                    newElement.className = 'home-grid-video fade-out';
+                    activeVideoCount++;
+                    slot.isPlayingVideo = true;
+                } else {
+                    newElement = document.createElement('img');
+                    newElement.src = `images/${newData.folder}/fulls/${newData.file}`;
+                    newElement.className = 'home-grid-item fade-out';
+                }
+                
+                let existingPlayBtn = slot.box.querySelector('.grid-play-btn');
+                if (isNewVideoData && !existingPlayBtn) {
+                    let playSvg = document.createElement('div');
+                    playSvg.innerHTML = `<svg class="grid-play-btn" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
+                    slot.box.appendChild(playSvg.firstChild);
+                } else if (!isNewVideoData && existingPlayBtn) {
+                    existingPlayBtn.remove();
+                }
 
-			        const gallery = document.getElementById("thumbnails");
-			        if (gallery) {
-			            gallery.style.opacity = 0;
-			            setTimeout(() => {
-			                document.querySelectorAll('.portfolio-item').forEach(item => item.style.display = 'none');
-			            }, 300);
-			        }
-			    }
+                slot.box.appendChild(newElement);
+                slot.domElement = newElement;
+                slot.box.onclick = () => routeToMedia(newData);
+                
+                void newElement.offsetWidth;
+                newElement.classList.remove('fade-out');
+                
+            }, 1500); 
+        }
+    }, 2500); 
 
-			    const h1 = document.querySelector('#header h1');
-			    if (h1) {
-			        h1.style.cursor = 'pointer'; h1.title = "Return to Home Grid";
-			        h1.addEventListener('click', (e) => { e.preventDefault(); resetToHome(); });
-			    }
+    // 🚀 ROUTING & NAVIGATION
+    function routeToMedia(imgData) {
+        wrapper.classList.add('hidden'); 
+        document.body.classList.remove('is-home-mode'); 
+        
+        const tabLink = document.querySelector(`a[onclick*="${imgData.originTab}"]`);
+        if (tabLink) {
+            const parentNav = tabLink.closest('nav');
+            if (parentNav) {
+                const mainLink = document.getElementById('link-' + parentNav.id);
+                if (mainLink) mainLink.click();
+            }
+            tabLink.click();
+        }
+        setTimeout(() => {
+            const thumbnails = document.querySelectorAll(`.${imgData.originTab} .thumbnail img`);
+            for (let thumb of thumbnails) {
+                if (thumb.src.includes(imgData.file)) {
+                    thumb.parentElement.click(); break;
+                }
+            }
+        }, 350); 
+    }
 
-			    setTimeout(() => { resetToHome(); }, 100);
-			});</script>
+    document.querySelectorAll('#header a[onclick*="switchMain"], #header a[onclick*="switchTab"]').forEach(link => {
+        link.addEventListener('click', () => { 
+            wrapper.classList.add('hidden'); 
+            document.body.classList.remove('is-home-mode'); 
+        });
+    });
+
+    function resetToHome() {
+        wrapper.classList.remove('hidden');
+        document.body.classList.add('is-home-mode'); 
+        
+        closeMedia();
+        const viewerClose = document.querySelector('#viewer .close');
+        if (viewerClose) viewerClose.click();
+
+        document.querySelectorAll('.main-categories a, .sub-categories a').forEach(a => {
+            a.style.fontWeight = 'normal'; a.style.textDecoration = 'none'; a.style.color = '#a0a0a1'; 
+        });
+        
+        document.querySelectorAll('.sub-nav').forEach(nav => nav.style.display = 'none');
+        const descBox = document.getElementById('category-desc');
+        if (descBox) descBox.style.display = 'none';
+
+        const gallery = document.getElementById("thumbnails");
+        if (gallery) {
+            gallery.style.opacity = 0;
+            setTimeout(() => {
+                document.querySelectorAll('.portfolio-item').forEach(item => item.style.display = 'none');
+            }, 300);
+        }
+    }
+
+    const h1 = document.querySelector('#header h1');
+    if (h1) {
+        h1.style.cursor = 'pointer'; h1.title = "Return to Home Grid";
+        h1.addEventListener('click', (e) => { e.preventDefault(); resetToHome(); });
+    }
+
+    setTimeout(() => { resetToHome(); }, 100);
+});			</script>
 
 		<script src="assets/js/jquery.min.js"></script>
 		<script src="assets/js/browser.min.js"></script>
