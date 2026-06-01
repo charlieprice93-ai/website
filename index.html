@@ -230,7 +230,7 @@
 			.slot-square-sm { grid-column: span 2; grid-row: span 2; }
 
 			.home-grid-slot { position: relative; overflow: hidden; border-radius: 4px; cursor: pointer; background: #000; }
-
+            .invisible-spacer { background: transparent !important; box-shadow: none !important; pointer-events: none; }
 			.home-grid-item, .home-grid-video {
 			    width: 100%; height: 100%; position: absolute; top: 0; left: 0;
 			    transition: opacity 1.5s ease-in-out, transform 0.3s ease;
@@ -692,44 +692,63 @@ document.addEventListener("DOMContentLoaded", function() {
     let activeVideoCount = 0;
     const MAX_VIDEOS = 3; 
     
-const loadCount = window.innerWidth <= 736 ? 12 : 32;let allAvailable = shuffleArray([...buckets.landscape, ...buckets.portrait, ...buckets.square]);
-    
-    for (let i = 0; i < Math.min(loadCount, allAvailable.length); i++) {
-        let typeToPick = allAvailable[i].orientation || 'landscape';
-        
-        if (buckets[typeToPick].length > 0) {
-            let imgData = buckets[typeToPick].shift();
-            
-            let scale = 'sm'; 
-            let roll = Math.random();
-            if (roll > 0.90) scale = 'lg';      
-            else if (roll > 0.50) scale = 'md'; 
-            
-            let cssType = `${typeToPick}-${scale}`;
-            
-            let box = document.createElement('div');
-            box.className = `home-grid-slot slot-${cssType}`;
-            box.onclick = () => routeToMedia(imgData);
-            
-            let isVideoData = (imgData.isVideo === true || imgData.isVideo === "true");
+// 🚀 NEW: The Invisible Spacer Trick
+			    const loadCount = window.innerWidth <= 736 ? 12 : 32; 
+			    const spacerCount = window.innerWidth <= 736 ? 6 : 14; // Number of invisible voids
+			    
+			    let allAvailable = shuffleArray([...buckets.landscape, ...buckets.portrait, ...buckets.square]);
+			    
+			    // 🚀 We shuffle the spacers and real images together into a sequence
+			    let loadSequence = Array(loadCount).fill('real').concat(Array(spacerCount).fill('spacer'));
+			    loadSequence = shuffleArray(loadSequence);
+			    
+			    for (let i = 0; i < loadSequence.length; i++) {
+			        if (loadSequence[i] === 'spacer') {
+			            // Drop an invisible block into the grid
+			            let sType = ['landscape', 'portrait', 'square'][Math.floor(Math.random() * 3)];
+			            let sScale = Math.random() > 0.8 ? 'lg' : (Math.random() > 0.4 ? 'md' : 'sm');
+			            let spacer = document.createElement('div');
+			            spacer.className = `home-grid-slot invisible-spacer slot-${sType}-${sScale}`;
+			            gridContainer.appendChild(spacer);
+			        } else {
+			            // Drop a real image into the grid
+			            if (allAvailable.length === 0) continue; 
+			            
+			            let nextReal = allAvailable.shift(); 
+			            let typeToPick = nextReal.orientation || 'landscape';
+			            
+			            if (buckets[typeToPick].length > 0) {
+			                let imgData = buckets[typeToPick].shift();
+			                
+			                let scale = 'sm'; 
+			                let roll = Math.random();
+			                if (roll > 0.90) scale = 'lg';      
+			                else if (roll > 0.50) scale = 'md'; 
+			                
+			                let cssType = `${typeToPick}-${scale}`;
+			                
+			                let box = document.createElement('div');
+			                box.className = `home-grid-slot slot-${cssType}`;
+			                box.onclick = () => routeToMedia(imgData);
+			                
+			                let isVideoData = (imgData.isVideo === true || imgData.isVideo === "true");
 
-            // 🚀 We load everything as an image initially to allow the browser to position the grid
-            let mediaElement = document.createElement('img');
-            mediaElement.src = `images/${imgData.folder}/fulls/${imgData.file}`;
-            mediaElement.className = 'home-grid-item';
-            box.appendChild(mediaElement);
-            
-            if (isVideoData) {
-                let playSvg = document.createElement('div');
-                playSvg.innerHTML = `<svg class="grid-play-btn" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
-                box.appendChild(playSvg.firstChild);
-            }
+			                let mediaElement = document.createElement('img');
+			                mediaElement.src = `images/${imgData.folder}/fulls/${imgData.file}`;
+			                mediaElement.className = 'home-grid-item';
+			                box.appendChild(mediaElement);
+			                
+			                if (isVideoData) {
+			                    let playSvg = document.createElement('div');
+			                    playSvg.innerHTML = `<svg class="grid-play-btn" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
+			                    box.appendChild(playSvg.firstChild);
+			                }
 
-            gridContainer.appendChild(box);
-            activeSlots.push({ box: box, domElement: mediaElement, currentData: imgData, bucket: typeToPick, scale: scale, isPlayingVideo: false });
-        }
-    }
-
+			                gridContainer.appendChild(box);
+			                activeSlots.push({ box: box, domElement: mediaElement, currentData: imgData, bucket: typeToPick, scale: scale, isPlayingVideo: false });
+			            }
+			        }
+			    }
     // 🚀 NEW: Start videos 1 second after load, checking for adjacency
     setTimeout(() => {
         let available = activeSlots.filter(s => (s.currentData.isVideo === true || s.currentData.isVideo === "true"));
