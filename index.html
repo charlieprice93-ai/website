@@ -198,37 +198,35 @@
 				transform: scale(1.15); 
 			}
 
-/* 🚀 HOME PAGE EXTREME SCALE TETRIS (V13) */
-#home-mosaic-wrapper {
-    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    width: 85vw; z-index: 45;
-    /* Removed background, height, and overflow to create organic jagged edges */
-    transition: opacity 0.8s ease, visibility 0.8s ease;
-}
-#home-mosaic-wrapper.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+/* 🚀 HOME PAGE EXTREME SCALE TETRIS (V14 - Curated Cluster) */
+			#home-mosaic-wrapper {
+			    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+			    width: 60vw; z-index: 45; /* 🚀 Drastically shrunk to create massive white margins */
+			    transition: opacity 0.8s ease, visibility 0.8s ease;
+			}
+			#home-mosaic-wrapper.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+
 			#home-tetris-board {
 			    display: grid;
-			    grid-template-columns: repeat(24, 1fr);
-			    grid-auto-rows: calc((85vw - (23 * 8px)) / 24); 
-			    gap: 8px; padding: 10px; width: 100%;
+			    /* 🚀 16 columns instead of 24 to keep the smaller cluster tight */
+			    grid-template-columns: repeat(16, 1fr);
+			    grid-auto-rows: calc((60vw - (15 * 8px)) / 16); 
+			    gap: 8px; width: 100%;
 			    grid-auto-flow: dense; 
 			}
 
-			/* 🚀 REFINED EXTREME SCALE SPANS (Toned-down Heroes) */
-			/* Landscapes (3:2) */
-			.slot-landscape-lg { grid-column: span 9; grid-row: span 6; } 
+			/* 🚀 REFINED EXTREME SCALE SPANS (Adjusted for 16 columns) */
+			.slot-landscape-lg { grid-column: span 8; grid-row: span 5; } 
 			.slot-landscape-md { grid-column: span 6; grid-row: span 4; }
-			.slot-landscape-sm { grid-column: span 3; grid-row: span 2; }
+			.slot-landscape-sm { grid-column: span 4; grid-row: span 3; }
 
-			/* Portraits (2:3) */
-			.slot-portrait-lg { grid-column: span 6; grid-row: span 9; } 
+			.slot-portrait-lg { grid-column: span 5; grid-row: span 8; } 
 			.slot-portrait-md { grid-column: span 4; grid-row: span 6; }
-			.slot-portrait-sm { grid-column: span 2; grid-row: span 3; }
+			.slot-portrait-sm { grid-column: span 3; grid-row: span 4; }
 
-			/* Squares (1:1) */
 			.slot-square-lg { grid-column: span 6; grid-row: span 6; } 
 			.slot-square-md { grid-column: span 4; grid-row: span 4; }
-			.slot-square-sm { grid-column: span 2; grid-row: span 2; }
+			.slot-square-sm { grid-column: span 3; grid-row: span 3; }
 
 			.home-grid-slot { position: relative; overflow: hidden; border-radius: 4px; cursor: pointer; background: #000; }
 
@@ -246,28 +244,28 @@
 			.home-grid-slot:hover .home-grid-item, .home-grid-slot:hover .home-grid-video { opacity: 0.85; }
 			.home-grid-slot:hover .home-grid-item { transform: scale(1.05); }
 
+			/* 🚀 REFINED PLAY BUTTON: Tiny, subtle, bottom-left corner */
 			.grid-play-btn {
-			    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-			    width: 45px; height: 45px; fill: white; filter: drop-shadow(0px 4px 15px rgba(0,0,0,0.7));
-			    opacity: 0.8; pointer-events: none; transition: 0.3s ease; z-index: 10;
+			    position: absolute; bottom: 12px; left: 12px; top: auto; transform: none;
+			    width: 22px; height: 22px; fill: rgba(255,255,255,0.9); 
+			    filter: drop-shadow(0px 2px 6px rgba(0,0,0,0.8));
+			    opacity: 0.35; pointer-events: none; transition: all 0.3s ease; z-index: 10;
 			}
-			.home-grid-slot:hover .grid-play-btn { opacity: 1; transform: translate(-50%, -50%) scale(1.15); }
+			.home-grid-slot:hover .grid-play-btn { opacity: 1; transform: scale(1.15) translate(2px, -2px); }
 			.fade-out { opacity: 0 !important; }
 
 			/* Responsive adjustments */
 			@media screen and (max-width: 980px) { 
-			    #home-mosaic-wrapper { width: 95vw; }
-			    #home-tetris-board { grid-auto-rows: calc((95vw - (23 * 8px)) / 24); }
+			    #home-mosaic-wrapper { width: 85vw; }
+			    #home-tetris-board { grid-auto-rows: calc((85vw - (15 * 8px)) / 16); }
 			}
 			@media screen and (max-width: 736px) { 
-			    #home-mosaic-wrapper { height: 90vh; }
-			    #home-tetris-board { grid-template-columns: repeat(12, 1fr); grid-auto-rows: calc((95vw - (11 * 8px)) / 12); } 
+			    #home-tetris-board { grid-template-columns: repeat(12, 1fr); grid-auto-rows: calc((85vw - (11 * 8px)) / 12); } 
 			    /* Force mobile sizes to prevent screen overflow */
 			    .slot-landscape-lg, .slot-landscape-md { grid-column: span 6; grid-row: span 4; }
 			    .slot-portrait-lg, .slot-portrait-md { grid-column: span 4; grid-row: span 6; }
 			    .slot-square-lg, .slot-square-md { grid-column: span 4; grid-row: span 4; }
 			}
-
 /* BACKGROUND BLEED FIX */
 body.is-home-mode #viewer .slide { opacity: 0 !important; }
 body.is-home-mode #viewer { background-color: #f0f0f0; transition: background-color 0.8s ease; }
@@ -695,8 +693,7 @@ document.addEventListener("DOMContentLoaded", function() {
     let activeVideoCount = 0;
     const MAX_VIDEOS = 3; 
     
-    const loadCount = window.innerWidth <= 736 ? 20 : 60; 
-    let allAvailable = shuffleArray([...buckets.landscape, ...buckets.portrait, ...buckets.square]);
+const loadCount = window.innerWidth <= 736 ? 8 : 14;    let allAvailable = shuffleArray([...buckets.landscape, ...buckets.portrait, ...buckets.square]);
     
     for (let i = 0; i < Math.min(loadCount, allAvailable.length); i++) {
         let typeToPick = allAvailable[i].orientation || 'landscape';
